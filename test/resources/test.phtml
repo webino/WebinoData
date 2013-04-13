@@ -1,0 +1,72 @@
+<h2>Simple list</h2>
+
+<table>
+    <tr>
+
+        <?php foreach ($this->head as $label) : ?>
+
+            <td>
+
+                <?php echo $label; ?>
+
+            </td>
+
+        <?php endforeach; ?>
+
+    </tr>
+
+    <?php foreach ($this->list as $item) : ?>
+
+        <tr>
+            <td>
+
+                <?php echo $item['id']; ?>
+
+            </td>
+            <td>
+
+                <?php echo $item['text']; ?>
+
+            </td>
+            <td>
+
+                <?php echo $item['toggle']; ?>
+
+            </td>
+            <td>
+
+                <?php echo $item['counter']; ?>
+
+            </td>
+        </tr>
+
+    <?php endforeach; ?>
+
+</table>
+
+
+<h2>Data structure</h2>
+
+<ul>
+
+    <?php foreach ($this->data as $item) : ?>
+
+        <li>
+
+            <?php echo $item['name']; ?>
+
+            <ul>
+
+                <li>
+
+                    <?php echo $item['sub']['value']; ?>
+
+                </li>
+
+            </ul>
+
+        </li>
+
+    <?php endforeach; ?>
+
+</ul>

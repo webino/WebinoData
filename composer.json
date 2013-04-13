@@ -1,0 +1,31 @@
+{
+    "name": "webino/webino-data",
+    "description": "Webino lightweight Data service",
+    "type": "library",
+    "keywords": [
+        "webino", "data", "zf2"
+    ],
+    "homepage": "http://bitbucket.org/webino/WebinoData",
+    "authors": [
+        {
+            "name": "Peter Bačinský",
+            "email": "peter@bacinsky.sk",
+            "homepage": "http://www.bacinsky.sk/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zendframework": "2.*"
+    },
+    "suggest": {
+        "webino/zf2nette-debug": "User friendly Exception and Error handler ported from Nette Framework",
+        "webino/webino-draw": "XHTML Layout Renderer for Zend Framework",
+        "webino/webino-image-thumb": "Image Thumbnailer for Zend Framework"
+    },
+    "autoload": {
+        "psr-0": {
+            "WebinoData": "src/"
+        }
+    }
+}
