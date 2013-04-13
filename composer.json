@@ -1,11 +1,11 @@
 {
     "name": "webino/webino-data",
-    "description": "Webino lightweight Data service",
+    "description": "Modular Data service over Zend Db",
     "type": "library",
     "keywords": [
         "webino", "data", "zf2"
     ],
-    "homepage": "http://bitbucket.org/webino/WebinoData",
+    "homepage": "https://github.com/webino/WebinoData",
     "authors": [
         {
             "name": "Peter Bačinský",
