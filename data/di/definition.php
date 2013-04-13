@@ -243,7 +243,7 @@ return array (
       ),
     ),
   ),
-  'WebinoData\\Mvc\\Service\\DataService' => 
+  'WebinoData\\DataService' => 
   array (
     'supertypes' => 
     array (
@@ -270,14 +270,14 @@ return array (
     array (
       '__construct' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::__construct:0' => 
+        'WebinoData\\DataService::__construct:0' => 
         array (
           0 => 'tableGateway',
           1 => 'Zend\\Db\\TableGateway\\TableGateway',
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Mvc\\Service\\DataService::__construct:1' => 
+        'WebinoData\\DataService::__construct:1' => 
         array (
           0 => 'config',
           1 => NULL,
@@ -287,7 +287,7 @@ return array (
       ),
       'setEvent' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setEvent:0' => 
+        'WebinoData\\DataService::setEvent:0' => 
         array (
           0 => 'event',
           1 => 'WebinoData\\DataEvent',
@@ -297,7 +297,7 @@ return array (
       ),
       'setEventManager' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setEventManager:0' => 
+        'WebinoData\\DataService::setEventManager:0' => 
         array (
           0 => 'eventManager',
           1 => 'Zend\\EventManager\\EventManagerInterface',
@@ -307,7 +307,7 @@ return array (
       ),
       'setServiceManager' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setServiceManager:0' => 
+        'WebinoData\\DataService::setServiceManager:0' => 
         array (
           0 => 'serviceManager',
           1 => 'Zend\\ServiceManager\\ServiceManager',
@@ -317,7 +317,7 @@ return array (
       ),
       'setPlatform' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setPlatform:0' => 
+        'WebinoData\\DataService::setPlatform:0' => 
         array (
           0 => 'platform',
           1 => 'Zend\\Db\\Adapter\\Platform\\PlatformInterface',
@@ -327,7 +327,7 @@ return array (
       ),
       'setInputFilterFactory' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setInputFilterFactory:0' => 
+        'WebinoData\\DataService::setInputFilterFactory:0' => 
         array (
           0 => 'factory',
           1 => 'Zend\\InputFilter\\Factory',
@@ -337,7 +337,7 @@ return array (
       ),
       'setInputFilter' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setInputFilter:0' => 
+        'WebinoData\\DataService::setInputFilter:0' => 
         array (
           0 => 'inputFilter',
           1 => 'Zend\\InputFilter\\InputFilterInterface',
@@ -347,41 +347,41 @@ return array (
       ),
       'setHasOne' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setHasOne:0' => 
+        'WebinoData\\DataService::setHasOne:0' => 
         array (
           0 => 'name',
           1 => NULL,
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Mvc\\Service\\DataService::setHasOne:1' => 
+        'WebinoData\\DataService::setHasOne:1' => 
         array (
           0 => 'service',
-          1 => 'WebinoData\\Mvc\\Service\\DataService',
+          1 => 'WebinoData\\DataService',
           2 => true,
           3 => NULL,
         ),
       ),
       'setHasMany' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setHasMany:0' => 
+        'WebinoData\\DataService::setHasMany:0' => 
         array (
           0 => 'name',
           1 => NULL,
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Mvc\\Service\\DataService::setHasMany:1' => 
+        'WebinoData\\DataService::setHasMany:1' => 
         array (
           0 => 'service',
-          1 => 'WebinoData\\Mvc\\Service\\DataService',
+          1 => 'WebinoData\\DataService',
           2 => true,
           3 => NULL,
         ),
       ),
       'setQuery' => 
       array (
-        'WebinoData\\Mvc\\Service\\DataService::setQuery:0' => 
+        'WebinoData\\DataService::setQuery:0' => 
         array (
           0 => 'query',
           1 => 'WebinoData\\DataQuery',
@@ -567,7 +567,7 @@ return array (
         'WebinoData\\DataQuery\\AbstractDataQuery::__construct:0' => 
         array (
           0 => 'sql',
-          1 => 'Zend\\Db\\Sql\\Update',
+          1 => 'Zend\\Db\\Sql\\SqlInterface',
           2 => true,
           3 => NULL,
         ),

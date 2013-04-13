@@ -164,7 +164,7 @@ Following steps are necessary to get this module working, considering a zf2-skel
 
   2. Clone this repository
 
-  3. Configure the db in the `config.local.php.dist` and delete the `.dist` extension.
+  3. Configure the db in the `test/resources/config.local.php.dist` and delete the `.dist` extension.
 
   4. Run `phing update`
 
