@@ -3,6 +3,7 @@
 return array(
     'WebinoData\Module'                             => __DIR__ . '/src/WebinoData/Module.php',
     'WebinoData\DataEvent'                          => __DIR__ . '/src/WebinoData/DataEvent.php',
+    'WebinoData\Paginator\Adapter\WebinoDataSelect' => __DIR__ . '/src/WebinoData/Paginator/Adapter/WebinoDataSelect.php',
     'WebinoData\Exception\ExceptionInterface'       => __DIR__ . '/src/WebinoData/Exception/ExceptionInterface.php',
     'WebinoData\Exception\InvalidArgumentException' => __DIR__ . '/src/WebinoData/Exception/InvalidArgumentException.php',
     'WebinoData\Exception\MissingPropertyException' => __DIR__ . '/src/WebinoData/Exception/MissingPropertyException.php',

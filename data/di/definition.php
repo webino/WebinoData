@@ -105,6 +105,53 @@ return array (
       ),
     ),
   ),
+  'WebinoData\\Paginator\\Adapter\\WebinoDataSelect' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'Countable',
+      1 => 'Zend\\Paginator\\Adapter\\AdapterInterface',
+      2 => 'Zend\\Paginator\\Adapter\\DbSelect',
+      3 => 'Zend\\Paginator\\Adapter\\AdapterInterface',
+      4 => 'Countable',
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      '__construct' => true,
+      'setOverflow' => false,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
+        'WebinoData\\Paginator\\Adapter\\WebinoDataSelect::__construct:0' => 
+        array (
+          0 => 'select',
+          1 => 'WebinoData\\DataSelect',
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\Paginator\\Adapter\\WebinoDataSelect::__construct:1' => 
+        array (
+          0 => 'service',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setOverflow' => 
+      array (
+        'WebinoData\\Paginator\\Adapter\\WebinoDataSelect::setOverflow:0' => 
+        array (
+          0 => 'overflow',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\Exception\\ExceptionInterface' => 
   array (
     'supertypes' => 
