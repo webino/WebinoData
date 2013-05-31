@@ -7,11 +7,13 @@ use Zend\Db\Sql\Select;
 
 class DataSelect
 {
+    protected $service;
     protected $sqlSelect;
     protected $subselects = array();
 
-    public function __construct(Select $sqlSelect)
+    public function __construct(DataService $service, Select $sqlSelect)
     {
+        $this->service   = $service;
         $this->sqlSelect = $sqlSelect;
     }
 
@@ -75,6 +77,43 @@ class DataSelect
         }
 
         $this->subselects[$name] = $select;
+        return $this;
+    }
+
+    public function search($term, array $columns = array(), $combination = PredicateSet::OP_AND)
+    {
+        if (empty($term)) {
+            return $this;
+        }
+
+        if (is_array($term)) {
+            foreach ($term as $subKey => $subTerm) {
+
+                empty($subKey) || empty($subTerm) or
+                    $this->search($subTerm, array($subKey));
+            }
+            return $this;
+        }
+
+        $term     = preg_replace('~[^a-zA-Z0-9]+~', ' ', $term);
+        $platform = $this->service->getPlatform();
+        $where    = array();
+
+        foreach (explode(' ', $term) as $word) {
+
+            if (empty($word)) {
+                continue;
+            }
+
+            foreach ($columns as $col) {
+
+                $word    = preg_replace('~[^a-zA-Z0-9]+~', '%', $word);
+                $where[] = $platform->quoteIdentifier($col) . ' LIKE '
+                         . $platform->quoteValue('%' . $word . '%');
+            }
+        }
+
+        $this->sqlSelect->where('(' . join(' AND ', $where) . ')', $combination);
         return $this;
     }
 }

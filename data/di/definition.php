@@ -485,6 +485,13 @@ return array (
       array (
         'WebinoData\\DataSelect::__construct:0' => 
         array (
+          0 => 'service',
+          1 => 'WebinoData\\DataService',
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\DataSelect::__construct:1' => 
+        array (
           0 => 'sqlSelect',
           1 => 'Zend\\Db\\Sql\\Select',
           2 => true,

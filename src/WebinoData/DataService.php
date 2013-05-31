@@ -420,7 +420,10 @@ class DataService implements
 
     public function select()
     {
-        return new \WebinoData\DataSelect($this->tableGateway->getSql()->select());
+        return new \WebinoData\DataSelect(
+            $this,
+            $this->tableGateway->getSql()->select()
+        );
     }
 
     public function configSelect()
@@ -502,6 +505,15 @@ class DataService implements
         return $rows->getArrayCopy();
     }
 
+    public function fetchPairs(\WebinoData\DataSelect $select, $parameters = array())
+    {
+        $data = array();
+        foreach ($this->fetchWith($select, $parameters) as $row) {
+            $data[current($row)] = next($row);
+        }
+        return $data;
+    }
+
     /**
      * Delete
      *
@@ -513,22 +525,6 @@ class DataService implements
         // todo event
 
         return $this->tableGateway->delete($where);
-    }
-
-    public function fetchJust($selectName, $term, array $parameters = array())
-    {
-        $select = $this->configSelect($selectName);
-        $select->where($this->search($term, $this->config['searchIn'], 'AND'));
-
-        return $this->fetchWith($select, $parameters);
-    }
-
-    public function fetchLike($selectName, $term, array $parameters = array())
-    {
-        $select = $this->configSelect($selectName);
-        $select->where($this->search($term, $this->config['searchIn'], 'OR'));
-
-        return $this->fetchWith($select, $parameters);
     }
 
     public function own(&$subject, $id)
@@ -657,7 +653,7 @@ class DataService implements
         return $this->executeQuery($query->toString());
     }
 
-    protected function getAdapter()
+    public function getAdapter()
     {
         return $this->tableGateway->getAdapter();
     }
