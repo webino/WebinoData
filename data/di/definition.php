@@ -297,6 +297,7 @@ return array (
       0 => 'Zend\\EventManager\\EventManagerAwareInterface',
       1 => 'Zend\\EventManager\\EventsCapableInterface',
       2 => 'Zend\\ServiceManager\\ServiceManagerAwareInterface',
+      3 => 'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface',
     ),
     'instantiator' => '__construct',
     'methods' => 
@@ -306,12 +307,13 @@ return array (
       'setEventManager' => true,
       'setServiceManager' => true,
       'setPlatform' => false,
-      'setInputFilterFactory' => false,
+      'setInputFilterFactory' => true,
       'setInputFilter' => false,
       'setHasOne' => false,
       'setHasMany' => false,
       'setQuery' => false,
       'getEventManager' => true,
+      'getInputFilter' => true,
     ),
     'parameters' => 
     array (
@@ -376,7 +378,7 @@ return array (
       array (
         'WebinoData\\DataService::setInputFilterFactory:0' => 
         array (
-          0 => 'factory',
+          0 => 'inputFilter',
           1 => 'Zend\\InputFilter\\Factory',
           2 => true,
           3 => NULL,

@@ -18,7 +18,8 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 class DataService implements
     EventManagerAwareInterface,
-    ServiceManagerAwareInterface
+    ServiceManagerAwareInterface,
+    InputFilter\InputFilterFactoryAwareInterface
 {
     /**
      * @var TableGateway
