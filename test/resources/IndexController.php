@@ -21,6 +21,7 @@ class IndexController extends AbstractActionController
      *
      * - insert (get insert id)
      * - update
+     * - delete
      * - toggle/increment/decrement
      * - select
      * - limit/offset/order
@@ -62,7 +63,9 @@ class IndexController extends AbstractActionController
 
         $dataService->exchangeArray($row);
 
-        // 3) toggle/increment/decrement
+        // 3) TODO delete example
+
+        // 4) toggle/increment/decrement
         $where = array('id' => '1');
         $dataService->toggle('toggle', $where);
 
@@ -72,11 +75,11 @@ class IndexController extends AbstractActionController
         $where = array('id' => '1');
         $dataService->decrement('counter', $where);
 
-        // 4) select
+        // 5) select
         $params = array(':param' => 'value');
         $list   = $dataService->fetch('all', $params);
 
-        // 5) limit/offset/order
+        // 6) limit/offset/order
         $select = $dataService
                     ->configSelect('limited')
                     ->limit(10)
@@ -85,7 +88,7 @@ class IndexController extends AbstractActionController
 
         $list = $dataService->fetchWith($select);
 
-        // 6) data structure
+        // 7) data structure
         $mainDataService = $this->getServiceLocator()->get('MainDataService');
 
         $mainData = array(

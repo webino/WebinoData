@@ -500,6 +500,30 @@ return array (
       ),
     ),
   ),
+  'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface' => 
+  array (
+    'supertypes' => 
+    array (
+    ),
+    'instantiator' => NULL,
+    'methods' => 
+    array (
+      'setInputFilterFactory' => false,
+    ),
+    'parameters' => 
+    array (
+      'setInputFilterFactory' => 
+      array (
+        'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface::setInputFilterFactory:0' => 
+        array (
+          0 => 'inputFilter',
+          1 => 'Zend\\InputFilter\\Factory',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\Plugin\\Relations' => 
   array (
     'supertypes' => 
