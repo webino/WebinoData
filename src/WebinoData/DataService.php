@@ -471,7 +471,6 @@ class DataService implements
         $sqlSelect = $select->getSqlSelect();
         $sql       = $this->tableGateway->getSql();
         $statement = $sql->prepareStatementForSqlObject($sqlSelect);
-        $adapter   = $this->tableGateway->getAdapter();
 
         $sqlString = $sql->getSqlStringForSqlObject($sqlSelect, $this->getPlatform());
 
@@ -544,16 +543,9 @@ class DataService implements
 
     public function validate(array $data)
     {
-        /* @var $inputFilter \Zend\InputFilter\InputFilter */
         $inputFilter = $this->getInputFilter();
         $inputFilter->setData($data);
-
-        if (!$inputFilter->isValid()) {
-            throw new Exception\RuntimeException(
-                sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
-            );
-        }
-        return $inputFilter->getValues();
+        return $inputFilter->isValid();
     }
 
     public function getArrayCopy()
@@ -574,8 +566,13 @@ class DataService implements
 
         $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $dataEvent);
 
-//        $validData['datetime_update'] = date('Y-m-d H:i:s');
-        $validData = $this->validate($dataObject->getArrayCopy());
+        $inputFilter = $this->getInputFilter();
+        if (!$this->validate($dataObject->getArrayCopy())) {
+            throw new Exception\RuntimeException(
+                sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
+            );
+        }
+        $validData = $inputFilter->getValues();
 
         $dataExchange         = array_flip(array_keys($validData));
         $filterExchange       = array_flip(array_keys($this->config['input_filter']));
@@ -586,10 +583,10 @@ class DataService implements
             function ($key) use (&$validData, $dataExchange, $filterExchange) {
 
                 if (!isset($dataExchange[$key])) {
-                    unset($data[$key]);
+                    unset($validData[$key]);
                 }
                 if (!isset($filterExchange[$key])) {
-                    unset($data[$key]);
+                    unset($validData[$key]);
                 }
             }
         );
