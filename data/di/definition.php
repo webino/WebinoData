@@ -494,7 +494,7 @@ return array (
         ),
         'WebinoData\\DataSelect::__construct:1' => 
         array (
-          0 => 'sqlSelect',
+          0 => 'select',
           1 => 'Zend\\Db\\Sql\\Select',
           2 => true,
           3 => NULL,

@@ -20,6 +20,7 @@ class DataEvent extends Event
     /**#@+
      * Ajax events
      */
+    const EVENT_SELECT = 'data.select';
     const EVENT_EXCHANGE_PRE = 'data.exchange.pre';
     const EVENT_EXCHANGE_POST = 'data.exchange.post';
     const EVENT_FETCH_PRE = 'data.fetch.pre';

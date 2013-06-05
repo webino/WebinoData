@@ -90,6 +90,11 @@ class DataService implements
         $this->config       = $config;
     }
 
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
     /**
      * @return void
      */
@@ -419,12 +424,27 @@ class DataService implements
         return $this;
     }
 
-    public function select()
+    public function select($columns = array())
     {
-        return new \WebinoData\DataSelect(
+        $select = new \WebinoData\DataSelect(
             $this,
             $this->tableGateway->getSql()->select()
         );
+
+        empty($columns) or
+            $select->columns($columns, false);
+
+        $this->init();
+
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
+
+        $event->setParam('service', $this);
+        $event->setParam('select', $select);
+
+        $events->trigger(DataEvent::EVENT_SELECT, $event);
+
+        return $select;
     }
 
     public function configSelect()
@@ -495,7 +515,12 @@ class DataService implements
         $rows = new \ArrayObject;
 
         foreach ($result as $row) {
-            $rows[$row['id']] = $row;
+
+            if (!empty($row['id'])) {
+                $rows[$row['id']] = $row;
+            } else {
+                $rows[] = $row;
+            }
         }
 
         $dataEvent->setParam('rows', $rows);
@@ -553,26 +578,27 @@ class DataService implements
         return array();
     }
 
-    public function exchangeArray(array $data)
+    public function exchangeArray(array $array)
     {
         $this->init();
 
-        $events    = $this->getEventManager();
-        $dataEvent = $this->getEvent();
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
 
-        $dataObject = new \ArrayObject($data);
-        $dataEvent->setParam('service', $this);
-        $dataEvent->setParam('data', $dataObject);
-
-        $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $dataEvent);
+        $data = new \ArrayObject($array);
+        $event->setParam('service', $this);
+        $event->setParam('data', $data);
 
         $inputFilter = $this->getInputFilter();
-        if (!$this->validate($dataObject->getArrayCopy())) {
+        if (!$this->validate($data->getArrayCopy())) {
             throw new Exception\RuntimeException(
                 sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
             );
         }
-        $validData = $inputFilter->getValues();
+
+        $event->setParam('validData', new \ArrayObject($inputFilter->getValues()));
+        $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $event);
+        $validData = $event->getParam('validData')->getArrayCopy();
 
         $dataExchange         = array_flip(array_keys($validData));
         $filterExchange       = array_flip(array_keys($this->config['input_filter']));
@@ -613,7 +639,7 @@ class DataService implements
             );
         }
 
-        $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $dataEvent);
+        $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
     }
 
     public function executeQuery($query)

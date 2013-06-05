@@ -2,15 +2,18 @@
 
 namespace WebinoData\Paginator\Adapter;
 
-use WebinoData\DataSelect as Select;
+use WebinoData\DataSelect;
+use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Select;
+use Zend\Paginator\Adapter\DbSelect;
 
-class WebinoDataSelect extends \Zend\Paginator\Adapter\DbSelect
+class WebinoDataSelect extends DbSelect
 {
     protected $dataSelect;
     protected $service;
     protected $overflow = 0;
 
-    public function __construct(Select $select, $service)
+    public function __construct(DataSelect $select, $service)
     {
         parent::__construct($select->getSqlSelect(), $service->getAdapter());
 

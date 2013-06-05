@@ -2,6 +2,7 @@
 
 namespace WebinoData;
 
+use Zend\Db\Adapter\Platform\PlatformInterface;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Select;
 
@@ -11,10 +12,10 @@ class DataSelect
     protected $sqlSelect;
     protected $subselects = array();
 
-    public function __construct(DataService $service, Select $sqlSelect)
+    public function __construct(DataService $service, Select $select)
     {
         $this->service   = $service;
-        $this->sqlSelect = $sqlSelect;
+        $this->sqlSelect = $select;
     }
 
     public function getSqlSelect()
@@ -24,7 +25,7 @@ class DataSelect
 
     public function getColumns()
     {
-        return $this->getSqlSelect()->getRawState('columns');
+        return $this->sqlSelect->getRawState('columns');
     }
 
     public function columns(array $columns, $prefixColumnsWithTable = true)
@@ -115,5 +116,30 @@ class DataSelect
 
         $this->sqlSelect->where('(' . join(' AND ', $where) . ')', $combination);
         return $this;
+    }
+
+    /**
+     * Get SQL string for statement
+     *
+     * @param  null|PlatformInterface $adapterPlatform If null, defaults to Sql92
+     * @return string
+     */
+    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    {
+        return $this->sqlSelect->getSqlString($adapterPlatform);
+    }
+
+    /**
+     * @param string $part
+     * @return Select
+     */
+    public function reset($part)
+    {
+        return $this->sqlSelect->reset($part);
+    }
+
+    public function __toString()
+    {
+        return $this->getSqlString($this->service->getPlatform());
     }
 }
