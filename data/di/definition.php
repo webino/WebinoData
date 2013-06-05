@@ -526,7 +526,7 @@ return array (
       ),
     ),
   ),
-  'WebinoData\\Plugin\\Relations' => 
+  'WebinoData\\DataPlugin\\Relations' => 
   array (
     'supertypes' => 
     array (
@@ -540,7 +540,7 @@ return array (
     array (
       '__construct' => 
       array (
-        'WebinoData\\Plugin\\Relations::__construct:0' => 
+        'WebinoData\\DataPlugin\\Relations::__construct:0' => 
         array (
           0 => 'adapter',
           1 => 'Zend\\Db\\Adapter\\AdapterInterface',

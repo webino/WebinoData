@@ -8,6 +8,14 @@ return array(
             ),
         ),
         'instance' => array(
+            'alias' => array(
+                'WebinoDataRelations' => 'WebinoData\DataPlugin\Relations',
+            ),
+            'WebinoDataRelations' => array(
+                'parameters' => array(
+                    'adapter' => 'Zend\Db\Adapter\Adapter',
+                ),
+            ),
             'Zend\InputFilter\Factory' => array(
                 'injections' => array(
                     'Zend\Filter\FilterChain',

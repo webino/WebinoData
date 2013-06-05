@@ -10,12 +10,6 @@ return array(
                 'MainDataService'     => 'WebinoData\DataService',
                 'SubTable'            => 'Zend\Db\TableGateway\TableGateway',
                 'SubDataService'      => 'WebinoData\DataService',
-                'WebinoDataRelations' => 'WebinoData\Plugin\Relations',
-            ),
-            'WebinoDataRelations' => array(
-                'parameters' => array(
-                    'adapter' => 'Zend\Db\Adapter\Adapter',
-                ),
             ),
             'MainTable' => array(
                 'parameters' => array(

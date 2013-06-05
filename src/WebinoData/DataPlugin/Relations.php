@@ -1,6 +1,6 @@
 <?php
 
-namespace WebinoData\Plugin;
+namespace WebinoData\DataPlugin;
 
 use WebinoData\DataService;
 use Zend\Db\Adapter\AdapterInterface;

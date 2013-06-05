@@ -12,7 +12,7 @@ return array(
     'WebinoData\DataQuery'                                    => __DIR__ . '/src/WebinoData/DataQuery.php',
     'WebinoData\DataSelect'                                   => __DIR__ . '/src/WebinoData/DataSelect.php',
     'WebinoData\InputFilter\InputFilterFactoryAwareInterface' => __DIR__ . '/src/WebinoData/InputFilter/InputFilterFactoryAwareInterface.php',
-    'WebinoData\Plugin\Relations'                             => __DIR__ . '/src/WebinoData/Plugin/Relations.php',
+    'WebinoData\DataPlugin\Relations'                         => __DIR__ . '/src/WebinoData/DataPlugin/Relations.php',
     'WebinoData\DataQuery\Decrement'                          => __DIR__ . '/src/WebinoData/DataQuery/Decrement.php',
     'WebinoData\DataQuery\Increment'                          => __DIR__ . '/src/WebinoData/DataQuery/Increment.php',
     'WebinoData\DataQuery\AbstractDataQuery'                  => __DIR__ . '/src/WebinoData/DataQuery/AbstractDataQuery.php',
