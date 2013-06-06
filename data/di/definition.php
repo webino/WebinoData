@@ -24,11 +24,17 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
-      'setParams' => false,
-      'setName' => false,
-      'setTarget' => false,
-      'setParam' => false,
+      '__construct' => 3,
+      'setService' => 0,
+      'setSelect' => 0,
+      'setData' => 0,
+      'setValidData' => 0,
+      'setRows' => 0,
+      'setUpdate' => 0,
+      'setParams' => 0,
+      'setName' => 0,
+      'setTarget' => 0,
+      'setParam' => 0,
     ),
     'parameters' => 
     array (
@@ -54,6 +60,66 @@ return array (
           1 => NULL,
           2 => false,
           3 => NULL,
+        ),
+      ),
+      'setService' => 
+      array (
+        'WebinoData\\DataEvent::setService:0' => 
+        array (
+          0 => 'service',
+          1 => 'WebinoData\\DataService',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setSelect' => 
+      array (
+        'WebinoData\\DataEvent::setSelect:0' => 
+        array (
+          0 => 'select',
+          1 => 'WebinoData\\DataSelect',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setData' => 
+      array (
+        'WebinoData\\DataEvent::setData:0' => 
+        array (
+          0 => 'data',
+          1 => 'ArrayAccess',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setValidData' => 
+      array (
+        'WebinoData\\DataEvent::setValidData:0' => 
+        array (
+          0 => 'validData',
+          1 => 'ArrayAccess',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setRows' => 
+      array (
+        'WebinoData\\DataEvent::setRows:0' => 
+        array (
+          0 => 'rows',
+          1 => 'ArrayAccess',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setUpdate' => 
+      array (
+        'WebinoData\\DataEvent::setUpdate:0' => 
+        array (
+          0 => 'bool',
+          1 => NULL,
+          2 => false,
+          3 => true,
         ),
       ),
       'setParams' => 
@@ -118,8 +184,8 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
-      'setOverflow' => false,
+      '__construct' => 3,
+      'setOverflow' => 0,
     ),
     'parameters' => 
     array (
@@ -177,7 +243,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -219,7 +285,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -260,7 +326,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -302,18 +368,18 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
-      'setEvent' => false,
-      'setEventManager' => true,
-      'setServiceManager' => true,
-      'setPlatform' => false,
-      'setInputFilterFactory' => true,
-      'setInputFilter' => false,
-      'setHasOne' => false,
-      'setHasMany' => false,
-      'setQuery' => false,
-      'getEventManager' => true,
-      'getInputFilter' => true,
+      '__construct' => 3,
+      'setEvent' => 0,
+      'setEventManager' => 3,
+      'setServiceManager' => 3,
+      'setPlatform' => 0,
+      'setInputFilterFactory' => 3,
+      'setInputFilter' => 0,
+      'setHasOne' => 0,
+      'setHasMany' => 0,
+      'setQuery' => 0,
+      'getEventManager' => 3,
+      'getInputFilter' => 3,
     ),
     'parameters' => 
     array (
@@ -448,7 +514,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -479,7 +545,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -510,7 +576,7 @@ return array (
     'instantiator' => NULL,
     'methods' => 
     array (
-      'setInputFilterFactory' => false,
+      'setInputFilterFactory' => 0,
     ),
     'parameters' => 
     array (
@@ -534,7 +600,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -560,7 +626,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -600,7 +666,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -638,7 +704,7 @@ return array (
     'instantiator' => NULL,
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (
@@ -670,7 +736,7 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => true,
+      '__construct' => 3,
     ),
     'parameters' => 
     array (

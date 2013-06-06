@@ -439,8 +439,8 @@ class DataService implements
         $events = $this->getEventManager();
         $event  = $this->getEvent();
 
-        $event->setParam('service', $this);
-        $event->setParam('select', $select);
+        $event->setService($this);
+        $event->setSelect($select);
 
         $events->trigger(DataEvent::EVENT_SELECT, $event);
 
@@ -483,8 +483,8 @@ class DataService implements
         $events    = $this->getEventManager();
         $dataEvent = $this->getEvent();
 
-        $dataEvent->setParam('service', $this);
-        $dataEvent->setParam('select', $select);
+        $dataEvent->setService($this);
+        $dataEvent->setSelect($select);
 
         $events->trigger(DataEvent::EVENT_FETCH_PRE, $dataEvent);
 
@@ -523,7 +523,7 @@ class DataService implements
             }
         }
 
-        $dataEvent->setParam('rows', $rows);
+        $dataEvent->setRows($rows);
 
         $events->trigger(DataEvent::EVENT_FETCH_POST, $dataEvent);
 
@@ -586,46 +586,49 @@ class DataService implements
         $event  = $this->getEvent();
 
         $data = new \ArrayObject($array);
-        $event->setParam('service', $this);
-        $event->setParam('data', $data);
+        $event->setService($this);
+        $event->setData($data);
+        $dataArray = $data->getArrayCopy();
 
-        $inputFilter = $this->getInputFilter();
-        if (!$this->validate($data->getArrayCopy())) {
-            throw new Exception\RuntimeException(
-                sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
-            );
-        }
+        $inputFilter       = $this->getInputFilter();
+        $isValid           = $this->validate($dataArray);
+        $inputFilterValues = $inputFilter->getValues();
 
-        $event->setParam('validData', new \ArrayObject($inputFilter->getValues()));
-        $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $event);
-        $validData = $event->getParam('validData')->getArrayCopy();
-
-        $dataExchange         = array_flip(array_keys($validData));
-        $filterExchange       = array_flip(array_keys($this->config['input_filter']));
-        $filterExchange['id'] = true;
+        /* filter valid data */
+        $dataExchange = array_flip(array_keys($dataArray));
 
         array_filter(
-            array_keys($validData),
-            function ($key) use (&$validData, $dataExchange, $filterExchange) {
+            array_keys($inputFilterValues),
+            function ($key) use (&$inputFilterValues, $dataExchange) {
 
-                if (!isset($dataExchange[$key])) {
-                    unset($validData[$key]);
-                }
-                if (!isset($filterExchange[$key])) {
-                    unset($validData[$key]);
+                if (!array_key_exists($key, $dataExchange)) {
+                    unset($inputFilterValues[$key]);
                 }
             }
         );
+        /* /filter valid data */
+
+        $validData = new \ArrayObject($inputFilterValues);
+        $event->setUpdate(!empty($validData['id']));
+        $event->setValidData($validData);
+        $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $event);
+        $validDataArray = $event->getValidData()->getArrayCopy();
 
         try {
 
-            if (empty($validData['id'])) {
+            if ($event->isUpdate()) {
 
-                $this->tableGateway->insert($validData);
+                $this->tableGateway->update($validDataArray, array('id=?' => $validDataArray['id']));
 
             } else {
 
-                $this->tableGateway->update($validData, array('id=?' => $validData['id']));
+                if (!$isValid) {
+                    throw new Exception\RuntimeException(
+                        sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
+                    );
+                }
+
+                $this->tableGateway->insert($validDataArray);
             }
 
         } catch (\Exception $e) {

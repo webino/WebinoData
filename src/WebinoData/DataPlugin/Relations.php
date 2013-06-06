@@ -2,6 +2,7 @@
 
 namespace WebinoData\DataPlugin;
 
+use WebinoData\DataEvent;
 use WebinoData\DataService;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Predicate\In as SqlIn;
@@ -23,20 +24,20 @@ class Relations
         $eventManager->attach('data.fetch.post', array($this, 'postFetch'));
     }
 
-    public function preExchange($event)
+    public function preExchange(DataEvent $event)
     {
         $this->associateExchange($event);
     }
 
-    public function postExchange($event)
+    public function postExchange(DataEvent $event)
     {
         $this->compositeExchange($event);
     }
 
-    public function preFetch($event)
+    public function preFetch(DataEvent $event)
     {
-        $service = $event->getParam('service');
-        $select  = $event->getParam('select');
+        $service = $event->getService();
+        $select  = $event->getSelect();
         $columns = $select->getColumns();
 
         $columns['id'] = 'id';
@@ -57,16 +58,17 @@ class Relations
         $select->columns($columns);
     }
 
-    public function postFetch($event)
+    public function postFetch(DataEvent $event)
     {
         $this->associateFetch($event);
         $this->compositeFetch($event);
     }
 
-    protected function associateExchange($event)
+    protected function associateExchange(DataEvent $event)
     {
-        $service = $event->getParam('service');
-        $data    = $event->getParam('data');
+        $service   = $event->getService();
+        $data      = $event->getData();
+        $validData = $event->getValidData();
 
         foreach ($data->getArrayCopy() as $key => $value) {
 
@@ -86,20 +88,20 @@ class Relations
                 $id = $subservice->getLastInsertValue();
             }
 
-            $data[$key . '_id'] = $id;
+            $validData[$key . '_id'] = $id;
         }
     }
 
-    protected function associateFetch($event)
+    protected function associateFetch(DataEvent $event)
     {
-        $rows = $event->getParam('rows');
+        $rows = $event->getRows();
 
         if (0 === $rows->count()) {
             return;
         }
 
-        $service  = $event->getParam('service');
-        $select   = $event->getParam('select');
+        $service  = $event->getService();
+        $select   = $event->getSelect();
         $columns  = $select->getColumns();
         $attached = array();
 
@@ -135,10 +137,10 @@ class Relations
         }
     }
 
-    protected function compositeExchange($event)
+    protected function compositeExchange(DataEvent $event)
     {
-        $service = $event->getParam('service');
-        $data    = $event->getParam('data');
+        $service = $event->getService();
+        $data    = $event->getData();
 
         $mainId = $service->getLastInsertValue();
 
@@ -165,16 +167,16 @@ class Relations
         }
     }
 
-    protected function compositeFetch($event)
+    protected function compositeFetch(DataEvent $event)
     {
-        $rows = $event->getParam('rows');
+        $rows = $event->getRows();
 
         if (0 === $rows->count()) {
             return;
         }
 
-        $service  = $event->getParam('service');
-        $select   = $event->getParam('select');
+        $service  = $event->getService();
+        $select   = $event->getSelect();
         $columns  = $select->getColumns();
         $attached = array();
 
