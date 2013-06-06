@@ -31,6 +31,7 @@ return array (
       'setValidData' => 0,
       'setRows' => 0,
       'setUpdate' => 0,
+      'setArguments' => 0,
       'setParams' => 0,
       'setName' => 0,
       'setTarget' => 0,
@@ -120,6 +121,16 @@ return array (
           1 => NULL,
           2 => false,
           3 => true,
+        ),
+      ),
+      'setArguments' => 
+      array (
+        'WebinoData\\DataEvent::setArguments:0' => 
+        array (
+          0 => 'arguments',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
         ),
       ),
       'setParams' => 

@@ -22,6 +22,7 @@ class DataEvent extends Event
      * Ajax events
      */
     const EVENT_SELECT = 'data.select';
+    const EVENT_DELETE = 'data.delete';
     const EVENT_EXCHANGE_PRE = 'data.exchange.pre';
     const EVENT_EXCHANGE_POST = 'data.exchange.post';
     const EVENT_FETCH_PRE = 'data.fetch.pre';
@@ -34,6 +35,7 @@ class DataEvent extends Event
     protected $validData;
     protected $rows;
     protected $update;
+    protected $arguments = array();
 
     /**
      * @return DataService
@@ -113,6 +115,17 @@ class DataEvent extends Event
     public function setUpdate($bool = true)
     {
         $this->update = (bool) $bool;
+        return $this;
+    }
+
+    public function getArguments()
+    {
+        return $this->arguments;
+    }
+
+    public function setArguments(array $arguments)
+    {
+        $this->arguments = $arguments;
         return $this;
     }
 }

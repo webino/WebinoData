@@ -547,7 +547,20 @@ class DataService implements
      */
     public function delete($where)
     {
-        // todo event
+        $this->init();
+
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
+
+        $event
+            ->setService($this)
+            ->setArguments(array($where));
+
+        $events->trigger(DataEvent::EVENT_DELETE, $event);
+
+        if ($event->propagationIsStopped()) {
+            return 0;
+        }
 
         return $this->tableGateway->delete($where);
     }
