@@ -658,6 +658,10 @@ class DataService implements
         }
 
         $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
+
+        // reset input filter
+        $this->inputFilter = null;
+        $this->getInputFilter();
     }
 
     public function executeQuery($query)
