@@ -621,12 +621,14 @@ class DataService implements
 
         $inputFilter = $this->getInputFilter();
 
-        $validInput = $inputFilter->getValidInput();
-        if (empty($validInput)) {
+        // on update filter by exchange
+        !$event->isUpdate() or
+            $this->filterInputFilter($array, $inputFilter);
+
+        if (!$inputFilter->getValidInput()) {
             $inputFilter->setData($data);
             $inputFilter->isValid();
         }
-        unset($validInput);
 
         if ($inputFilter->getInvalidInput()) {
             throw new Exception\RuntimeException(
@@ -758,5 +760,20 @@ class DataService implements
         }
 
         return '(' . join(' ' . $type . ' ', $where) . ')';
+    }
+
+    protected function filterInputFilter(array $data, InputFilter $inputFilter)
+    {
+        $exchange = array_flip(array_keys($data));
+        foreach ($inputFilter->getInputs() as $input) {
+
+            $inputName = $input->getName();
+
+            if (!isset($exchange[$inputName])) {
+                $inputFilter->remove($inputName);
+            }
+        }
+
+        return $this;
     }
 }
