@@ -4,6 +4,7 @@ namespace WebinoData;
 
 use WebinoData\DataEvent;
 use WebinoData\DataQuery;
+use WebinoData\InputFilter\InputFilterFactoryAwareInterface;
 use WebinoData\Exception;
 use Zend\Db\Adapter\Platform\PlatformInterface;
 use Zend\Db\Sql;
@@ -12,6 +13,7 @@ use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\InputFilter\Factory as InputFilterFactory;
+use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterInterface;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
@@ -19,7 +21,7 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 class DataService implements
     EventManagerAwareInterface,
     ServiceManagerAwareInterface,
-    InputFilter\InputFilterFactoryAwareInterface
+    InputFilterFactoryAwareInterface
 {
     /**
      * @var TableGateway
@@ -321,6 +323,14 @@ class DataService implements
     }
 
     /**
+     * @return array
+     */
+    public function getHasOneList()
+    {
+        return $this->hasOneList;
+    }
+
+    /**
      * @param string $name
      * @param DataService $service
      * @return DataService
@@ -352,6 +362,14 @@ class DataService implements
         }
 
         return $this->hasManyList[$name];
+    }
+
+    /**
+     * @return array
+     */
+    public function getHasManyList()
+    {
+        return $this->hasManyList;
     }
 
     /**
@@ -481,12 +499,12 @@ class DataService implements
         $this->init();
 
         $events    = $this->getEventManager();
-        $dataEvent = $this->getEvent();
+        $event = $this->getEvent();
 
-        $dataEvent->setService($this);
-        $dataEvent->setSelect($select);
+        $event->setService($this);
+        $event->setSelect($select);
 
-        $events->trigger(DataEvent::EVENT_FETCH_PRE, $dataEvent);
+        $events->trigger(DataEvent::EVENT_FETCH_PRE, $event);
 
         $sqlSelect = $select->getSqlSelect();
         $sql       = $this->tableGateway->getSql();
@@ -523,11 +541,11 @@ class DataService implements
             }
         }
 
-        $dataEvent->setRows($rows);
+        $event->setRows($rows);
 
-        $events->trigger(DataEvent::EVENT_FETCH_POST, $dataEvent);
+        $events->trigger(DataEvent::EVENT_FETCH_POST, $event);
 
-        return $rows->getArrayCopy();
+        return $event->getRows();
     }
 
     public function fetchPairs(\WebinoData\DataSelect $select, $parameters = array())
@@ -579,13 +597,6 @@ class DataService implements
         return $this->tableGateway->fetch($where)->toArray();
     }
 
-    public function validate(array $data)
-    {
-        $inputFilter = $this->getInputFilter();
-        $inputFilter->setData($data);
-        return $inputFilter->isValid();
-    }
-
     public function getArrayCopy()
     {
         return array();
@@ -593,57 +604,48 @@ class DataService implements
 
     public function exchangeArray(array $array)
     {
+        if (empty($array)) {
+            throw new \InvalidArgumentException('Expected data but empty');
+        }
+
         $this->init();
 
         $events = $this->getEventManager();
         $event  = $this->getEvent();
+        $data   = new \ArrayObject($array);
 
-        $data = new \ArrayObject($array);
-        $event->setService($this);
-        $event->setData($data);
-        $dataArray = $data->getArrayCopy();
+        $event
+            ->setService($this)
+            ->setData($data)
+            ->setUpdate(!empty($array['id']));
 
-        $inputFilter       = $this->getInputFilter();
-        $isValid           = $this->validate($dataArray);
-        $inputFilterValues = $inputFilter->getValues();
+        $inputFilter = $this->getInputFilter();
 
-        /* filter valid data */
-        $dataExchange = array_flip(array_keys($dataArray));
+        $validInput = $inputFilter->getValidInput();
+        if (empty($validInput)) {
+            $inputFilter->setData($data);
+            $inputFilter->isValid();
+        }
+        unset($validInput);
 
-        array_filter(
-            array_keys($inputFilterValues),
-            function ($key) use (&$inputFilterValues, $dataExchange) {
+        if ($inputFilter->getInvalidInput()) {
+            throw new Exception\RuntimeException(
+                sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
+            );
+        }
 
-                if (!array_key_exists($key, $dataExchange)) {
-                    unset($inputFilterValues[$key]);
-                }
-            }
-        );
-        /* /filter valid data */
-
-        $validData = new \ArrayObject($inputFilterValues);
-        $event->setUpdate(!empty($validData['id']));
+        $validData = new \ArrayObject($inputFilter->getValues());
         $event->setValidData($validData);
         $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $event);
-        $validDataArray = $event->getValidData()->getArrayCopy();
+        $validDataArray = $validData->getArrayCopy();
 
         try {
-
             if ($event->isUpdate()) {
 
                 $this->tableGateway->update($validDataArray, array('id=?' => $validDataArray['id']));
-
             } else {
-
-                if (!$isValid) {
-                    throw new Exception\RuntimeException(
-                        sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
-                    );
-                }
-
                 $this->tableGateway->insert($validDataArray);
             }
-
         } catch (\Exception $e) {
 
             throw new Exception\RuntimeException(
