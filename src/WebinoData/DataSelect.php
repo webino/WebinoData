@@ -118,6 +118,12 @@ class DataSelect
         return $this;
     }
 
+    public function group($group)
+    {
+        $this->sqlSelect->group($group);
+        return $this;
+    }
+
     /**
      * Get SQL string for statement
      *
