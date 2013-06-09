@@ -534,7 +534,9 @@ class DataService implements
 
         foreach ($result as $row) {
 
-            if (!empty($row['id'])) {
+            if (!empty($row['id'])
+                && empty($rows[$row['id']])
+            ) {
                 $rows[$row['id']] = $row;
             } else {
                 $rows[] = $row;
