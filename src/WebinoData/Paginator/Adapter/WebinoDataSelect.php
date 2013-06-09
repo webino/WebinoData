@@ -42,4 +42,41 @@ class WebinoDataSelect extends DbSelect
 
         return $this->service->fetchWith($select);
     }
+
+    /**
+     * Returns the total number of rows in the result set
+     *
+     * @return int
+     */
+    public function count()
+    {
+        if ($this->rowCount !== null) {
+            return $this->rowCount;
+        }
+
+        $select = clone $this->select;
+        $select->reset(Select::COLUMNS);
+        $select->reset(Select::LIMIT);
+        $select->reset(Select::OFFSET);
+        $select->reset(Select::ORDER);
+
+        // get join information, clear, and repopulate without columns
+        $joins = $select->getRawState(Select::JOINS);
+        $select->reset(Select::JOINS);
+        foreach ($joins as $join) {
+            $select->join($join['name'], $join['on'], array(), $join['type']);
+        }
+
+        $select->columns(array('c' => new Expression('COUNT(*)')));
+
+        $sql = 'SELECT COUNT(*) as c FROM(' . $this->sql->getSqlStringForSqlObject($select) . ') AS x';
+
+        $statement = $this->sql->getAdapter()->createStatement($sql);
+        $result    = $statement->execute();
+        $row       = $result->current();
+
+        $this->rowCount = $row['c'];
+
+        return $this->rowCount;
+    }
 }
