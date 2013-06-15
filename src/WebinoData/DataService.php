@@ -2,8 +2,6 @@
 
 namespace WebinoData;
 
-use WebinoData\DataEvent;
-use WebinoData\DataQuery;
 use WebinoData\InputFilter\InputFilterFactoryAwareInterface;
 use WebinoData\Exception;
 use Zend\Db\Adapter\Platform\PlatformInterface;
@@ -612,14 +610,28 @@ class DataService implements
 
         $this->init();
 
-        $events = $this->getEventManager();
-        $event  = $this->getEvent();
-        $data   = new \ArrayObject($array);
+        $event = $this->getEvent();
+        $event->setUpdate(!empty($array['id']));
+
+        // update where
+        if ($event->isUpdate()) {
+
+            if ($array['id'] instanceof DataSelect) {
+
+                $updateWhere = array(new Sql\Predicate\In('id', $array['id']->getSqlSelect()));
+                unset($array['id']);
+
+            } else {
+                $updateWhere = array('id=?' => $array['id']);
+            }
+        }
+        // /update where
+
+        $data = new \ArrayObject($array);
 
         $event
             ->setService($this)
-            ->setData($data)
-            ->setUpdate(!empty($array['id']));
+            ->setData($data);
 
         $inputFilter = $this->getInputFilter();
 
@@ -628,6 +640,7 @@ class DataService implements
             $this->filterInputFilter($array, $inputFilter);
 
         if (!$inputFilter->getValidInput()) {
+            // validate on exchange
             $inputFilter->setData($data);
             $inputFilter->isValid();
         }
@@ -638,7 +651,9 @@ class DataService implements
             );
         }
 
+        $events    = $this->getEventManager();
         $validData = new \ArrayObject($inputFilter->getValues());
+
         $event->setValidData($validData);
         $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $event);
         $validDataArray = $validData->getArrayCopy();
@@ -646,7 +661,7 @@ class DataService implements
         try {
             if ($event->isUpdate()) {
 
-                $this->tableGateway->update($validDataArray, array('id=?' => $validDataArray['id']));
+                $this->tableGateway->update($validDataArray, $updateWhere);
             } else {
                 $this->tableGateway->insert($validDataArray);
             }
@@ -665,7 +680,6 @@ class DataService implements
 
         // reset input filter
         $this->inputFilter = null;
-        $this->getInputFilter();
     }
 
     public function executeQuery($query)
