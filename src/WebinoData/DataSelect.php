@@ -37,7 +37,23 @@ class DataSelect
             }
         }
 
-        $this->sqlSelect->columns($columns, $prefixColumnsWithTable);
+        $event = $this->service->getEvent();
+        $event->setParam('columns', $columns);
+
+        $this->service->getEventManager()
+            ->trigger('data.select.columns', $event);
+
+        $this->sqlSelect->columns($event->getParam('columns'), $prefixColumnsWithTable);
+        return $this;
+    }
+
+    public function addColumn($name, $value)
+    {
+        $columns = array_replace(
+            $this->getColumns(),
+            array($name => $value)
+        );
+        $this->columns($columns);
         return $this;
     }
 
