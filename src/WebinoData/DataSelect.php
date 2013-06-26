@@ -41,6 +41,7 @@ class DataSelect
 
         $event
             ->setSelect($this)
+            ->setService($this->service)
             ->setParam('columns', $columns);
 
         $this->service->getEventManager()

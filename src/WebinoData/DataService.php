@@ -442,6 +442,8 @@ class DataService implements
 
     public function select($columns = array())
     {
+        $this->init();
+
         $select = new \WebinoData\DataSelect(
             $this,
             $this->tableGateway->getSql()->select()
@@ -449,8 +451,6 @@ class DataService implements
 
         empty($columns) or
             $select->columns($columns, false);
-
-        $this->init();
 
         $events = $this->getEventManager();
         $event  = $this->getEvent();
