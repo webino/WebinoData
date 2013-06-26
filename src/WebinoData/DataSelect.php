@@ -133,6 +133,10 @@ class DataSelect
             }
         }
 
+        if (empty($where)) {
+            return $this;
+        }
+
         $this->sqlSelect->where('(' . join(' AND ', $where) . ')', $combination);
         return $this;
     }
