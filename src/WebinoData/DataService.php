@@ -419,13 +419,18 @@ class DataService implements
         return $this;
     }
 
+    public function getSql()
+    {
+        return $this->tableGateway->getSql();
+    }
+
     // todo
     public function getQuery()
     {
         if (null === $this->query) {
             $this->setQuery(
                 new DataQuery(
-                    $this->tableGateway->getSql(),
+                    $this->getSql(),
                     $this->getPlatform()
                 )
             );
@@ -446,7 +451,7 @@ class DataService implements
 
         $select = new \WebinoData\DataSelect(
             $this,
-            $this->tableGateway->getSql()->select()
+            $this->getSql()->select()
         );
 
         empty($columns) or
@@ -505,7 +510,7 @@ class DataService implements
         $events->trigger(DataEvent::EVENT_FETCH_PRE, $event);
 
         $sqlSelect = $select->getSqlSelect();
-        $sql       = $this->tableGateway->getSql();
+        $sql       = $this->getSql();
         $statement = $sql->prepareStatementForSqlObject($sqlSelect);
 
         $sqlString = $sql->getSqlStringForSqlObject($sqlSelect, $this->getPlatform());
