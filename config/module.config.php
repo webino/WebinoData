@@ -16,6 +16,11 @@ return array(
                     'adapter' => 'Zend\Db\Adapter\Adapter',
                 ),
             ),
+            'WebinoData\DataPlugin\Order' => array(
+                'parameters' => array(
+                    'adapter' => 'Zend\Db\Adapter\Adapter',
+                ),
+            ),
             'Zend\InputFilter\Factory' => array(
                 'injections' => array(
                     'Zend\Filter\FilterChain',
