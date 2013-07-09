@@ -29,6 +29,16 @@ class DataSelect
         return $this->sqlSelect->getRawState('columns');
     }
 
+    public function getWhere()
+    {
+        return $this->sqlSelect->getRawState('where');
+    }
+
+    public function getOrder()
+    {
+        return $this->sqlSelect->getRawState('order');
+    }
+
     public function getSearch()
     {
         return $this->search;

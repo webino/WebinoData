@@ -627,6 +627,30 @@ return array (
       ),
     ),
   ),
+  'WebinoData\\DataPlugin\\Order' => 
+  array (
+    'supertypes' => 
+    array (
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      '__construct' => 3,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
+        'WebinoData\\DataPlugin\\Order::__construct:0' => 
+        array (
+          0 => 'adapter',
+          1 => 'Zend\\Db\\Adapter\\AdapterInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\DataQuery\\Decrement' => 
   array (
     'supertypes' => 

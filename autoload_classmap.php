@@ -13,6 +13,7 @@ return array(
     'WebinoData\DataSelect'                                   => __DIR__ . '/src/WebinoData/DataSelect.php',
     'WebinoData\InputFilter\InputFilterFactoryAwareInterface' => __DIR__ . '/src/WebinoData/InputFilter/InputFilterFactoryAwareInterface.php',
     'WebinoData\DataPlugin\Relations'                         => __DIR__ . '/src/WebinoData/DataPlugin/Relations.php',
+    'WebinoData\DataPlugin\Order'                             => __DIR__ . '/src/WebinoData/DataPlugin/Order.php',
     'WebinoData\DataQuery\Decrement'                          => __DIR__ . '/src/WebinoData/DataQuery/Decrement.php',
     'WebinoData\DataQuery\Increment'                          => __DIR__ . '/src/WebinoData/DataQuery/Increment.php',
     'WebinoData\DataQuery\AbstractDataQuery'                  => __DIR__ . '/src/WebinoData/DataQuery/AbstractDataQuery.php',
