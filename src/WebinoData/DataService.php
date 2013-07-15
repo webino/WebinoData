@@ -501,11 +501,12 @@ class DataService implements
     {
         $this->init();
 
-        $events    = $this->getEventManager();
-        $event = $this->getEvent();
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
 
-        $event->setService($this);
-        $event->setSelect($select);
+        $event
+            ->setService($this)
+            ->setSelect($select);
 
         $events->trigger(DataEvent::EVENT_FETCH_PRE, $event);
 
