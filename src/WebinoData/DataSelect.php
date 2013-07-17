@@ -39,6 +39,11 @@ class DataSelect
         return $this->sqlSelect->getRawState('order');
     }
 
+    public function getLimit()
+    {
+        return $this->sqlSelect->getRawState('limit');
+    }
+
     public function getSearch()
     {
         return $this->search;
@@ -110,6 +115,9 @@ class DataSelect
     public function subselect($name, DataSelect $select = null)
     {
         if (null === $select) {
+            if (empty($this->subselects[$name])) {
+                return null;
+            }
             return $this->subselects[$name];
         }
 
