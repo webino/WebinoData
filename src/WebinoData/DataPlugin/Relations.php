@@ -5,6 +5,7 @@ namespace WebinoData\DataPlugin;
 use WebinoData\DataEvent;
 use WebinoData\DataService;
 use Zend\Db\Adapter\AdapterInterface;
+use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\Db\Sql\Predicate\In as SqlIn;
 
 class Relations
@@ -40,22 +41,26 @@ class Relations
         $select  = $event->getSelect();
         $columns = $select->getColumns();
 
-        $columns['id'] = 'id';
-
         foreach ($columns as $key => &$column) {
 
             if ($service->hasOne($key)) {
-                $column = $key . '_id';
+                $select->addColumn($key, $key . '_id');
                 continue;
             }
 
-            if ($service->hasMany($key)) {
-                $column = new \Zend\Db\Sql\Expression('1');
+            if (!$service->hasMany($key)) {
                 continue;
             }
+
+            $subservice = $service->many($key);
+            $subselect  = $subservice->configSelect($column);
+
+            if ($subselect) {
+                $select->subselect($key, $subselect);
+            }
+
+            $select->addColumn($key, new SqlExpression('\'0\''));
         }
-
-        $select->columns($columns);
     }
 
     public function postFetch(DataEvent $event)
@@ -187,14 +192,20 @@ class Relations
             }
 
             $attached[$key] = $key;
+
+            $subselect = $select->subselect($key);
+
+            $subselect or
+                $select->subselect($key, $service->many($key)->select());
         }
 
         if (empty($attached)) {
             return;
         }
 
-        $mainIds = array_keys($rows->getArrayCopy());
-        $mainKey = $service->getTableName() . 'id';
+        $mainIds   = array_keys($rows->getArrayCopy());
+        $tableName = $service->getTableName();
+        $mainKey   = $tableName . '_id';
 
         foreach ($attached as $key) {
 
@@ -203,7 +214,13 @@ class Relations
 
             $subselect->where(new SqlIn($mainKey, $mainIds));
 
-            $this->assocJoin($subselect, $service, $subservice);
+            // todo composition key instead of tableName
+            !$subservice->hasMany($tableName) or
+                $this->assocJoin($subselect, $service, $subservice);
+
+            // limit
+            $limit = $subselect->getLimit();
+            $subselect->reset('limit');
 
             $subItems = $subservice->fetchWith($subselect);
 
@@ -213,6 +230,10 @@ class Relations
 
                 is_array($rows[$mainId][$key]) or
                     $rows[$mainId][$key] = array();
+
+                if ($limit && $limit <= count($rows[$mainId][$key])) {
+                    continue;
+                }
 
                 $rows[$mainId][$key][] = $subItem;
             }
