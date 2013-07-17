@@ -476,14 +476,8 @@ class DataService implements
         foreach ($selectNames as $selectName) {
 
             if (!isset($this->config['select'][$selectName])) {
-
-                throw new Exception\MissingPropertyException(
-                    sprintf(
-                        'Expected select `%s` in : %s',
-                        $selectName,
-                        print_r($this->config['select'], 1)
-                    )
-                );
+                // allow empty select config
+                continue;
             }
 
             $this->configureSelect($select->getSqlSelect(), $this->config['select'][$selectName]);
