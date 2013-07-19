@@ -44,11 +44,24 @@ class Relations
         foreach ($columns as $key => &$column) {
 
             if ($service->hasOne($key)) {
+
+                $options = $service->oneOptions($key);
+
+                if ($this->relationsDisabled($options)) {
+                    continue;
+                }
+
                 $select->addColumn($key, $key . '_id');
                 continue;
             }
 
             if (!$service->hasMany($key)) {
+                continue;
+            }
+
+            $options = $service->manyOptions($key);
+
+            if ($this->relationsDisabled($options)) {
                 continue;
             }
 
@@ -77,7 +90,15 @@ class Relations
 
         foreach ($data->getArrayCopy() as $key => $value) {
 
-            if (!$service->hasOne($key)) {
+            if (!$service->hasOne($key)
+                || !is_array($value)
+            ) {
+                continue;
+            }
+
+            $options = $service->oneOptions($key);
+
+            if ($this->relationsDisabled($options)) {
                 continue;
             }
 
@@ -113,6 +134,12 @@ class Relations
         foreach (array_keys($columns) as $key) {
 
             if (!$service->hasOne($key)) {
+                continue;
+            }
+
+            $options = $service->oneOptions($key);
+
+            if ($this->relationsDisabled($options)) {
                 continue;
             }
 
@@ -155,6 +182,12 @@ class Relations
                 continue;
             }
 
+            $options = $service->manyOptions($key);
+
+            if ($this->relationsDisabled($options)) {
+                continue;
+            }
+
             $subservice = $service->many($key);
 
             foreach ($values as $value) {
@@ -188,6 +221,12 @@ class Relations
         foreach (array_keys($columns) as $key) {
 
             if (!$service->hasMany($key)) {
+                continue;
+            }
+
+            $options = $service->manyOptions($key);
+
+            if ($this->relationsDisabled($options)) {
                 continue;
             }
 
@@ -266,5 +305,17 @@ class Relations
         $name    = $mainKey . '_' . $subKey;
 
         $select->join($name, $subKey . '.id=' . $name . '.' . $subKey . 'id');
+    }
+
+    /**
+     * Return true when relations are enabled by options
+     *
+     * @param array $options
+     * @return bool
+     */
+    protected function relationsDisabled(array $options)
+    {
+        return array_key_exists('relations', $options)
+                && false === $options['relations'];
     }
 }

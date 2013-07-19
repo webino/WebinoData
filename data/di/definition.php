@@ -487,6 +487,15 @@ return array (
           2 => true,
           3 => NULL,
         ),
+        'WebinoData\\DataService::setHasOne:2' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => 
+          array (
+          ),
+        ),
       ),
       'setHasMany' => 
       array (
@@ -503,6 +512,15 @@ return array (
           1 => 'WebinoData\\DataService',
           2 => true,
           3 => NULL,
+        ),
+        'WebinoData\\DataService::setHasMany:2' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => 
+          array (
+          ),
         ),
       ),
       'setQuery' => 

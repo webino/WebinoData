@@ -292,9 +292,13 @@ class DataService implements
      * @param DataService $service
      * @return DataService
      */
-    public function setHasOne($name, DataService $service)
+    public function setHasOne($name, DataService $service, array $options = array())
     {
-        $this->hasOneList[$name] = $service;
+        isset($this->hasOneList[$name]) or
+            $this->hasOneList[$name] = array();
+
+        $this->hasOneList[$name]['service'] = $service;
+        $this->hasOneList[$name]['options'] = $options;
         return $this;
     }
 
@@ -310,14 +314,34 @@ class DataService implements
     /**
      * @param string $name
      * @return DataService
+     * @throws \OutOfBoundsException
      */
-    public function one($name)
+    protected function resolveOne($name)
     {
         if (empty($this->hasOneList[$name])) {
             throw new \OutOfBoundsException('Hasn\'t one ' . $name);
         }
 
         return $this->hasOneList[$name];
+    }
+    /**
+     * @param string $name
+     * @return DataService
+     */
+    public function one($name)
+    {
+        $item = $this->resolveOne($name);
+        return $item['service'];
+    }
+
+    /**
+     * @param string $name
+     * @return DataService
+     */
+    public function oneOptions($name)
+    {
+        $item = $this->resolveOne($name);
+        return $item['options'];
     }
 
     /**
@@ -333,9 +357,13 @@ class DataService implements
      * @param DataService $service
      * @return DataService
      */
-    public function setHasMany($name, DataService $service)
+    public function setHasMany($name, DataService $service, array $options = array())
     {
-        $this->hasManyList[$name] = $service;
+        isset($this->hasManyList[$name]) or
+            $this->hasManyList[$name] = array();
+
+        $this->hasManyList[$name]['service'] = $service;
+        $this->hasManyList[$name]['options'] = $options;
         return $this;
     }
 
@@ -353,13 +381,33 @@ class DataService implements
      * @return DataService
      * @throws \OutOfBoundsException
      */
-    public function many($name)
+    protected function resolveMany($name)
     {
         if (empty($this->hasManyList[$name])) {
             throw new \OutOfBoundsException('Hasn\'t many ' . $name);
         }
 
         return $this->hasManyList[$name];
+    }
+
+    /**
+     * @param string $name
+     * @return DataService
+     */
+    public function many($name)
+    {
+        $item = $this->resolveMany($name);
+        return $item['service'];
+    }
+
+    /**
+     * @param string $name
+     * @return DataService
+     */
+    public function manyOptions($name)
+    {
+        $item = $this->resolveMany($name);
+        return $item['options'];
     }
 
     /**
@@ -474,6 +522,10 @@ class DataService implements
         $select      = $this->select();
 
         foreach ($selectNames as $selectName) {
+
+            if (!is_string($selectName)) {
+                continue;
+            }
 
             if (!isset($this->config['select'][$selectName])) {
                 // allow empty select config
