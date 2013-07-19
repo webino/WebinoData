@@ -557,6 +557,7 @@ return array (
     'methods' => 
     array (
       '__construct' => 3,
+      'setFlag' => 0,
     ),
     'parameters' => 
     array (
@@ -575,6 +576,23 @@ return array (
           1 => 'Zend\\Db\\Sql\\Select',
           2 => true,
           3 => NULL,
+        ),
+      ),
+      'setFlag' => 
+      array (
+        'WebinoData\\DataSelect::setFlag:0' => 
+        array (
+          0 => 'name',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\DataSelect::setFlag:1' => 
+        array (
+          0 => 'value',
+          1 => NULL,
+          2 => false,
+          3 => true,
         ),
       ),
     ),

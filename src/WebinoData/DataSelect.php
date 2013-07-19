@@ -12,6 +12,7 @@ class DataSelect
     protected $sqlSelect;
     protected $subselects = array();
     protected $search = array();
+    protected $flags = array();
 
     public function __construct(DataService $service, Select $select)
     {
@@ -47,6 +48,23 @@ class DataSelect
     public function getSearch()
     {
         return $this->search;
+    }
+
+    public function setFlag($name, $value = true)
+    {
+        if (null === $value) {
+            unset($this->flags[$name]);
+        }
+        $this->flags[$name] = $value;
+        return $this;
+    }
+
+    public function hasFlag($name)
+    {
+        if (empty($this->flags[$name])) {
+            return false;
+        }
+        return true;
     }
 
     public function columns(array $columns, $prefixColumnsWithTable = true)
