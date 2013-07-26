@@ -1,5 +1,193 @@
 <?php 
 return array (
+  'Zend\\Db\\TableGateway\\TableGateway' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'Zend\\Db\\TableGateway\\TableGatewayInterface',
+      1 => 'Zend\\Db\\TableGateway\\AbstractTableGateway',
+      2 => 'Zend\\Db\\TableGateway\\TableGatewayInterface',
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      '__construct' => 3,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
+        'Zend\\Db\\TableGateway\\TableGateway::__construct:0' => 
+        array (
+          0 => 'table',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'Zend\\Db\\TableGateway\\TableGateway::__construct:1' => 
+        array (
+          0 => 'adapter',
+          1 => 'Zend\\Db\\Adapter\\AdapterInterface',
+          2 => true,
+          3 => NULL,
+        ),
+        'Zend\\Db\\TableGateway\\TableGateway::__construct:2' => 
+        array (
+          0 => 'features',
+          1 => NULL,
+          2 => false,
+          3 => NULL,
+        ),
+        'Zend\\Db\\TableGateway\\TableGateway::__construct:3' => 
+        array (
+          0 => 'resultSetPrototype',
+          1 => 'Zend\\Db\\ResultSet\\ResultSetInterface',
+          2 => false,
+          3 => NULL,
+        ),
+        'Zend\\Db\\TableGateway\\TableGateway::__construct:4' => 
+        array (
+          0 => 'sql',
+          1 => 'Zend\\Db\\Sql\\Sql',
+          2 => false,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
+  'Zend\\Filter\\FilterChain' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'Zend\\Filter\\FilterInterface',
+      1 => 'Countable',
+      2 => 'Zend\\Filter\\AbstractFilter',
+      3 => 'Zend\\Filter\\FilterInterface',
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      '__construct' => 3,
+      'setOptions' => 0,
+      'setPluginManager' => 0,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
+        'Zend\\Filter\\FilterChain::__construct:0' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => NULL,
+        ),
+      ),
+      'setOptions' => 
+      array (
+        'Zend\\Filter\\FilterChain::setOptions:0' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setPluginManager' => 
+      array (
+        'Zend\\Filter\\FilterChain::setPluginManager:0' => 
+        array (
+          0 => 'plugins',
+          1 => 'Zend\\Filter\\FilterPluginManager',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
+  'Zend\\InputFilter\\Factory' => 
+  array (
+    'supertypes' => 
+    array (
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      '__construct' => 3,
+      'setDefaultFilterChain' => 0,
+      'setDefaultValidatorChain' => 0,
+      'setInputFilterManager' => 0,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
+        'Zend\\InputFilter\\Factory::__construct:0' => 
+        array (
+          0 => 'inputFilterManager',
+          1 => 'Zend\\InputFilter\\InputFilterPluginManager',
+          2 => false,
+          3 => NULL,
+        ),
+      ),
+      'setDefaultFilterChain' => 
+      array (
+        'Zend\\InputFilter\\Factory::setDefaultFilterChain:0' => 
+        array (
+          0 => 'filterChain',
+          1 => 'Zend\\Filter\\FilterChain',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setDefaultValidatorChain' => 
+      array (
+        'Zend\\InputFilter\\Factory::setDefaultValidatorChain:0' => 
+        array (
+          0 => 'validatorChain',
+          1 => 'Zend\\Validator\\ValidatorChain',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setInputFilterManager' => 
+      array (
+        'Zend\\InputFilter\\Factory::setInputFilterManager:0' => 
+        array (
+          0 => 'inputFilterManager',
+          1 => 'Zend\\InputFilter\\InputFilterPluginManager',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
+  'Zend\\Validator\\ValidatorChain' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'Countable',
+      1 => 'Zend\\Validator\\ValidatorInterface',
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      'setPluginManager' => 0,
+    ),
+    'parameters' => 
+    array (
+      'setPluginManager' => 
+      array (
+        'Zend\\Validator\\ValidatorChain::setPluginManager:0' => 
+        array (
+          0 => 'plugins',
+          1 => 'Zend\\Validator\\ValidatorPluginManager',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\Module' => 
   array (
     'supertypes' => 
