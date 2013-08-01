@@ -66,9 +66,9 @@ class Relations
             }
 
             $subservice = $service->many($key);
-            $subselect  = $subservice->configSelect($column);
 
-            if ($subselect) {
+            if (is_string($column)) {
+                $subselect = $subservice->configSelect($column);
                 $select->subselect($key, $subselect);
             }
 
