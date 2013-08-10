@@ -2,6 +2,8 @@
 
 namespace WebinoData;
 
+use ArrayObject;
+use WebinoData\InputFilter\InputFilter;
 use WebinoData\InputFilter\InputFilterFactoryAwareInterface;
 use WebinoData\Exception;
 use Zend\Db\Adapter\Platform\PlatformInterface;
@@ -11,7 +13,6 @@ use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\InputFilter\Factory as InputFilterFactory;
-use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterInterface;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
@@ -580,7 +581,7 @@ class DataService implements
             );
         }
 
-        $rows = new \ArrayObject;
+        $rows = new ArrayObject;
 
         foreach ($result as $row) {
 
@@ -607,6 +608,50 @@ class DataService implements
             $data[current($row)] = next($row);
         }
         return $data;
+    }
+
+    public function export($callback, DataSelect $select = null)
+    {
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException('Provided `$callback` not callable');
+        }
+
+        $select = empty($select) ? $this->select() : $select;
+        $result = $this->executeQuery((string) $select);
+
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
+
+        $event
+            ->setService($this)
+            ->setResult($result);
+
+        foreach ($result as $row) {
+
+            $rowObject = new ArrayObject($row);
+
+            $event->setRow($rowObject);
+            $events->trigger(DataEvent::EVENT_EXPORT, $event);
+            $callback($rowObject->getArrayCopy());
+        }
+
+        return $this;
+    }
+
+    public function import(array $data)
+    {
+        $dataObject = new ArrayObject($data);
+
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
+
+        $event
+            ->setService($this)
+            ->setData($dataObject);
+
+        $events->trigger(DataEvent::EVENT_IMPORT, $event);
+        $this->exchangeArray($dataObject->getArrayCopy());
+        return $this;
     }
 
     /**
@@ -679,7 +724,7 @@ class DataService implements
         }
         // /update where
 
-        $data = new \ArrayObject($array);
+        $data = new ArrayObject($array);
 
         $event
             ->setService($this)
@@ -691,22 +736,30 @@ class DataService implements
         !$event->isUpdate() or
             $this->filterInputFilter($array, $inputFilter);
 
-        if (!$inputFilter->getValidInput()) {
-            // validate on exchange
-            $inputFilter->setData($data);
-            $inputFilter->isValid();
-        }
+        $inputFilter->getValidInput() or
+            $inputFilter->validate($data->getArrayCopy());
+
+        $events = $this->getEventManager();
 
         if ($inputFilter->getInvalidInput()) {
-            throw new Exception\RuntimeException(
-                sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
-            );
+
+            $events->trigger(DataEvent::EVENT_EXCHANGE_INVALID, $event);
+
+            // post invalid validation
+            if (!$inputFilter->validate($data->getArrayCopy())) {
+
+                // reset input filter
+                $this->inputFilter = null;
+
+                throw new Exception\RuntimeException(
+                    sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
+                );
+            }
         }
 
-        $events    = $this->getEventManager();
-        $validData = new \ArrayObject($inputFilter->getValues());
-
+        $validData = new ArrayObject($inputFilter->getValues());
         $event->setValidData($validData);
+
         $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $event);
         $validDataArray = $validData->getArrayCopy();
 
@@ -732,6 +785,8 @@ class DataService implements
 
         // reset input filter
         $this->inputFilter = null;
+
+        return $this;
     }
 
     public function executeQuery($query)

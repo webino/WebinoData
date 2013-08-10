@@ -67,10 +67,42 @@ class DataSelect
         return true;
     }
 
-    public function columns(array $columns, $prefixColumnsWithTable = true)
+    public function columns(array $columns)
     {
-        foreach ($columns as $key => &$column) {
+        $serviceConfig = $this->service->getConfig();
+        $tableName     = $this->service->getTableName();
 
+        $inputFilter = $serviceConfig['input_filter'];
+        unset($inputFilter['type']);
+
+        // todo PHP 5.5 array_column
+        // collect input column names
+        $inputColumns = array_map(
+            function ($value) {
+                return $value['name'];
+            },
+            $inputFilter
+        );
+
+        // replace star with input columns
+        $starIndex = array_search('*', $columns);
+        if (false !== $starIndex) {
+            unset($columns[$starIndex]);
+            $columns = array_merge($inputColumns, $columns);
+        }
+
+        // prefix id with table name
+        $idIndex = array_search('id', $columns);
+        if (false !== $idIndex) {
+            unset($columns[$idIndex]);
+            $columns = array_merge(
+                array('id' => new \Zend\Db\Sql\Expression($tableName . '.id')),
+                $columns
+            );
+        }
+
+        // store subselects
+        foreach ($columns as $key => &$column) {
             if ($column instanceof self) {
                 $this->subselect($key, $column);
             }
@@ -86,7 +118,7 @@ class DataSelect
         $this->service->getEventManager()
             ->trigger('data.select.columns', $event);
 
-        $this->sqlSelect->columns($event->getParam('columns'), $prefixColumnsWithTable);
+        $this->sqlSelect->columns($event->getParam('columns'), false);
         return $this;
     }
 

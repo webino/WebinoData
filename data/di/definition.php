@@ -217,7 +217,9 @@ return array (
       'setSelect' => 0,
       'setData' => 0,
       'setValidData' => 0,
+      'setResult' => 0,
       'setRows' => 0,
+      'setRow' => 0,
       'setUpdate' => 0,
       'setArguments' => 0,
       'setParams' => 0,
@@ -291,11 +293,31 @@ return array (
           3 => NULL,
         ),
       ),
+      'setResult' => 
+      array (
+        'WebinoData\\DataEvent::setResult:0' => 
+        array (
+          0 => 'result',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
       'setRows' => 
       array (
         'WebinoData\\DataEvent::setRows:0' => 
         array (
           0 => 'rows',
+          1 => 'ArrayAccess',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setRow' => 
+      array (
+        'WebinoData\\DataEvent::setRow:0' => 
+        array (
+          0 => 'row',
           1 => 'ArrayAccess',
           2 => true,
           3 => NULL,
@@ -827,6 +849,66 @@ return array (
       ),
     ),
   ),
+  'WebinoData\\InputFilter\\InputFilter' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'Zend\\InputFilter\\InputFilterInterface',
+      1 => 'Countable',
+      2 => 'Zend\\InputFilter\\UnknownInputsCapableInterface',
+      3 => 'Zend\\Stdlib\\InitializableInterface',
+      4 => 'Zend\\InputFilter\\InputFilter',
+      5 => 'Zend\\Stdlib\\InitializableInterface',
+      6 => 'Zend\\InputFilter\\UnknownInputsCapableInterface',
+      7 => 'Countable',
+      8 => 'Zend\\InputFilter\\InputFilterInterface',
+      9 => 'Zend\\InputFilter\\BaseInputFilter',
+      10 => 'Zend\\InputFilter\\InputFilterInterface',
+      11 => 'Countable',
+      12 => 'Zend\\InputFilter\\UnknownInputsCapableInterface',
+      13 => 'Zend\\Stdlib\\InitializableInterface',
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      'setFactory' => 0,
+      'setData' => 0,
+      'setValidationGroup' => 0,
+    ),
+    'parameters' => 
+    array (
+      'setFactory' => 
+      array (
+        'WebinoData\\InputFilter\\InputFilter::setFactory:0' => 
+        array (
+          0 => 'factory',
+          1 => 'Zend\\InputFilter\\Factory',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setData' => 
+      array (
+        'WebinoData\\InputFilter\\InputFilter::setData:0' => 
+        array (
+          0 => 'data',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setValidationGroup' => 
+      array (
+        'WebinoData\\InputFilter\\InputFilter::setValidationGroup:0' => 
+        array (
+          0 => 'name',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\DataPlugin\\Relations' => 
   array (
     'supertypes' => 
@@ -849,6 +931,19 @@ return array (
           3 => NULL,
         ),
       ),
+    ),
+  ),
+  'WebinoData\\DataPlugin\\AutoValue' => 
+  array (
+    'supertypes' => 
+    array (
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+    ),
+    'parameters' => 
+    array (
     ),
   ),
   'WebinoData\\DataPlugin\\Order' => 

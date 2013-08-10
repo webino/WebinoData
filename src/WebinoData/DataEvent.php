@@ -23,17 +23,22 @@ class DataEvent extends Event
      */
     const EVENT_SELECT = 'data.select';
     const EVENT_DELETE = 'data.delete';
+    const EVENT_EXCHANGE_INVALID = 'data.exchange.invalid';
     const EVENT_EXCHANGE_PRE = 'data.exchange.pre';
     const EVENT_EXCHANGE_POST = 'data.exchange.post';
     const EVENT_FETCH_PRE = 'data.fetch.pre';
     const EVENT_FETCH_POST = 'data.fetch.post';
+    const EVENT_EXPORT = 'data.export';
+    const EVENT_IMPORT = 'data.import';
     /**#@-*/
 
     protected $service;
     protected $select;
     protected $data;
     protected $validData;
+    protected $result;
     protected $rows;
+    protected $row;
     protected $update;
     protected $arguments = array();
 
@@ -93,6 +98,17 @@ class DataEvent extends Event
         return $this;
     }
 
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    public function setResult($result)
+    {
+        $this->result = $result;
+        return $this;
+    }
+
     /**
      * @return ArrayAccess
      */
@@ -104,6 +120,17 @@ class DataEvent extends Event
     public function setRows(ArrayAccess $rows)
     {
         $this->rows = $rows;
+        return $this;
+    }
+
+    public function getRow()
+    {
+        return $this->row;
+    }
+
+    public function setRow(ArrayAccess $row)
+    {
+        $this->row = $row;
         return $this;
     }
 
