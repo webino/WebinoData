@@ -285,6 +285,12 @@ class DataService implements
      */
     public function setInputFilter(InputFilterInterface $inputFilter)
     {
+        if (!method_exists($inputFilter, 'validate')) {
+            // todo: interface
+            throw new \InvalidArgumentException(
+                'Expects inputFilter validate() method for: ' . $this->getTableName()
+            );
+        }
         $this->inputFilter = $inputFilter;
         return $this;
     }
