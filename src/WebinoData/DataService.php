@@ -898,9 +898,8 @@ class DataService implements
 
             $inputName = $input->getName();
 
-            if (!isset($exchange[$inputName])) {
+            isset($exchange[$inputName]) or
                 $inputFilter->remove($inputName);
-            }
         }
 
         return $this;
