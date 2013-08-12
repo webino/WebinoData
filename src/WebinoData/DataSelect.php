@@ -78,8 +78,8 @@ class DataSelect
         // todo PHP 5.5 array_column
         // collect input column names
         $inputColumns = array_map(
-            function ($value) {
-                return $value['name'];
+            function ($value) use ($tableName) {
+                return new \Zend\Db\Sql\Expression('`' . $tableName . '`.`' . $value['name'] . '`');
             },
             $inputFilter
         );
@@ -96,7 +96,7 @@ class DataSelect
         if (false !== $idIndex) {
             unset($columns[$idIndex]);
             $columns = array_merge(
-                array('id' => new \Zend\Db\Sql\Expression($tableName . '.id')),
+                array('id' => new \Zend\Db\Sql\Expression('`' . $tableName . '`.`id`')),
                 $columns
             );
         }
