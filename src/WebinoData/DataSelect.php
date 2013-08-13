@@ -3,6 +3,7 @@
 namespace WebinoData;
 
 use Zend\Db\Adapter\Platform\PlatformInterface;
+use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Select;
 
@@ -75,14 +76,10 @@ class DataSelect
         $inputFilter = $serviceConfig['input_filter'];
         unset($inputFilter['type']);
 
-        // todo PHP 5.5 array_column
         // collect input column names
-        $inputColumns = array_map(
-            function ($value) use ($tableName) {
-                return new \Zend\Db\Sql\Expression('`' . $tableName . '`.`' . $value['name'] . '`');
-            },
-            $inputFilter
-        );
+        foreach ($inputFilter as $input) {
+            $inputColumns[$input['name']] = new SqlExpression('`' . $tableName . '`.`' . $input['name'] . '`');
+        }
 
         // replace star with input columns
         $starIndex = array_search('*', $columns);
@@ -94,17 +91,23 @@ class DataSelect
         // prefix id with table name
         $idIndex = array_search('id', $columns);
         if (false !== $idIndex) {
-            unset($columns[$idIndex]);
-            $columns = array_merge(
-                array('id' => new \Zend\Db\Sql\Expression('`' . $tableName . '`.`id`')),
-                $columns
-            );
+
+            $columns[$idIndex] = new SqlExpression('`' . $tableName . '`.`id`');
+
+            if (is_numeric($idIndex)) {
+                // we need to change the index to a string
+                // when we want to use an expression
+                $keys            = array_keys($columns);
+                $keyIndex        = array_search($idIndex, $keys);
+                $keys[$keyIndex] = 'id';
+                $columns         = array_combine($keys, array_values($columns));
+            }
         }
 
         // store subselects
-        foreach ($columns as $key => &$column) {
-            if ($column instanceof self) {
-                $this->subselect($key, $column);
+        foreach ($columns as $key => &$idColumn) {
+            if ($idColumn instanceof self) {
+                $this->subselect($key, $idColumn);
             }
         }
 
