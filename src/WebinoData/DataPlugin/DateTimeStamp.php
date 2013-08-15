@@ -14,6 +14,7 @@ class DateTimeStamp
     public function attach(EventManager $eventManager)
     {
         $eventManager->attach('data.exchange.pre', array($this, 'preExchange'));
+        $eventManager->attach('data.export', array($this, 'export'));
     }
 
     /**
@@ -53,5 +54,23 @@ class DateTimeStamp
         }
 
         $data['added'] = $dateTime;
+    }
+
+    public function export(DataEvent $event)
+    {
+        $row = $event->getRow();
+
+        // don't want to synchronize this
+        unset($row['added']);
+        unset($row['updated']);
+    }
+
+    public function import(DataEvent $event)
+    {
+        $data = $event->getData();
+
+        // don't want to synchronize this
+        unset($data['added']);
+        unset($data['updated']);
     }
 }
