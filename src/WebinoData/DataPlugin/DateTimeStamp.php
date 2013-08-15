@@ -2,6 +2,7 @@
 
 namespace WebinoData\DataPlugin;
 
+use ArrayAccess;
 use WebinoData\DataEvent;
 use Zend\EventManager\EventManager;
 use Zend\Filter\DateTimeFormatter;
@@ -25,15 +26,7 @@ class DateTimeStamp
     {
         $data = $event->getValidData();
 
-        $dateTimeFormatter = new DateTimeFormatter();
-        $dateTime = $dateTimeFormatter->filter(time());
-
-        $data['updated'] = $dateTime;
-
-        if ($event->isUpdate()) {
-            return;
-        }
-
+        // resolve inputs
         $service = $event->getService();
         $config  = $service->getConfig();
         unset($config['input_filter']['type']);
@@ -48,29 +41,39 @@ class DateTimeStamp
             )
         );
 
-        if (empty($inputs['added'])) {
-            // added is optional
+        $dateTimeFormatter = new DateTimeFormatter();
+        $dateTime = $dateTimeFormatter->filter(time());
+
+        empty($inputs['updated']) or
+            $data['updated'] = $dateTime;
+
+        if ($event->isUpdate()) {
             return;
         }
 
-        $data['added'] = $dateTime;
+        empty($inputs['added']) or
+            $data['added'] = $dateTime;
     }
 
     public function export(DataEvent $event)
     {
-        $row = $event->getRow();
-
-        // don't want to synchronize this
-        unset($row['added']);
-        unset($row['updated']);
+        $this->unsetTimeStamps($event->getRow());
     }
 
     public function import(DataEvent $event)
     {
-        $data = $event->getData();
+        $this->unsetTimeStamps($event->getData());
+    }
 
+    public function unsetTimeStamps(ArrayAccess $data)
+    {
         // don't want to synchronize this
-        unset($data['added']);
-        unset($data['updated']);
+        if (isset($data['added'])) {
+            unset($data['added']);
+        }
+
+        if (isset($data['updated'])) {
+            unset($data['updated']);
+        }
     }
 }
