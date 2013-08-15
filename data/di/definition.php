@@ -933,6 +933,19 @@ return array (
       ),
     ),
   ),
+  'WebinoData\\DataPlugin\\DateTimeStamp' => 
+  array (
+    'supertypes' => 
+    array (
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+    ),
+    'parameters' => 
+    array (
+    ),
+  ),
   'WebinoData\\DataPlugin\\AutoValue' => 
   array (
     'supertypes' => 

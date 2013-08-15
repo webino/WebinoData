@@ -14,6 +14,7 @@ return array(
     'WebinoData\InputFilter\InputFilterFactoryAwareInterface' => __DIR__ . '/src/WebinoData/InputFilter/InputFilterFactoryAwareInterface.php',
     'WebinoData\InputFilter\InputFilter'                      => __DIR__ . '/src/WebinoData/InputFilter/InputFilter.php',
     'WebinoData\DataPlugin\Relations'                         => __DIR__ . '/src/WebinoData/DataPlugin/Relations.php',
+    'WebinoData\DataPlugin\DateTimeStamp'                     => __DIR__ . '/src/WebinoData/DataPlugin/DateTimeStamp.php',
     'WebinoData\DataPlugin\AutoValue'                         => __DIR__ . '/src/WebinoData/DataPlugin/AutoValue.php',
     'WebinoData\DataPlugin\Order'                             => __DIR__ . '/src/WebinoData/DataPlugin/Order.php',
     'WebinoData\DataQuery\Decrement'                          => __DIR__ . '/src/WebinoData/DataQuery/Decrement.php',

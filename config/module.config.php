@@ -10,6 +10,7 @@ return array(
         'instance' => array(
             'alias' => array(
                 'WebinoDataRelations' => 'WebinoData\DataPlugin\Relations',
+                'WebinoDataDateTimeStamp' => 'WebinoData\DataPlugin\DateTimeStamp',
             ),
             'WebinoDataRelations' => array(
                 'parameters' => array(
