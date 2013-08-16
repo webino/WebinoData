@@ -185,10 +185,12 @@ class DataSelect
         }
 
         if (is_array($term)) {
-            foreach ($term as $subKey => $subTerm) {
+            foreach ($term as $subKey => $subTerms) {
+                foreach ((array) $subTerms as $subTerm) {
 
-                empty($subKey) || empty($subTerm) or
-                    $this->search($subTerm, array($subKey));
+                    empty($subKey) || empty($subTerm) or
+                        $this->search($subTerm, array($subKey));
+                }
             }
             return $this;
         }
@@ -203,10 +205,10 @@ class DataSelect
                 continue;
             }
 
-            foreach ($columns as $col) {
+            foreach ($columns as $column) {
 
                 $word    = preg_replace('~[^a-zA-Z0-9]+~', '%', $word);
-                $where[] = $platform->quoteIdentifier($col) . ' LIKE '
+                $where[] = $platform->quoteIdentifier($column) . ' LIKE '
                          . $platform->quoteValue('%' . $word . '%');
             }
         }
@@ -215,8 +217,14 @@ class DataSelect
             return $this;
         }
 
-        in_array($term, $this->search) or
-            $this->search[] = $term;
+        foreach ($columns as $column) {
+
+            isset($this->search[$column]) or
+                $this->search[$column] = array();
+
+            in_array($term, $this->search) or
+                $this->search[$column][] = $term;
+        }
 
         $this->sqlSelect->where('(' . join(' AND ', $where) . ')', $combination);
         return $this;
