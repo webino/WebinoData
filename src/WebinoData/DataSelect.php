@@ -2,6 +2,7 @@
 
 namespace WebinoData;
 
+use ArrayObject;
 use Zend\Db\Adapter\Platform\PlatformInterface;
 use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\Db\Sql\Predicate\PredicateSet;
@@ -161,7 +162,25 @@ class DataSelect
 
     public function where($predicate, $combination = PredicateSet::OP_AND)
     {
+        is_object($predicate) or
+            $predicate = new ArrayObject($predicate);
+
+        $event = $this->service->getEvent();
+
+        $event
+            ->setSelect($this)
+            ->setService($this->service)
+            ->setParam('predicate', $predicate)
+            ->setParam('combination', $combination);
+
+        $this->service->getEventManager()
+            ->trigger('data.select.where', $event);
+
+        !($predicate instanceof ArrayObject) or
+            $predicate = $predicate->getArrayCopy();
+
         $this->sqlSelect->where($predicate, $combination);
+
         return $this;
     }
 
