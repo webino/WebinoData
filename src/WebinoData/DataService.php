@@ -758,7 +758,11 @@ class DataService implements
                 $this->inputFilter = null;
 
                 throw new Exception\RuntimeException(
-                    sprintf('Expected valid data: %s', print_r($inputFilter->getMessages(), 1))
+                    sprintf(
+                        'Expected valid data: %s %s',
+                        print_r($inputFilter->getMessages(), true),
+                        print_r($data, true)
+                    )
                 );
             }
         }
