@@ -174,7 +174,7 @@ class Relations
         $service = $event->getService();
         $data    = $event->getData();
 
-        $mainId = $service->getLastInsertValue();
+        $mainId = !empty($data['id']) ? $data['id'] : $service->getLastInsertValue();
 
         foreach ($data->getArrayCopy() as $key => $values) {
 
@@ -190,6 +190,21 @@ class Relations
 
             $subservice = $service->many($key);
 
+            if (!isset($values)) {
+                continue;
+            }
+
+            // delete association
+            $this->assocDelete(
+                $service,
+                $subservice,
+                $mainId
+            );
+
+            if (empty($values)) {
+                continue;
+            }
+
             foreach ($values as $value) {
 
                 $subservice->exchangeArray($value);
@@ -199,7 +214,7 @@ class Relations
                     $service,
                     $subservice,
                     $mainId,
-                    $subservice->getLastInsertValue()
+                    !empty($value['id']) ? $value['id'] : $subservice->getLastInsertValue()
                 );
             }
         }
@@ -244,18 +259,21 @@ class Relations
 
         $mainIds   = array_keys($rows->getArrayCopy());
         $tableName = $service->getTableName();
-        $mainKey   = $tableName . '_id';
 
         foreach ($attached as $key) {
 
             $subselect  = clone $select->subselect($key);
             $subservice = $service->many($key);
 
-            $subselect->where(new SqlIn($mainKey, $mainIds));
-
             // todo composition key instead of tableName
-            !$subservice->hasMany($tableName) or
+            if ($subservice->hasMany($tableName)) {
+                $mainKey = $tableName . 'id';
                 $this->assocJoin($subselect, $service, $subservice);
+            } else {
+                $mainKey = $tableName . '_id';
+            }
+
+            $subselect->where(new SqlIn($mainKey, $mainIds));
 
             // limit
             $limit = $subselect->getLimit();
@@ -286,10 +304,12 @@ class Relations
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
         $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
 
-        $mainKey = $service->getTableName();
-        $subKey  = $subservice->getTableName();
+        $mainKey   = $service->getTableName();
+        $subKey    = $subservice->getTableName();
+        $options   = $service->manyOptions($subKey);
+        $tableName = !empty($options['tableName']) ? $options['tableName'] : $mainKey . '_' . $subKey;
 
-        $sql = 'INSERT INTO ' . $qi($mainKey . '_' . $subKey)
+        $sql = 'INSERT IGNORE INTO ' . $qi($tableName)
              . ' (' . $qi($mainKey . 'id') . ', ' . $qi($subKey . 'id') . ')'
              . ' VALUES (' . $qv($mainId) . ', ' . $qv($subId) . ')';
 
@@ -298,13 +318,34 @@ class Relations
              ->execute();
     }
 
+    protected function assocDelete(DataService $service, DataService $subservice, $mainId)
+    {
+        $platform = $service->getPlatform();
+
+        $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
+        $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
+
+        $mainKey   = $service->getTableName();
+        $subKey    = $subservice->getTableName();
+        $options   = $service->manyOptions($subKey);
+        $tableName = !empty($options['tableName']) ? $options['tableName'] : $mainKey . '_' . $subKey;
+
+        $sql = 'DELETE FROM ' . $qi($tableName)
+             . ' WHERE ' . $qi($mainKey . 'id') . ' = ' . $qv($mainId);
+
+        $this->adapter
+             ->query($sql)
+             ->execute();
+    }
+
     protected function assocJoin($select, DataService $service, DataService $subservice)
     {
-        $mainKey = $service->getTableName();
-        $subKey  = $subservice->getTableName();
-        $name    = $mainKey . '_' . $subKey;
+        $mainKey   = $service->getTableName();
+        $subKey    = $subservice->getTableName();
+        $options   = $service->manyOptions($subKey);
+        $tableName = !empty($options['tableName']) ? $options['tableName'] : $mainKey . '_' . $subKey;
 
-        $select->join($name, $subKey . '.id=' . $name . '.' . $subKey . 'id');
+        $select->join($tableName, $subKey . '.id=' . $tableName . '.' . $subKey . 'id');
     }
 
     /**
