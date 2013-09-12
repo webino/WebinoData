@@ -80,6 +80,9 @@ class DataService implements
     protected $hasOneList = array();
     protected $hasManyList = array();
 
+    protected $hasOneService = array();
+    protected $hasManyService = array();
+
 
     /**
      * @param TableGateway $tableGateway
@@ -296,6 +299,7 @@ class DataService implements
     }
 
     /**
+     * @deprecated Use setHasManyService instead, it prevents circular dependency exception
      * @param DataService $service
      * @return DataService
      */
@@ -310,12 +314,29 @@ class DataService implements
     }
 
     /**
+     * @param DataService $service
+     * @return DataService
+     */
+    public function setHasOneService($name, $serviceName, array $options = array())
+    {
+        isset($this->hasOneService[$name]) or
+            $this->hasOneService[$name] = array();
+
+        $this->hasOneService[$name]['serviceName'] = $serviceName;
+        $this->hasOneService[$name]['options']     = $options;
+        return $this;
+    }
+
+    /**
      * @param string $name
      * @return bool
      */
     public function hasOne($name)
     {
-        return !empty($this->hasOneList[$name]);
+        if (!empty($this->hasOneList[$name])) {
+            return true;
+        }
+        return !empty($this->hasOneService[$name]);
     }
 
     /**
@@ -326,7 +347,13 @@ class DataService implements
     protected function resolveOne($name)
     {
         if (empty($this->hasOneList[$name])) {
-            throw new \OutOfBoundsException('Hasn\'t one ' . $name);
+            if (empty($this->hasOneService[$name])) {
+                throw new \OutOfBoundsException('Hasn\'t one ' . $name);
+            } else {
+                $serviceName = $this->hasOneService[$name]['serviceName'];
+                $this->hasOneService[$name]['service'] = $this->serviceManager->get($serviceName);
+                return $this->hasOneService[$name];
+            }
         }
 
         return $this->hasOneList[$name];
@@ -360,6 +387,15 @@ class DataService implements
     }
 
     /**
+     * @return array
+     */
+    public function getHasOneService()
+    {
+        return $this->hasOneService;
+    }
+
+    /**
+     * @deprecated Use setHasManyService instead, it prevents circular dependency exception
      * @param string $name
      * @param DataService $service
      * @return DataService
@@ -376,11 +412,29 @@ class DataService implements
 
     /**
      * @param string $name
+     * @param string $serviceName
+     * @return DataService
+     */
+    public function setHasManyService($name, $serviceName, array $options = array())
+    {
+        isset($this->hasManyService[$name]) or
+            $this->hasManyService[$name] = array();
+
+        $this->hasManyService[$name]['serviceName'] = $serviceName;
+        $this->hasManyService[$name]['options']     = $options;
+        return $this;
+    }
+
+    /**
+     * @param string $name
      * @return bool
      */
     public function hasMany($name)
     {
-        return !empty($this->hasManyList[$name]);
+        if (!empty($this->hasManyList[$name])) {
+            return true;
+        }
+        return !empty($this->hasManyService[$name]);
     }
 
     /**
@@ -391,7 +445,13 @@ class DataService implements
     protected function resolveMany($name)
     {
         if (empty($this->hasManyList[$name])) {
-            throw new \OutOfBoundsException('Hasn\'t many ' . $name);
+            if (empty($this->hasManyService[$name])) {
+                throw new \OutOfBoundsException('Hasn\'t many ' . $name);
+            } else {
+                $serviceName = $this->hasManyService[$name]['serviceName'];
+                $this->hasManyService[$name]['service'] = $this->serviceManager->get($serviceName);
+                return $this->hasManyService[$name];
+            }
         }
 
         return $this->hasManyList[$name];
@@ -421,6 +481,14 @@ class DataService implements
      * @return array
      */
     public function getHasManyList()
+    {
+        return $this->hasManyList;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHasManyService()
     {
         return $this->hasManyList;
     }

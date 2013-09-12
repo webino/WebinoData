@@ -6,6 +6,17 @@ return array(
             'compiler' => array(
                 __DIR__ . '/../data/di/definition.php',
             ),
+            'class' => array(
+                'WebinoData\DataService' => array(
+                    'methods' => array(
+                        'setHasManyService' => array(
+                            'name' => array('type' => false),
+                            'serviceName' => array('type' => false),
+                            'options' => array('type' => false),
+                        ),
+                    ),
+                ),
+            ),
         ),
         'instance' => array(
             'alias' => array(

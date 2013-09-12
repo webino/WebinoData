@@ -597,7 +597,9 @@ return array (
       'setInputFilterFactory' => 3,
       'setInputFilter' => 0,
       'setHasOne' => 0,
+      'setHasOneService' => 0,
       'setHasMany' => 0,
+      'setHasManyService' => 0,
       'setQuery' => 0,
       'getEventManager' => 3,
       'getInputFilter' => 3,
@@ -707,6 +709,32 @@ return array (
           ),
         ),
       ),
+      'setHasOneService' => 
+      array (
+        'WebinoData\\DataService::setHasOneService:0' => 
+        array (
+          0 => 'name',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\DataService::setHasOneService:1' => 
+        array (
+          0 => 'serviceName',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\DataService::setHasOneService:2' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => 
+          array (
+          ),
+        ),
+      ),
       'setHasMany' => 
       array (
         'WebinoData\\DataService::setHasMany:0' => 
@@ -724,6 +752,32 @@ return array (
           3 => NULL,
         ),
         'WebinoData\\DataService::setHasMany:2' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => 
+          array (
+          ),
+        ),
+      ),
+      'setHasManyService' => 
+      array (
+        'WebinoData\\DataService::setHasManyService:0' => 
+        array (
+          0 => 'name',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\DataService::setHasManyService:1' => 
+        array (
+          0 => 'serviceName',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\DataService::setHasManyService:2' => 
         array (
           0 => 'options',
           1 => NULL,
