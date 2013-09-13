@@ -9,10 +9,15 @@ return array(
             'class' => array(
                 'WebinoData\DataService' => array(
                     'methods' => array(
+                        'setHasOneService' => array(
+                            'name' => array('type' => false),
+                            'serviceName' => array('type' => false),
+                            'options' => array('type' => false, 'default' => array()),
+                        ),
                         'setHasManyService' => array(
                             'name' => array('type' => false),
                             'serviceName' => array('type' => false),
-                            'options' => array('type' => false),
+                            'options' => array('type' => false, 'default' => array()),
                         ),
                     ),
                 ),
