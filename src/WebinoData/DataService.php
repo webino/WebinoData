@@ -852,7 +852,8 @@ class DataService implements
 
             throw new Exception\RuntimeException(
                     sprintf(
-                        'Statement could not be executed'
+                        'Statement could not be executed for the service table `%s`',
+                        $this->getTableName()
                     ) . '; ' . $e->getPrevious()->getMessage(),
                     $e->getCode(),
                     $e
