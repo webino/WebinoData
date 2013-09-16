@@ -51,7 +51,12 @@ class Relations
                     continue;
                 }
 
-                $select->addColumn($key, $key . '_id');
+                if (is_string($column)) {
+                    $subselect = $service->one($key)->configSelect($column);
+                    $select->subselect($key, $subselect);
+                }
+
+                $select->addColumn($key, new SqlExpression('\'0\''));
                 continue;
             }
 
@@ -65,10 +70,8 @@ class Relations
                 continue;
             }
 
-            $subservice = $service->many($key);
-
             if (is_string($column)) {
-                $subselect = $subservice->configSelect($column);
+                $subselect = $service->many($key)->configSelect($column);
                 $select->subselect($key, $subselect);
             }
 
@@ -145,8 +148,16 @@ class Relations
 
             $attached[$key] = array();
 
+            $subselect = $select->subselect($key);
+
+            $subselect or
+                $select->subselect($key, $service->one($key)->select());
+
             foreach ($rows as $row) {
-                $attached[$key][$row[$key]] = $row[$key];
+                $idKey = $key . '_id';
+
+                empty($row[$idKey]) or
+                    $attached[$key][$row[$idKey]] = $row[$idKey];
             }
         }
 
@@ -158,13 +169,15 @@ class Relations
 
             $subselect  = clone $select->subselect($key);
             $subservice = $service->one($key);
+            $tableName  = $subservice->getTableName();
 
-            $subselect->where(new SqlIn('id', $subIds));
+            $subselect->where(new SqlIn($tableName . '.id', $subIds));
 
             $subItems = $subservice->fetchWith($subselect);
 
             foreach ($rows as &$row) {
-                $row[$key] = $subItems[$row[$key]];
+                $idKey = $key . '_id';
+                $row[$key] = $subItems[$row[$idKey]];
             }
         }
     }
