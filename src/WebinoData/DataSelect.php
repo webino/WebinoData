@@ -83,14 +83,30 @@ class DataSelect
         }
 
         // replace star with input columns
-        $starIndex = array_search('*', $columns);
+        $starIndex = false;
+        foreach ($columns as $index => $value) {
+            if ('*' === $value) {
+                $starIndex = $index;
+                unset($index);
+                unset($value);
+                break;
+            }
+        }
         if (false !== $starIndex) {
             unset($columns[$starIndex]);
             $columns = array_merge($inputColumns, $columns);
         }
 
         // prefix id with table name
-        $idIndex = array_search('id', $columns);
+        $idIndex = false;
+        foreach ($columns as $index => $value) {
+            if ('id' === $value) {
+                $idIndex = $index;
+                unset($index);
+                unset($value);
+                break;
+            }
+        }
         if (false !== $idIndex) {
 
             $columns[$idIndex] = new SqlExpression('`' . $tableName . '`.`id`');
