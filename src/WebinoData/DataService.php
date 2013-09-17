@@ -593,22 +593,26 @@ class DataService implements
 
     public function configSelect()
     {
-        $selectNames = func_get_args();
+        $firstArg    = func_get_arg(0);
+        $selectNames = is_array($firstArg) ? $firstArg : func_get_args();
         $select      = $this->select();
+        $sqlSelect   = $select->getSqlSelect();
 
+        $selectConfig = array();
         foreach ($selectNames as $selectName) {
 
             if (!is_string($selectName)) {
                 continue;
             }
-
             if (!isset($this->config['select'][$selectName])) {
                 // allow empty select config
                 continue;
             }
 
-            $this->configureSelect($select->getSqlSelect(), $this->config['select'][$selectName]);
+            $selectConfig = array_replace_recursive($selectConfig, $this->config['select'][$selectName]);
         }
+
+        $this->configureSelect($sqlSelect, $selectConfig);
 
         return $select;
     }
@@ -918,7 +922,7 @@ class DataService implements
             $select->columns($config['columns'][0], $config['columns'][1]);
         }
 
-        if (isset($config['where'])) {
+        if (!empty($config['where'])) {
 
             array_key_exists(1, $config['where']) or
                 $config['where'][1] = Sql\Predicate\PredicateSet::OP_AND;
