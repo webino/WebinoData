@@ -69,13 +69,13 @@ class WebinoDataSelect extends DbSelect
 
         $select->columns(array('c' => new Expression('COUNT(*)')));
 
-        $sql = 'SELECT COUNT(*) as c FROM(' . $this->sql->getSqlStringForSqlObject($select) . ') AS x';
-
+        $sql       = $this->sql->getSqlStringForSqlObject($select);
         $statement = $this->sql->getAdapter()->createStatement($sql);
         $result    = $statement->execute();
         $row       = $result->current();
 
-        $this->rowCount = $row['c'];
+        $resultCount    = $result->count();
+        $this->rowCount = 1 < $resultCount ? $resultCount : $row['c'];
 
         return $this->rowCount;
     }
