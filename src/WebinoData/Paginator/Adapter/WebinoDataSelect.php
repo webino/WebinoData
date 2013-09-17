@@ -69,7 +69,8 @@ class WebinoDataSelect extends DbSelect
 
         $select->columns(array('c' => new Expression('COUNT(*)')));
 
-        $sql       = $this->sql->getSqlStringForSqlObject($select);
+        $sql = 'SELECT COUNT(*) as c FROM(' . $this->sql->getSqlStringForSqlObject($select) . ') AS x';
+
         $statement = $this->sql->getAdapter()->createStatement($sql);
         $result    = $statement->execute();
         $row       = $result->current();
