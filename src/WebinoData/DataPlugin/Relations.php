@@ -41,7 +41,7 @@ class Relations
         $select  = $event->getSelect();
         $columns = $select->getColumns();
 
-        foreach ($columns as $key => &$column) {
+        foreach ($columns as $key => $column) {
 
             if ($service->hasOne($key)) {
 
@@ -51,7 +51,7 @@ class Relations
                     continue;
                 }
 
-                if (is_string($column)) {
+                if (is_string($column) || is_array($column)) {
                     $subselect = $service->one($key)->configSelect($column);
                     $select->subselect($key, $subselect);
                 }
@@ -70,7 +70,7 @@ class Relations
                 continue;
             }
 
-            if (is_string($column)) {
+            if (is_string($column) || is_array($column)) {
                 $subselect = $service->many($key)->configSelect($column);
                 $select->subselect($key, $subselect);
             }
