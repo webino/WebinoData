@@ -213,7 +213,7 @@ class DataSelect
         return $this;
     }
 
-    public function search($term, array $columns = array(), $combination = PredicateSet::OP_AND)
+    public function search($term, array $columns = array(), $combination = PredicateSet::OP_OR)
     {
         if (empty($term)) {
             return $this;
@@ -224,7 +224,7 @@ class DataSelect
                 foreach ((array) $subTerms as $subTerm) {
 
                     empty($subKey) || empty($subTerm) or
-                        $this->search($subTerm, array($subKey));
+                        $this->search($subTerm, array($subKey), $combination);
                 }
             }
             return $this;
@@ -261,7 +261,7 @@ class DataSelect
                 $this->search[$column][] = $term;
         }
 
-        $this->sqlSelect->where('(' . join(' AND ', $where) . ')', $combination);
+        $this->sqlSelect->where('(' . join(' ' . $combination . ' ', $where) . ')', PredicateSet::OP_AND);
         return $this;
     }
 
