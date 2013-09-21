@@ -242,6 +242,13 @@ class DataSelect
 
             foreach ($columns as $column) {
 
+                if (preg_match('~_id$~', $column)) {
+                    // id column
+                    $where[] = $platform->quoteIdentifier($column) . ' = '
+                             . $platform->quoteValue($word);
+                    continue;
+                }
+
                 $word    = preg_replace('~[^a-zA-Z0-9]+~', '%', $word);
                 $where[] = $platform->quoteIdentifier($column) . ' LIKE '
                          . $platform->quoteValue('%' . $word . '%');
