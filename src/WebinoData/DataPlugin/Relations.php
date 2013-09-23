@@ -166,6 +166,9 @@ class Relations
         }
 
         foreach ($attached as $key => $subIds) {
+            if (empty($subIds)) {
+                continue;
+            }
 
             $subselect  = clone $select->subselect($key);
             $subservice = $service->one($key);
