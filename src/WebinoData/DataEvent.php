@@ -23,6 +23,7 @@ class DataEvent extends Event
      */
     const EVENT_SELECT = 'data.select';
     const EVENT_DELETE = 'data.delete';
+    const EVENT_DELETE_POST = 'data.delete.post';
     const EVENT_EXCHANGE_INVALID = 'data.exchange.invalid';
     const EVENT_EXCHANGE_PRE = 'data.exchange.pre';
     const EVENT_EXCHANGE_POST = 'data.exchange.post';

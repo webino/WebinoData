@@ -785,7 +785,11 @@ class DataService implements
             return 0;
         }
 
-        return $this->tableGateway->delete($where);
+        $result = $this->tableGateway->delete($where);
+
+        $events->trigger(DataEvent::EVENT_DELETE_POST, $event);
+
+        return $result;
     }
 
     public function own(&$subject, $id)
@@ -894,10 +898,10 @@ class DataService implements
             );
         }
 
-        $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
-
         // reset input filter
         $this->inputFilter = null;
+
+        $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
 
         return $this;
     }
