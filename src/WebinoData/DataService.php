@@ -319,6 +319,10 @@ class DataService implements
      */
     public function setHasOneService($name, $serviceName, array $options = array())
     {
+        if (empty($name)) {
+            throw new \InvalidArgumentException('Name cannot be null');
+        }
+
         isset($this->hasOneService[$name]) or
             $this->hasOneService[$name] = array();
 
@@ -383,7 +387,18 @@ class DataService implements
      */
     public function getHasOneList()
     {
-        return $this->hasOneList;
+        $hasOne = $this->hasOneList;
+        if (!empty($this->hasOneService)) {
+            foreach ($this->hasOneService as $name => $item) {
+
+                !empty($item['service']) or
+                    $item = $this->resolveOne($name);
+
+                $hasOne[$name] = $item;
+            }
+        }
+
+        return $hasOne;
     }
 
     /**
@@ -417,6 +432,10 @@ class DataService implements
      */
     public function setHasManyService($name, $serviceName, array $options = array())
     {
+        if (empty($name)) {
+            throw new \InvalidArgumentException('Name cannot be null');
+        }
+
         isset($this->hasManyService[$name]) or
             $this->hasManyService[$name] = array();
 
@@ -482,7 +501,18 @@ class DataService implements
      */
     public function getHasManyList()
     {
-        return $this->hasManyList;
+        $hasMany = $this->hasManyList;
+        if (!empty($this->hasManyService)) {
+            foreach ($this->hasManyService as $name => $item) {
+
+                !empty($item['service']) or
+                    $item = $this->resolveMany($name);
+
+                $hasMany[$name] = $item;
+            }
+        }
+
+        return $hasMany;
     }
 
     /**

@@ -5,22 +5,7 @@ return array(
         'definition' => array(
             'compiler' => array(
                 __DIR__ . '/../data/di/definition.php',
-            ),
-            'class' => array(
-                'WebinoData\DataService' => array(
-                    'methods' => array(
-                        'setHasOneService' => array(
-                            'name' => array('type' => false),
-                            'serviceName' => array('type' => false),
-                            'options' => array('type' => false, 'default' => array()),
-                        ),
-                        'setHasManyService' => array(
-                            'name' => array('type' => false),
-                            'serviceName' => array('type' => false),
-                            'options' => array('type' => false, 'default' => array()),
-                        ),
-                    ),
-                ),
+                __DIR__ . '/../data/di/DataService.definition.php',
             ),
         ),
         'instance' => array(
