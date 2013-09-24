@@ -185,7 +185,7 @@ if ('delivery' === $key) {
             foreach ($rows as &$row) {
                 $idKey = $key . '_id';
 
-                empty($subItems[$row[$idKey]]) or
+                empty($row[$idKey]) || empty($subItems[$row[$idKey]]) or
                     $row[$key] = $subItems[$row[$idKey]];
             }
         }
