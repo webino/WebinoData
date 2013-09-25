@@ -106,11 +106,7 @@ class Relations
             }
 
             $subservice = $service->one($key);
-if ('delivery' === $key) {
-//    var_dump($subservice->getTableName());exit;
-//    $subservice->exchangeArray($value);
-//var_dump($value);exit;
-            }
+
             $subservice->exchangeArray($value);
 
             unset($data[$key]);
@@ -314,7 +310,13 @@ if ('delivery' === $key) {
                     continue;
                 }
 
-                $rows[$mainId][$key][] = $subItem;
+                if (!empty($subItem['id'])
+                    && empty($rows[$mainId][$key][$subItem['id']])
+                ) {
+                    $rows[$mainId][$key][$subItem['id']] = $subItem;
+                } else {
+                    $rows[$mainId][$key][] = $subItem;
+                }
             }
         }
     }
