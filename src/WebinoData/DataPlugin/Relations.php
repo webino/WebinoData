@@ -213,6 +213,7 @@ class Relations
             }
 
             // delete association
+            // todo one to many
             $this->assocDelete(
                 $service,
                 $subservice,
@@ -228,6 +229,7 @@ class Relations
                 $subservice->exchangeArray($value);
 
                 // create association
+                // todo one to many
                 $this->assocInsert(
                     $service,
                     $subservice,
