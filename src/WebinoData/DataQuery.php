@@ -22,21 +22,25 @@ class DataQuery
         );
     }
 
-    public function increment($column)
+    public function increment($column, $increment = 1)
     {
-        return new DataQuery\Increment(
+        $query = new DataQuery\Increment(
             $column,
             $this->sql->update(),
             $this->platform
         );
+        $query->setIncrement($increment);
+        return $query;
     }
 
-    public function decrement($column)
+    public function decrement($column, $decrement = 1)
     {
-        return new DataQuery\Decrement(
+        $query = new DataQuery\Decrement(
             $column,
             $this->sql->update(),
             $this->platform
         );
+        $query->setDecrement($decrement);
+        return $query;
     }
 }
