@@ -109,8 +109,6 @@ class Relations
 
             $subservice->exchangeArray($value);
 
-            unset($data[$key]);
-
             if (!empty($value['id'])) {
                 $id = $value['id'];
             } else {

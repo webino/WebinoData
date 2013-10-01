@@ -626,7 +626,6 @@ class DataService implements
         $firstArg    = func_get_arg(0);
         $selectNames = is_array($firstArg) ? $firstArg : func_get_args();
         $select      = $this->select();
-        $sqlSelect   = $select->getSqlSelect();
 
         $selectConfig = array();
         foreach ($selectNames as $selectName) {
@@ -642,7 +641,7 @@ class DataService implements
             $selectConfig = array_replace_recursive($selectConfig, $this->config['select'][$selectName]);
         }
 
-        $this->configureSelect($sqlSelect, $selectConfig);
+        $this->configureSelect($select, $selectConfig);
 
         return $select;
     }
@@ -946,7 +945,7 @@ class DataService implements
         return $this->tableGateway->getAdapter();
     }
 
-    protected function configureSelect(Sql\Select $select, array $config)
+    protected function configureSelect(DataSelect $select, array $config)
     {
         if (isset($config['columns'])) {
 
