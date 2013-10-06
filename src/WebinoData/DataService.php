@@ -948,19 +948,21 @@ class DataService implements
     protected function configureSelect(DataSelect $select, array $config)
     {
         if (isset($config['columns'])) {
+            // todo prefixColumnsWithTable deprecated
+            $columns = current($config['columns']);
+            $prefixColumnsWithTable = (2 === count($config['columns'])) ? next($config['columns']) : false;
 
-            array_key_exists(1, $config['columns']) or
-                $config['columns'][1] = false;
-
-            $select->columns($config['columns'][0], $config['columns'][1]);
+            $select->columns($columns, $prefixColumnsWithTable);
         }
 
         if (!empty($config['where'])) {
 
-            array_key_exists(1, $config['where']) or
-                $config['where'][1] = Sql\Predicate\PredicateSet::OP_AND;
+            $where = current($config['where']);
+            $combination = (2 === count($config['where']))
+                            ? next($config['where'])
+                            : Sql\Predicate\PredicateSet::OP_AND;
 
-            $select->where($config['where'][0], $config['where'][1]);
+            $select->where($where, $combination);
         }
 
         empty($config['order']) or
