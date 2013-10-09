@@ -242,16 +242,20 @@ class DataSelect
 
             foreach ($columns as $column) {
 
+                $columnParts = explode('.', $column);
+                $identifier  = (2 === count($columnParts))
+                                ? $platform->quoteIdentifier($columnParts[0])
+                                  . '.' . $platform->quoteIdentifier($columnParts[1])
+                                : $platform->quoteIdentifier($column);
+
                 if (preg_match('~_id$~', $column)) {
                     // id column
-                    $where[] = $platform->quoteIdentifier($column) . ' = '
-                             . $platform->quoteValue($word);
+                    $where[] = $identifier . ' = ' . $platform->quoteValue($word);
                     continue;
                 }
 
                 $word    = preg_replace('~[^a-zA-Z0-9]+~', '%', $word);
-                $where[] = $platform->quoteIdentifier($column) . ' LIKE '
-                         . $platform->quoteValue('%' . $word . '%');
+                $where[] = $identifier . ' LIKE ' . $platform->quoteValue('%' . $word . '%');
             }
         }
 
