@@ -71,9 +71,14 @@ class WebinoDataSelect extends DbSelect
 
         $sql       = $this->sql->getSqlStringForSqlObject($select);
         $statement = $this->sql->getAdapter()->createStatement($sql);
-        $result    = $statement->execute();
-        $row       = $result->current();
 
+        try {
+            $result = $statement->execute();
+        } catch (\Exception $exc) {
+            throw new \RuntimeException('Could not execute SQL ' . $sql, $exc->getCode(), $exc);
+        }
+
+        $row            = $result->current();
         $resultCount    = $result->count();
         $this->rowCount = 1 < $resultCount ? $resultCount : $row['c'];
 
