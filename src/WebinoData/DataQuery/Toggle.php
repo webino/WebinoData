@@ -24,18 +24,22 @@ class Toggle extends AbstractDataQuery
 
     public function __toString()
     {
-        $identifier = $this->platform->quoteIdentifier($this->column);
+        $columns = is_array($this->column) ? $this->column : array($this->column => 1);
+        $set     = array();
 
-        $this->sql->set(
-            array(
-                $this->column => $this->createExpression($identifier),
-            )
-        );
+        foreach ($columns as $column => $value) {
+
+            $column       = !is_numeric($column) ? $column : $value;
+            $identifier   = $this->platform->quoteIdentifier($column);
+            $set[$column] = $this->createExpression($identifier, $value);
+        }
+
+        $this->sql->set($set);
 
         return $this->sql->getSqlString($this->platform);
     }
 
-    protected function createExpression($identifier)
+    protected function createExpression($identifier, $value)
     {
         return new SqlExpression('NOT ' . $identifier);
     }

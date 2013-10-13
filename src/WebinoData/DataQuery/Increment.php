@@ -6,16 +6,8 @@ use Zend\Db\Sql\Expression as SqlExpression;
 
 class Increment extends Toggle
 {
-    protected $increment = 1 ;
-
-    public function setIncrement($increment)
+    protected function createExpression($identifier, $increment)
     {
-        $this->increment = $increment;
-        return $this;
-    }
-
-    protected function createExpression($identifier)
-    {
-        return new SqlExpression($identifier . '+' . $this->increment);
+        return new SqlExpression($identifier . '+' . $increment);
     }
 }

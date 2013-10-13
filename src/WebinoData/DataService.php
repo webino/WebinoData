@@ -922,19 +922,19 @@ class DataService implements
         return $this->executeQuery($query->toString());
     }
 
-    public function increment($column, array $where, $increment = 1)
+    public function increment($column, array $where)
     {
         $query = $this->getQuery()
-                      ->increment($column, $increment)
+                      ->increment($column)
                       ->where($where);
 
         return $this->executeQuery($query->toString());
     }
 
-    public function decrement($column, array $where, $decrement = 1)
+    public function decrement($column, array $where)
     {
         $query = $this->getQuery()
-                      ->decrement($column, $decrement)
+                      ->decrement($column)
                       ->where($where);
 
         return $this->executeQuery($query->toString());

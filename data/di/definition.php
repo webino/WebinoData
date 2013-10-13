@@ -1048,7 +1048,6 @@ return array (
     'methods' => 
     array (
       '__construct' => 3,
-      'setDecrement' => 0,
     ),
     'parameters' => 
     array (
@@ -1076,16 +1075,6 @@ return array (
           3 => NULL,
         ),
       ),
-      'setDecrement' => 
-      array (
-        'WebinoData\\DataQuery\\Decrement::setDecrement:0' => 
-        array (
-          0 => 'decrement',
-          1 => NULL,
-          2 => true,
-          3 => NULL,
-        ),
-      ),
     ),
   ),
   'WebinoData\\DataQuery\\Increment' => 
@@ -1099,7 +1088,6 @@ return array (
     'methods' => 
     array (
       '__construct' => 3,
-      'setIncrement' => 0,
     ),
     'parameters' => 
     array (
@@ -1123,16 +1111,6 @@ return array (
         array (
           0 => 'platform',
           1 => 'Zend\\Db\\Adapter\\Platform\\PlatformInterface',
-          2 => true,
-          3 => NULL,
-        ),
-      ),
-      'setIncrement' => 
-      array (
-        'WebinoData\\DataQuery\\Increment::setIncrement:0' => 
-        array (
-          0 => 'increment',
-          1 => NULL,
           2 => true,
           3 => NULL,
         ),
