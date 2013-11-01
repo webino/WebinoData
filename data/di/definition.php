@@ -963,6 +963,30 @@ return array (
       ),
     ),
   ),
+  'WebinoData\\DataPlugin\\ConfigurableInterface' => 
+  array (
+    'supertypes' => 
+    array (
+    ),
+    'instantiator' => NULL,
+    'methods' => 
+    array (
+      'setOptions' => 0,
+    ),
+    'parameters' => 
+    array (
+      'setOptions' => 
+      array (
+        'WebinoData\\DataPlugin\\ConfigurableInterface::setOptions:0' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\DataPlugin\\Relations' => 
   array (
     'supertypes' => 
@@ -1000,6 +1024,31 @@ return array (
     array (
     ),
   ),
+  'WebinoData\\DataPlugin\\AbstractConfigurable' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'WebinoData\\DataPlugin\\ConfigurableInterface',
+    ),
+    'instantiator' => NULL,
+    'methods' => 
+    array (
+      'setOptions' => 0,
+    ),
+    'parameters' => 
+    array (
+      'setOptions' => 
+      array (
+        'WebinoData\\DataPlugin\\AbstractConfigurable::setOptions:0' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\DataPlugin\\AutoValue' => 
   array (
     'supertypes' => 
@@ -1031,6 +1080,44 @@ return array (
         array (
           0 => 'adapter',
           1 => 'Zend\\Db\\Adapter\\AdapterInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
+  'WebinoData\\DataPlugin\\CacheInvalidator' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'WebinoData\\DataPlugin\\ConfigurableInterface',
+      1 => 'WebinoData\\DataPlugin\\AbstractConfigurable',
+      2 => 'WebinoData\\DataPlugin\\ConfigurableInterface',
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      'setClearByTags' => 0,
+      'setOptions' => 0,
+    ),
+    'parameters' => 
+    array (
+      'setClearByTags' => 
+      array (
+        'WebinoData\\DataPlugin\\CacheInvalidator::setClearByTags:0' => 
+        array (
+          0 => 'clearByTags',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setOptions' => 
+      array (
+        'WebinoData\\DataPlugin\\CacheInvalidator::setOptions:0' => 
+        array (
+          0 => 'options',
+          1 => NULL,
           2 => true,
           3 => NULL,
         ),

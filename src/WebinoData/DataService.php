@@ -124,11 +124,27 @@ class DataService implements
         $serviceManager = $this->getServiceManager();
         $eventManager   = $this->getEventManager();
 
-        foreach ($config as $pluginName) {
+        foreach ($config as $pluginKey => $pluginName) {
 
-            $serviceManager
-                ->get($pluginName)
-                ->attach($eventManager);
+            $pluginOptions = array();
+            if (is_array($pluginName)) {
+
+                if (!empty($pluginName['plugin'])) {
+                    $pluginName = $pluginName['plugin'];
+                    unset($pluginName['plugin']);
+                    $pluginOptions = $pluginName;
+
+                } else {
+                    $pluginOptions = $pluginName;
+                    $pluginName    = $pluginKey;
+                }
+            }
+
+            $plugin = $serviceManager->get($pluginName);
+            $plugin->attach($eventManager);
+
+            empty($pluginOptions) or
+                $plugin->setOptions($pluginOptions);
         }
 
         return $this;
@@ -915,6 +931,17 @@ class DataService implements
 
     public function toggle($column, array $where)
     {
+        $this->init();
+
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
+
+        $event
+            ->setService($this)
+            ->setArguments(array($column, $where));
+
+        $events->trigger(DataEvent::EVENT_TOGGLE, $event);
+
         $query = $this->getQuery()
                       ->toggle($column)
                       ->where($where);
@@ -924,6 +951,17 @@ class DataService implements
 
     public function increment($column, array $where)
     {
+        $this->init();
+
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
+
+        $event
+            ->setService($this)
+            ->setArguments(array($column, $where));
+
+        $events->trigger(DataEvent::EVENT_INCREMENT, $event);
+
         $query = $this->getQuery()
                       ->increment($column)
                       ->where($where);
@@ -933,6 +971,17 @@ class DataService implements
 
     public function decrement($column, array $where)
     {
+        $this->init();
+
+        $events = $this->getEventManager();
+        $event  = $this->getEvent();
+
+        $event
+            ->setService($this)
+            ->setArguments(array($column, $where));
+
+        $events->trigger(DataEvent::EVENT_DECREMENT, $event);
+
         $query = $this->getQuery()
                       ->decrement($column)
                       ->where($where);

@@ -31,6 +31,9 @@ class DataEvent extends Event
     const EVENT_FETCH_POST = 'data.fetch.post';
     const EVENT_EXPORT = 'data.export';
     const EVENT_IMPORT = 'data.import';
+    const EVENT_TOGGLE = 'data.toggle';
+    const EVENT_INCREMENT = 'data.increment';
+    const EVENT_DECREMENT = 'data.decrement';
     /**#@-*/
 
     protected $service;
