@@ -368,7 +368,7 @@ class DataService implements
     {
         if (empty($this->hasOneList[$name])) {
             if (empty($this->hasOneService[$name])) {
-                throw new \OutOfBoundsException('Hasn\'t one ' . $name);
+                throw new \OutOfBoundsException('Hasn\'t one ' . $name . '; ' . $this->getTableName());
             } else {
                 $serviceName = $this->hasOneService[$name]['serviceName'];
                 $this->hasOneService[$name]['service'] = $this->serviceManager->get($serviceName);
@@ -481,7 +481,7 @@ class DataService implements
     {
         if (empty($this->hasManyList[$name])) {
             if (empty($this->hasManyService[$name])) {
-                throw new \OutOfBoundsException('Hasn\'t many ' . $name);
+                throw new \OutOfBoundsException('Hasn\'t many ' . $name . '; ' . $this->getTableName());
             } else {
                 $serviceName = $this->hasManyService[$name]['serviceName'];
                 $this->hasManyService[$name]['service'] = $this->serviceManager->get($serviceName);
