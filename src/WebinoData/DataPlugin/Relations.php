@@ -7,17 +7,24 @@ use WebinoData\DataService;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\Db\Sql\Predicate\In as SqlIn;
+use Zend\EventManager\EventManager;
 
 class Relations
 {
+    /**
+     * @var AdapterInterface
+     */
     protected $adapter;
 
+    /**
+     * @param AdapterInterface $adapter
+     */
     public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }
 
-    public function attach($eventManager)
+    public function attach(EventManager $eventManager)
     {
         $eventManager->attach('data.exchange.pre', array($this, 'preExchange'));
         $eventManager->attach('data.exchange.post', array($this, 'postExchange'));
@@ -52,8 +59,8 @@ class Relations
                 }
 
                 if (is_string($column) || is_array($column)) {
-                    $subselect = $service->one($key)->configSelect($column);
-                    $select->subselect($key, $subselect);
+                    $subSelect = $service->one($key)->configSelect($column);
+                    $select->subselect($key, $subSelect);
                 }
 
                 $select->addColumn($key, new SqlExpression('\'0\''));
@@ -71,8 +78,8 @@ class Relations
             }
 
             if (is_string($column) || is_array($column)) {
-                $subselect = $service->many($key)->configSelect($column);
-                $select->subselect($key, $subselect);
+                $subSelect = $service->many($key)->configSelect($column);
+                $select->subselect($key, $subSelect);
             }
 
             $select->addColumn($key, new SqlExpression('\'0\''));
@@ -92,7 +99,6 @@ class Relations
         $validData = $event->getValidData();
 
         foreach ($data->getArrayCopy() as $key => $value) {
-
             if (!$service->hasOne($key)
                 || !is_array($value)
             ) {
@@ -105,14 +111,14 @@ class Relations
                 continue;
             }
 
-            $subservice = $service->one($key);
+            $subService = $service->one($key);
 
-            $subservice->exchangeArray($value);
+            $subService->exchangeArray($value);
 
             if (!empty($value['id'])) {
                 $id = $value['id'];
             } else {
-                $id = $subservice->getLastInsertValue();
+                $id = $subService->getLastInsertValue();
             }
 
             $validData[$key . '_id'] = $id;
@@ -146,9 +152,9 @@ class Relations
 
             $attached[$key] = array();
 
-            $subselect = $select->subselect($key);
+            $subSelect = $select->subselect($key);
 
-            $subselect or
+            $subSelect or
                 $select->subselect($key, $service->one($key)->select());
 
             foreach ($rows as $row) {
@@ -168,13 +174,13 @@ class Relations
                 continue;
             }
 
-            $subselect  = clone $select->subselect($key);
-            $subservice = $service->one($key);
-            $tableName  = $subservice->getTableName();
+            $subSelect  = clone $select->subselect($key);
+            $subService = $service->one($key);
+            $tableName  = $subService->getTableName();
 
-            $subselect->where(new SqlIn($tableName . '.id', $subIds));
+            $subSelect->where(new SqlIn($tableName . '.id', $subIds));
 
-            $subItems = $subservice->fetchWith($subselect);
+            $subItems = $subService->fetchWith($subSelect);
 
             foreach ($rows as &$row) {
                 $idKey = $key . '_id';
@@ -189,11 +195,9 @@ class Relations
     {
         $service = $event->getService();
         $data    = $event->getData();
-
-        $mainId = !empty($data['id']) ? $data['id'] : $service->getLastInsertValue();
+        $mainId  = !empty($data['id']) ? $data['id'] : $service->getLastInsertValue();
 
         foreach ($data->getArrayCopy() as $key => $values) {
-
             if (!$service->hasMany($key)) {
                 continue;
             }
@@ -204,7 +208,7 @@ class Relations
                 continue;
             }
 
-            $subservice = $service->many($key);
+            $subService = $service->many($key);
 
             if (!isset($values)) {
                 continue;
@@ -214,8 +218,9 @@ class Relations
             // todo one to many
             $this->assocDelete(
                 $service,
-                $subservice,
-                $mainId
+                $subService,
+                $mainId,
+                $options
             );
 
             if (empty($values)) {
@@ -224,15 +229,18 @@ class Relations
 
             foreach ($values as $value) {
 
-                $subservice->exchangeArray($value);
+                $subService->exchangeArray($value);
+
+                $subId = !empty($value['id']) ? $value['id'] : $subService->getLastInsertValue();
 
                 // create association
                 // todo one to many
                 $this->assocInsert(
                     $service,
-                    $subservice,
+                    $subService,
                     $mainId,
-                    !empty($value['id']) ? $value['id'] : $subservice->getLastInsertValue()
+                    $subId,
+                    $options
                 );
             }
         }
@@ -252,7 +260,6 @@ class Relations
         $attached = array();
 
         foreach (array_keys($columns) as $key) {
-
             if (!$service->hasMany($key)) {
                 continue;
             }
@@ -263,11 +270,11 @@ class Relations
                 continue;
             }
 
-            $attached[$key] = $key;
+            $attached[$key] = $options;
 
-            $subselect = $select->subselect($key);
+            $subSelect = $select->subselect($key);
 
-            $subselect or
+            $subSelect or
                 $select->subselect($key, $service->many($key)->select());
         }
 
@@ -278,26 +285,28 @@ class Relations
         $mainIds   = array_keys($rows->getArrayCopy());
         $tableName = $service->getTableName();
 
-        foreach ($attached as $key) {
+        foreach ($attached as $key => $options) {
 
-            $subselect  = clone $select->subselect($key);
-            $subservice = $service->many($key);
+            $subSelect  = clone $select->subselect($key);
+            $subService = $service->many($key);
 
-            // todo composition key instead of tableName
-            if ($subservice->hasMany($tableName)) {
+            // decide relation
+            $subKey = $this->resolveSubKey($tableName, $options);
+            if ($subService->hasMany($subKey)) {
+                // bidirectional
                 $mainKey = $tableName . 'id';
-                $this->assocJoin($subselect, $service, $subservice);
+                $this->assocJoin($subSelect, $service, $subService, $options);
             } else {
+                // oneway
                 $mainKey = $tableName . '_id';
             }
 
-            $subselect->where(new SqlIn($mainKey, $mainIds));
+            $subSelect->where(new SqlIn($mainKey, $mainIds));
 
-            // limit
-            $limit = $subselect->getLimit();
-            $subselect->reset('limit');
+            $limit = $subSelect->getLimit();
+            $subSelect->reset('limit');
 
-            $subItems = $subservice->fetchWith($subselect);
+            $subItems = $subService->fetchWith($subSelect);
 
             foreach ($subItems as $subItem) {
 
@@ -321,59 +330,63 @@ class Relations
         }
     }
 
-    protected function assocInsert(DataService $service, DataService $subservice, $mainId, $subId)
+    protected function assocInsert(DataService $service, DataService $subService, $mainId, $subId, array $options)
     {
         $platform = $service->getPlatform();
 
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
         $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
 
-        $mainKey   = $service->getTableName();
-        $subKey    = $subservice->getTableName();
-        $options   = $service->manyOptions($subKey);
-        $tableName = !empty($options['tableName']) ? $options['tableName'] : $mainKey . '_' . $subKey;
+        $tableName      = $service->getTableName();
+        $subTableName   = $subService->getTableName();
+        $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
-        $sql = 'INSERT IGNORE INTO ' . $qi($tableName)
-             . ' (' . $qi($mainKey . 'id') . ', ' . $qi($subKey . 'id') . ')'
+        $sql = 'INSERT IGNORE INTO ' . $qi($assocTableName)
+             . ' (' . $qi($tableName . 'id') . ', ' . $qi($subTableName . 'id') . ')'
              . ' VALUES (' . $qv($mainId) . ', ' . $qv($subId) . ')';
 
-        $this->adapter
-             ->query($sql)
-             ->execute();
+        $this->adapter->query($sql)->execute();
     }
 
-    protected function assocDelete(DataService $service, DataService $subservice, $mainId)
+    protected function assocDelete(DataService $service, DataService $subService, $mainId, array $options)
     {
         $platform = $service->getPlatform();
 
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
         $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
 
-        $mainKey   = $service->getTableName();
-        $subKey    = $subservice->getTableName();
-        $options   = $service->manyOptions($subKey);
-        $tableName = !empty($options['tableName']) ? $options['tableName'] : $mainKey . '_' . $subKey;
+        $tableName      = $service->getTableName();
+        $subTableName   = $subService->getTableName();
+        $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
-        $sql = 'DELETE FROM ' . $qi($tableName)
-             . ' WHERE ' . $qi($mainKey . 'id') . ' = ' . $qv($mainId);
+        $sql = 'DELETE FROM ' . $qi($assocTableName)
+             . ' WHERE ' . $qi($tableName . 'id') . ' = ' . $qv($mainId);
 
-        $this->adapter
-             ->query($sql)
-             ->execute();
+        $this->adapter->query($sql)->execute();
     }
 
-    protected function assocJoin($select, DataService $service, DataService $subservice)
+    protected function assocJoin($select, DataService $service, DataService $subService, array $options)
     {
-        $mainKey   = $service->getTableName();
-        $subKey    = $subservice->getTableName();
-        $options   = $service->manyOptions($subKey);
-        $tableName = !empty($options['tableName']) ? $options['tableName'] : $mainKey . '_' . $subKey;
+        // todo DRY
+        $tableName      = $service->getTableName();
+        $subTableName   = $subService->getTableName();
+        $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
-        $select->join($tableName, $subKey . '.id=' . $tableName . '.' . $subKey . 'id');
+        $select->join($assocTableName, $subTableName . '.id=' . $assocTableName . '.' . $subTableName . 'id');
+    }
+
+    protected function resolveSubKey($tableName, array $options)
+    {
+        return !empty($options['key']) ? $options['key'] : $tableName;
+    }
+
+    protected function resolveAssocTableName($tableName, $subTableName, array $options)
+    {
+        return !empty($options['tableName']) ? $options['tableName'] : $tableName . '_' . $subTableName;
     }
 
     /**
-     * Return true when relations are enabled by options
+     * Return true when relations are disabled by options
      *
      * @param array $options
      * @return bool
