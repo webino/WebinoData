@@ -172,6 +172,10 @@ class DataSelect
 
     public function order($order)
     {
+        if (is_string($order) && strpos($order, '(')) {
+            $order = new SqlExpression($order);
+        }
+
         $this->sqlSelect->order($order);
         return $this;
     }
