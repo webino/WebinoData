@@ -219,7 +219,7 @@ class DataSelect
 
     public function search($term, array $columns = array(), $combination = PredicateSet::OP_OR)
     {
-        if (empty($term)) {
+        if (empty($term) && !is_numeric($term)) {
             return $this;
         }
 
@@ -227,7 +227,7 @@ class DataSelect
             foreach ($term as $subKey => $subTerms) {
                 foreach ((array) $subTerms as $subTerm) {
 
-                    empty($subKey) || empty($subTerm) or
+                    empty($subKey) || (empty($subTerm) && !is_numeric($subTerm)) or
                         $this->search($subTerm, array($subKey), $combination);
                 }
             }
@@ -240,7 +240,7 @@ class DataSelect
 
         foreach (explode(' ', $term) as $word) {
 
-            if (empty($word)) {
+            if (empty($word) && !is_numeric($word)) {
                 continue;
             }
 
