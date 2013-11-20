@@ -42,7 +42,7 @@ class DateTimeStamp
         );
 
         $dateTimeFormatter = new DateTimeFormatter();
-        $dateTime = $dateTimeFormatter->filter(time());
+        $dateTime = $dateTimeFormatter->filter('now');
 
         empty($inputs['updated']) or
             $data['updated'] = $dateTime;
