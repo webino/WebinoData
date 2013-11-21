@@ -159,7 +159,10 @@ class Relations
             $idKey  = $key . '_id';
             $subIds = array();
 
-            foreach ($rows as $row) {
+            foreach ($rows as &$row) {
+
+                is_array($row[$key]) or
+                    $row[$key] = array();
 
                 empty($row[$idKey]) or
                     $subIds[$row[$idKey]] = $row[$idKey];
@@ -301,10 +304,11 @@ class Relations
             $subItems = $subService->fetchWith($subSelect);
 
             foreach ($rows as &$row) {
-                foreach ($subItems as $subItem) {
 
-                    is_array($row[$key]) or
-                        $row[$key] = array();
+                is_array($row[$key]) or
+                    $row[$key] = array();
+
+                foreach ($subItems as $subItem) {
 
                     if ($subItem[$mainKey] !== $row['id']
                         || ($limit && $limit <= count($row[$key]))
