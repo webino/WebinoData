@@ -115,13 +115,9 @@ class Relations
 
             $subService->exchangeArray($value);
 
-            if (!empty($value['id'])) {
-                $id = $value['id'];
-            } else {
-                $id = $subService->getLastInsertValue();
-            }
-
-            $validData[$key . '_id'] = $id;
+            $validData[$key . '_id'] = !empty($value['id'])
+                                       ? $value['id']
+                                       : $subService->getLastInsertValue();
         }
     }
 
@@ -139,7 +135,6 @@ class Relations
         $attached = array();
 
         foreach (array_keys($columns) as $key) {
-
             if (!$service->hasOne($key)) {
                 continue;
             }
@@ -150,26 +145,26 @@ class Relations
                 continue;
             }
 
-            $attached[$key] = array();
+            $attached[$key] = $options;
 
-            $subSelect = $select->subselect($key);
-
-            $subSelect or
+            $select->subselect($key) or
                 $select->subselect($key, $service->one($key)->select());
-
-            foreach ($rows as $row) {
-                $idKey = $key . '_id';
-
-                empty($row[$idKey]) or
-                    $attached[$key][$row[$idKey]] = $row[$idKey];
-            }
         }
 
         if (empty($attached)) {
             return;
         }
 
-        foreach ($attached as $key => $subIds) {
+        foreach ($attached as $key => $options) {
+            $idKey  = $key . '_id';
+            $subIds = array();
+
+            foreach ($rows as $row) {
+
+                empty($row[$idKey]) or
+                    $subIds[$row[$idKey]] = $row[$idKey];
+            }
+
             if (empty($subIds)) {
                 continue;
             }
@@ -183,7 +178,6 @@ class Relations
             $subItems = $subService->fetchWith($subSelect);
 
             foreach ($rows as &$row) {
-                $idKey = $key . '_id';
 
                 empty($row[$idKey]) || empty($subItems[$row[$idKey]]) or
                     $row[$key] = $subItems[$row[$idKey]];
@@ -272,9 +266,7 @@ class Relations
 
             $attached[$key] = $options;
 
-            $subSelect = $select->subselect($key);
-
-            $subSelect or
+            $select->subselect($key) or
                 $select->subselect($key, $service->many($key)->select());
         }
 
@@ -308,23 +300,25 @@ class Relations
 
             $subItems = $subService->fetchWith($subSelect);
 
-            foreach ($subItems as $subItem) {
+            foreach ($rows as &$row) {
+                foreach ($subItems as $subItem) {
 
-                $mainId = $subItem[$mainKey];
+                    is_array($row[$key]) or
+                        $row[$key] = array();
 
-                is_array($rows[$mainId][$key]) or
-                    $rows[$mainId][$key] = array();
+                    if ($subItem[$mainKey] !== $row['id']
+                        || ($limit && $limit <= count($row[$key]))
+                    ) {
+                        continue;
+                    }
 
-                if ($limit && $limit <= count($rows[$mainId][$key])) {
-                    continue;
-                }
-
-                if (!empty($subItem['id'])
-                    && empty($rows[$mainId][$key][$subItem['id']])
-                ) {
-                    $rows[$mainId][$key][$subItem['id']] = $subItem;
-                } else {
-                    $rows[$mainId][$key][] = $subItem;
+                    if (!empty($subItem['id'])
+                        && empty($row[$key][$subItem['id']])
+                    ) {
+                        $row[$key][$subItem['id']] = $subItem;
+                    } else {
+                        $row[$key][] = $subItem;
+                    }
                 }
             }
         }
