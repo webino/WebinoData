@@ -17,6 +17,7 @@ use Zend\InputFilter\InputFilterInterface;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
+// todo refactor
 class DataService implements
     EventManagerAwareInterface,
     ServiceManagerAwareInterface,
@@ -657,7 +658,7 @@ class DataService implements
             $selectConfig = array_replace_recursive($selectConfig, $this->config['select'][$selectName]);
         }
 
-        $this->configureSelect($select, $selectConfig);
+        $select->configure($selectConfig);
 
         return $select;
     }
@@ -992,36 +993,6 @@ class DataService implements
     public function getAdapter()
     {
         return $this->tableGateway->getAdapter();
-    }
-
-    protected function configureSelect(DataSelect $select, array $config)
-    {
-        if (isset($config['columns'])) {
-            // todo prefixColumnsWithTable deprecated
-            $columns = current($config['columns']);
-            $prefixColumnsWithTable = (2 === count($config['columns'])) ? next($config['columns']) : false;
-
-            $select->columns($columns, $prefixColumnsWithTable);
-        }
-
-        if (!empty($config['where'])) {
-
-            $where = current($config['where']);
-            $combination = (2 === count($config['where']))
-                            ? next($config['where'])
-                            : Sql\Predicate\PredicateSet::OP_AND;
-
-            $select->where($where, $combination);
-        }
-
-        empty($config['order']) or
-            $select->order($config['order']);
-
-        empty($config['limit']) or
-            $select->limit($config['limit']);
-
-        empty($config['offset']) or
-            $select->offset($config['offset']);
     }
 
     protected function key($postfix = '', $idPostfix = '_id')

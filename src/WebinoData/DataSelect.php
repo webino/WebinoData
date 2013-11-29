@@ -4,12 +4,16 @@ namespace WebinoData;
 
 use ArrayObject;
 use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Sql\Expression as SqlExpression;
+use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Select;
 
+// todo refactor
 class DataSelect
 {
+    const EXPRESSION_MARK = 'EXPRESSION:';
+
     protected $service;
     protected $sqlSelect;
     protected $subselects = array();
@@ -79,7 +83,7 @@ class DataSelect
 
         // collect input column names
         foreach ($inputFilter as $input) {
-            $inputColumns[$input['name']] = new SqlExpression('`' . $tableName . '`.`' . $input['name'] . '`');
+            $inputColumns[$input['name']] = new Expression('`' . $tableName . '`.`' . $input['name'] . '`');
         }
 
         // replace star with input columns
@@ -109,7 +113,7 @@ class DataSelect
         }
         if (false !== $idIndex) {
 
-            $columns[$idIndex] = new SqlExpression('`' . $tableName . '`.`id`');
+            $columns[$idIndex] = new Expression('`' . $tableName . '`.`id`');
 
             if (is_numeric($idIndex)) {
                 // we need to change the index to a string
@@ -173,7 +177,7 @@ class DataSelect
     public function order($order)
     {
         if (is_string($order) && strpos($order, '(')) {
-            $order = new SqlExpression($order);
+            $order = new Expression($order);
         }
 
         $this->sqlSelect->order($order);
@@ -304,6 +308,118 @@ class DataSelect
     public function reset($part)
     {
         return $this->sqlSelect->reset($part);
+    }
+
+    public function configure(array $config)
+    {
+        if (isset($config['columns'])) {
+            // todo prefixColumnsWithTable deprecated
+            $columns = current($config['columns']);
+            $prefixColumnsWithTable = (2 === count($config['columns'])) ? next($config['columns']) : false;
+
+            $this->columns($columns, $prefixColumnsWithTable);
+        }
+
+        $this->configureWhere($config, $this->where);
+
+        empty($config['order']) or
+            $this->order($config['order']);
+
+        empty($config['limit']) or
+            $this->limit($config['limit']);
+
+        empty($config['offset']) or
+            $this->offset($config['offset']);
+
+        return $this;
+    }
+
+    // todo remain predicates
+    private function configureWhere(array $config, Predicate $where)
+    {
+        if (!empty($config['where'])) {
+
+            $predicate   = current($config['where']);
+            $combination = (2 === count($config['where']))
+                            ? next($config['where'])
+                            : PredicateSet::OP_AND;
+
+            $this->where($predicate, $combination);
+
+        }
+
+        empty($config['whereEqualTo']) or
+            $this->processPredicate(
+                'equalTo',
+                $config,
+                $where
+            );
+
+        empty($config['whereNotEqualTo']) or
+            $this->processPredicate(
+                'notEqualTo',
+                $config,
+                $where
+            );
+
+        empty($config['whereLessThanOrEqualTo']) or
+            $this->processPredicate(
+                'lessThanOrEqualTo',
+                $config,
+                $where
+            );
+
+        empty($config['whereGreaterThanOrEqualTo']) or
+            $this->processPredicate(
+                'greaterThanOrEqualTo',
+                $config,
+                $where
+            );
+
+        empty($config['whereNest']) or
+            $this->whereNest($config['whereNest'], $where);
+
+        return $this;
+    }
+
+    private function resolveOperatorArgs($predicate)
+    {
+        $left      = $this->autoExpression(key($predicate));
+        $right     = $this->autoExpression(current($predicate));
+        $op        = strtolower(!empty($predicate['op']) ? $predicate['op'] : PredicateSet::OP_AND);
+        $leftType  = !empty($predicate['leftType']) ? $predicate['leftType'] : Expression::TYPE_IDENTIFIER;
+        $rightType = !empty($predicate['rightType']) ? $predicate['rightType'] : Expression::TYPE_VALUE;
+
+        return array($left, $right, $op, $leftType, $rightType);
+    }
+
+    private function autoExpression($value)
+    {
+        // detect expression
+        if (0 === strpos($value, self::EXPRESSION_MARK)) {
+            return new Expression(substr($value, strlen(self::EXPRESSION_MARK)));
+        }
+
+        return $value;
+    }
+
+    private function processPredicate($type, array $config, Predicate $where)
+    {
+        foreach ($config['where' . ucfirst($type)] as $predicate) {
+
+            list($left, $right, $op, $leftType, $rightType) = $this->resolveOperatorArgs($predicate);
+            $where->{$op}->{$type}($left, $right, $leftType, $rightType);
+        }
+
+        return $this;
+    }
+
+    private function whereNest($config, Predicate $where)
+    {
+        $op = strtolower(!empty($config['op']) ? $config['op'] : PredicateSet::OP_AND);
+        $this->configureWhere($config, $where->{$op}->nest());
+
+        return $this;
     }
 
     /**
