@@ -685,12 +685,7 @@ class DataService implements
         $sql       = $this->getSql();
         $statement = $sql->prepareStatementForSqlObject($sqlSelect);
 
-        $sqlString = $sql->getSqlStringForSqlObject($sqlSelect, $this->getPlatform());
-
-        $statement->setSql($sqlString);
-
         try {
-
             $result = $statement->execute($parameters);
 
         } catch (\Exception $e) {
@@ -698,7 +693,7 @@ class DataService implements
             throw new Exception\RuntimeException(
                     sprintf(
                         'Statement could not be executed %s',
-                        $sqlString
+                        $sql->getSqlStringForSqlObject($sqlSelect, $this->getPlatform())
                     ) . '; ' . $e->getPrevious()->getMessage(),
                     $e->getCode(),
                     $e
