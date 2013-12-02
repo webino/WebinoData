@@ -1,4 +1,4 @@
-<phpunit bootstrap="./bootstrap.php" colors="true">
+<phpunit bootstrap="bootstrap.php" colors="true">
     <php>
         <includePath>../._test/ZendSkeletonApplication/vendor</includePath>
     </php>
@@ -8,8 +8,8 @@
         </whitelist>
     </filter>
     <testsuites>
-        <testsuite name="WebinoDraw Test Suite">
-            <directory>./</directory>
+        <testsuite name="WebinoData Test Suite">
+            <directory>.</directory>
         </testsuite>
     </testsuites>
 </phpunit>
