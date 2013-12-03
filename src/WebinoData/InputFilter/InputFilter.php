@@ -66,6 +66,12 @@ class InputFilter extends BaseInputFilter
         $translation = array();
 
         foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $subKey => $subValue) {
+                    $translation['{$' . $key . '[' . $subKey . ']}'] = $subValue;
+                }
+                continue;
+            }
             $translation['{$' . $key . '}'] = $value;
         }
 
