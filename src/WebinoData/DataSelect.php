@@ -444,6 +444,12 @@ class DataSelect
 
     public function __toString()
     {
-        return $this->getSqlString($this->service->getPlatform());
+        try {
+            $sql = $this->getSqlString($this->service->getPlatform());
+        } catch (\Exception $exc) {
+            return $exc;
+        }
+
+        return $sql;
     }
 }
