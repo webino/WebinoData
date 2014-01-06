@@ -841,6 +841,12 @@ class DataService implements
                 $updateWhere = array(new Sql\Predicate\In('id', $array['id']->getSqlSelect()));
                 unset($array['id']);
 
+            } elseif (is_array($array['id'])
+                || $array['id'] instanceof Sql\Where
+                || $array['id'] instanceof \Closure
+            ) {
+                $updateWhere = $array['id'];
+
             } else {
                 $updateWhere = array('id=?' => $array['id']);
             }
