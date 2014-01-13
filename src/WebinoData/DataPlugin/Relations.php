@@ -212,7 +212,9 @@ class Relations
                 continue;
             }
 
-            $manyToMany = $subService->hasMany($tableName);
+            $manyToMany = array_key_exists('oneToMany', $options)
+                        ? !$options['oneToMany']
+                        : true;
 
             // delete association
             $this->assocDelete(
