@@ -190,9 +190,10 @@ class Relations
 
     protected function compositeExchange(DataEvent $event)
     {
-        $service = $event->getService();
-        $data    = $event->getData();
-        $mainId  = !empty($data['id']) ? $data['id'] : $service->getLastInsertValue();
+        $service   = $event->getService();
+        $tableName = $service->getTableName();
+        $data      = $event->getData();
+        $mainId    = !empty($data['id']) ? $data['id'] : $service->getLastInsertValue();
 
         foreach ($data->getArrayCopy() as $key => $values) {
             if (!$service->hasMany($key)) {
@@ -211,13 +212,16 @@ class Relations
                 continue;
             }
 
+            $manyToMany = $subService->hasMany($tableName);
+
             // delete association
-            // todo one to many
             $this->assocDelete(
                 $service,
                 $subService,
                 $mainId,
-                $options
+                $options,
+                // temporary fix, when one to many make it just update instead of delete all associations
+                !$manyToMany ? '_id' : 'id'
             );
 
             if (empty($values)) {
@@ -226,19 +230,23 @@ class Relations
 
             foreach ($values as $value) {
 
+                $manyToMany or
+                    $value[$tableName . '_id'] = $mainId;
+
                 $subService->exchangeArray($value);
 
-                $subId = !empty($value['id']) ? $value['id'] : $subService->getLastInsertValue();
+                if ($manyToMany) {
+                    $subId = !empty($value['id']) ? $value['id'] : $subService->getLastInsertValue();
 
-                // create association
-                // todo one to many
-                $this->assocInsert(
-                    $service,
-                    $subService,
-                    $mainId,
-                    $subId,
-                    $options
-                );
+                    // create association
+                    $this->assocInsert(
+                        $service,
+                        $subService,
+                        $mainId,
+                        $subId,
+                        $options
+                    );
+                }
             }
         }
     }
@@ -346,7 +354,7 @@ class Relations
         $this->adapter->query($sql)->execute();
     }
 
-    protected function assocDelete(DataService $service, DataService $subService, $mainId, array $options)
+    protected function assocDelete(DataService $service, DataService $subService, $mainId, array $options, $idSuffix = 'id')
     {
         $platform = $service->getPlatform();
 
@@ -358,7 +366,7 @@ class Relations
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
         $sql = 'DELETE FROM ' . $qi($assocTableName)
-             . ' WHERE ' . $qi($tableName . 'id') . ' = ' . $qv($mainId);
+             . ' WHERE ' . $qi($tableName . $idSuffix) . ' = ' . $qv($mainId);
 
         $this->adapter->query($sql)->execute();
     }
