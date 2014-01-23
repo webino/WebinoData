@@ -749,9 +749,14 @@ class DataService implements
 
             $rowObject = new ArrayObject($row);
 
-            $event->setRow($rowObject);
+            $event
+                ->setRow($rowObject)
+                ->setParam('callback', $callback);
+
             $events->trigger(DataEvent::EVENT_EXPORT, $event);
-            $callback($rowObject->getArrayCopy());
+
+            !$rowObject->count() or
+                $callback($rowObject->getArrayCopy());
         }
 
         return $this;
@@ -762,14 +767,17 @@ class DataService implements
         $dataObject = new ArrayObject($data);
 
         $events = $this->getEventManager();
-        $event  = $this->getEvent();
+        $event  = clone $this->getEvent();
 
         $event
             ->setService($this)
             ->setData($dataObject);
 
         $events->trigger(DataEvent::EVENT_IMPORT, $event);
-        $this->exchangeArray($dataObject->getArrayCopy());
+
+        !$dataObject->count() or
+            $this->exchangeArray($dataObject->getArrayCopy());
+
         return $this;
     }
 
@@ -846,6 +854,7 @@ class DataService implements
                 || $array['id'] instanceof \Closure
             ) {
                 $updateWhere = $array['id'];
+                unset($array['id']);
 
             } else {
                 $updateWhere = array('id=?' => $array['id']);
@@ -898,7 +907,6 @@ class DataService implements
 
         try {
             if ($event->isUpdate()) {
-
                 $this->tableGateway->update($validDataArray, $updateWhere);
             } else {
                 $this->tableGateway->insert($validDataArray);
