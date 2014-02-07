@@ -601,8 +601,6 @@ return array (
       'setHasMany' => 0,
       'setHasManyService' => 0,
       'setQuery' => 0,
-      'getEventManager' => 3,
-      'getInputFilter' => 3,
     ),
     'parameters' => 
     array (
