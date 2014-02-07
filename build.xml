@@ -80,7 +80,7 @@
     <target name="classmap">
         <echo>Generating classmap ...</echo>
 
-        <exec command="php ${test.zendbindir}/classmap_generator.php -l ${module.srcdir} -wo ${project.basedir}/autoload_classmap.php"/>
+        <exec command="php ${test.zendbindir}/classmap_generator.php -l ${module.srcdir} -wo ${project.basedir}/src/WebinoData/autoload_classmap.php"/>
 
     </target>
 
