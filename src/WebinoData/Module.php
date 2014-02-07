@@ -9,6 +9,8 @@ class Module
     /**
      * Write data into the CSV file
      *
+     * @todo decouple to a service class
+     *
      * @param DataService $service
      * @param string $filePath
      * @param DataSelect $select
@@ -79,6 +81,7 @@ class Module
     {
         return array(
             'services' => array(
+                // todo create a service class
                 'WebinoData' => $this,
             ),
         );
