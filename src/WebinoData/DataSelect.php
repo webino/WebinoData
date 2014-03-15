@@ -158,7 +158,7 @@ class DataSelect
 
     public function limit($limit)
     {
-        $this->sqlSelect->limit($limit);
+        $this->sqlSelect->limit((int) $limit);
         return $this;
     }
 
@@ -170,7 +170,7 @@ class DataSelect
 
     public function offset($offset)
     {
-        $this->sqlSelect->offset($offset);
+        $this->sqlSelect->offset((int) $offset);
         return $this;
     }
 
