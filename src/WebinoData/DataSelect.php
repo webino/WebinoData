@@ -146,6 +146,16 @@ class DataSelect
         return $this;
     }
 
+    public function addColumns(array $columns)
+    {
+        $selectColumns = $this->getColumns();
+        foreach ($columns as $key => $value) {
+            $selectColumns[$key] = $value;
+        }
+        $this->columns($selectColumns);
+        return $this;
+    }
+
     public function addColumn($name, $value)
     {
         $columns = array_replace(
