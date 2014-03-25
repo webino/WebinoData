@@ -907,9 +907,9 @@ class DataService implements
 
         try {
             if ($event->isUpdate()) {
-                $this->tableGateway->update($validDataArray, $updateWhere);
+                $affectedRows = $this->tableGateway->update($validDataArray, $updateWhere);
             } else {
-                $this->tableGateway->insert($validDataArray);
+                $affectedRows = $this->tableGateway->insert($validDataArray);
             }
         } catch (\Exception $e) {
 
@@ -928,7 +928,7 @@ class DataService implements
 
         $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
 
-        return $this;
+        return $affectedRows;
     }
 
     public function executeQuery($query)
