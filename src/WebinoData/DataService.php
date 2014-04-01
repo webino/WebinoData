@@ -638,6 +638,16 @@ class DataService implements
         return $select;
     }
 
+    public function configSelectset($name)
+    {
+        $select = $this->select();
+        if (empty($this->config['selectset'][$name])) {
+            return $select;
+        }
+
+        return $this->configSelect($this->config['selectset'][$name]);
+    }
+
     public function configSelect()
     {
         $firstArg    = func_get_arg(0);
