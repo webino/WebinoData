@@ -125,11 +125,17 @@ class DataSelect
             }
         }
 
-        // store subselects
+        // manipulate columns
         foreach ($columns as $key => &$idColumn) {
+            // store subselects
             if ($idColumn instanceof self) {
                 $this->subselect($key, $idColumn);
+                continue;
             }
+
+            // use auto expression?
+            !is_string($idColumn) or
+               $idColumn = $this->autoExpression($idColumn);
         }
 
         $event = $this->service->getEvent();
