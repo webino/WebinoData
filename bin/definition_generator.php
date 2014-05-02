@@ -4,7 +4,8 @@
 use Zend\Code\Scanner\FileScanner as CodeFileScanner;
 use Zend\Di\Definition\CompilerDefinition;
 
-define('__ZFLIB__', __DIR__ . '/../vendor/zendframework/zendframework/library');
+//define('__ZFLIB__', __DIR__ . '/../vendor/zendframework/zendframework/library');
+define('__ZFLIB__', '/var/www/dev2/behprezeny.sk-src/vendor/zendframework/zendframework/library');
 
 // Autoloader
 $loader = require __ZFLIB__ . '/../../../autoload.php';

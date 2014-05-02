@@ -27,6 +27,7 @@ class DataEvent extends Event
     const EVENT_EXCHANGE_INVALID = 'data.exchange.invalid';
     const EVENT_EXCHANGE_PRE = 'data.exchange.pre';
     const EVENT_EXCHANGE_POST = 'data.exchange.post';
+    const EVENT_FETCH_WITH = 'data.fetch.with';
     const EVENT_FETCH_PRE = 'data.fetch.pre';
     const EVENT_FETCH_POST = 'data.fetch.post';
     const EVENT_EXPORT = 'data.export';

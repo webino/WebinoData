@@ -3,85 +3,65 @@
 namespace WebinoData\Paginator\Adapter;
 
 use WebinoData\DataSelect;
-use Zend\Db\Sql\Expression;
-use Zend\Db\Sql\Select;
-use Zend\Paginator\Adapter\DbSelect;
+use Zend\Cache\Storage\StorageInterface as CacheInterface;
 
-class WebinoDataSelect extends DbSelect
+class WebinoDataSelect extends AbstractWebinoDataSelect
 {
-    protected $dataSelect;
-    protected $service;
-    protected $overflow = 0;
+    protected $cache;
+    protected $cacheId;
+    protected $cacheTags = [];
 
     public function __construct(DataSelect $select, $service)
     {
-        parent::__construct($select->getSqlSelect(), $service->getAdapter());
-
-        $this->dataSelect = $select;
-        $this->service    = $service;
+        parent::__construct($select, $service);
+        $this->cacheId = $select->hash();
     }
 
-    public function setOverflow($overflow)
+    public function hasCache()
     {
-        $this->overflow = $overflow;
+        return null !== $this->cache;
+    }
+
+    protected function getCache()
+    {
+        return $this->cache;
+    }
+
+    public function setCache(CacheInterface $cache)
+    {
+        $this->cache = $cache;
         return $this;
     }
 
-    /**
-     * Returns an array of items for a page.
-     *
-     * @param  int $offset           Page offset
-     * @param  int $itemCountPerPage Number of items per page
-     * @return array
-     */
-    public function getItems($offset, $itemCountPerPage)
+    public function getCacheTags()
     {
-        $select = clone $this->dataSelect;
-        $select->offset($offset);
-        $select->limit($itemCountPerPage + $this->overflow);
-
-        return $this->service->fetchWith($select);
+        return $this->cacheTags;
     }
 
-    /**
-     * Returns the total number of rows in the result set
-     *
-     * @return int
-     */
+    public function setCacheTags(array $tags)
+    {
+        $this->cacheTags = $tags;
+        return $this;
+    }
+
     public function count()
     {
-        if ($this->rowCount !== null) {
-            return $this->rowCount;
+        if (!$this->hasCache()) {
+            return parent::count();
         }
 
-        $select = clone $this->select;
-        $select->reset(Select::COLUMNS);
-        $select->reset(Select::LIMIT);
-        $select->reset(Select::OFFSET);
-        $select->reset(Select::ORDER);
+        $cache   = $this->getCache();
+        $cacheId = md5($this->cacheId . '_count');
+        $count   = $cache->getItem($cacheId);
 
-        // get join information, clear, and repopulate without columns
-        $joins = $select->getRawState(Select::JOINS);
-        $select->reset(Select::JOINS);
-        foreach ($joins as $join) {
-            $select->join($join['name'], $join['on'], array(), $join['type']);
+        if (null === $count) {
+            // fetch count
+            $count = parent::count();
+
+            $cache->setItem($cacheId, $count);
+            $cache->setTags($cacheId, $this->getCacheTags());
         }
 
-        $select->columns(array('c' => new Expression('COUNT(*)')));
-
-        $sql       = $this->sql->getSqlStringForSqlObject($select);
-        $statement = $this->sql->getAdapter()->createStatement($sql);
-
-        try {
-            $result = $statement->execute();
-        } catch (\Exception $exc) {
-            throw new \RuntimeException('Could not execute SQL ' . $sql, $exc->getCode(), $exc);
-        }
-
-        $row            = $result->current();
-        $resultCount    = $result->count();
-        $this->rowCount = 1 < $resultCount ? $resultCount : $row['c'];
-
-        return $this->rowCount;
+        return $count;
     }
 }

@@ -201,6 +201,226 @@ return array (
     array (
     ),
   ),
+  'WebinoData\\AbstractDataService' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'Zend\\EventManager\\EventManagerAwareInterface',
+      1 => 'Zend\\EventManager\\EventsCapableInterface',
+      2 => 'Zend\\ServiceManager\\ServiceManagerAwareInterface',
+      3 => 'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface',
+    ),
+    'instantiator' => NULL,
+    'methods' => 
+    array (
+      '__construct' => 3,
+      'setEvent' => 0,
+      'setEventManager' => 3,
+      'setServiceManager' => 3,
+      'setPlatform' => 0,
+      'setInputFilterFactory' => 3,
+      'setInputFilter' => 0,
+      'setHasOne' => 0,
+      'setHasOneService' => 0,
+      'setHasMany' => 0,
+      'setHasManyService' => 0,
+      'setQuery' => 0,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
+        'WebinoData\\AbstractDataService::__construct:0' => 
+        array (
+          0 => 'tableGateway',
+          1 => 'Zend\\Db\\TableGateway\\TableGateway',
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::__construct:1' => 
+        array (
+          0 => 'config',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setEvent' => 
+      array (
+        'WebinoData\\AbstractDataService::setEvent:0' => 
+        array (
+          0 => 'event',
+          1 => 'WebinoData\\DataEvent',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setEventManager' => 
+      array (
+        'WebinoData\\AbstractDataService::setEventManager:0' => 
+        array (
+          0 => 'eventManager',
+          1 => 'Zend\\EventManager\\EventManagerInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setServiceManager' => 
+      array (
+        'WebinoData\\AbstractDataService::setServiceManager:0' => 
+        array (
+          0 => 'serviceManager',
+          1 => 'Zend\\ServiceManager\\ServiceManager',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setPlatform' => 
+      array (
+        'WebinoData\\AbstractDataService::setPlatform:0' => 
+        array (
+          0 => 'platform',
+          1 => 'Zend\\Db\\Adapter\\Platform\\PlatformInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setInputFilterFactory' => 
+      array (
+        'WebinoData\\AbstractDataService::setInputFilterFactory:0' => 
+        array (
+          0 => 'inputFilter',
+          1 => 'Zend\\InputFilter\\Factory',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setInputFilter' => 
+      array (
+        'WebinoData\\AbstractDataService::setInputFilter:0' => 
+        array (
+          0 => 'inputFilter',
+          1 => 'Zend\\InputFilter\\InputFilterInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setHasOne' => 
+      array (
+        'WebinoData\\AbstractDataService::setHasOne:0' => 
+        array (
+          0 => 'name',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::setHasOne:1' => 
+        array (
+          0 => 'service',
+          1 => 'WebinoData\\DataService',
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::setHasOne:2' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => 
+          array (
+          ),
+        ),
+      ),
+      'setHasOneService' => 
+      array (
+        'WebinoData\\AbstractDataService::setHasOneService:0' => 
+        array (
+          0 => 'name',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::setHasOneService:1' => 
+        array (
+          0 => 'serviceName',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::setHasOneService:2' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => 
+          array (
+          ),
+        ),
+      ),
+      'setHasMany' => 
+      array (
+        'WebinoData\\AbstractDataService::setHasMany:0' => 
+        array (
+          0 => 'name',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::setHasMany:1' => 
+        array (
+          0 => 'service',
+          1 => 'WebinoData\\DataService',
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::setHasMany:2' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => 
+          array (
+          ),
+        ),
+      ),
+      'setHasManyService' => 
+      array (
+        'WebinoData\\AbstractDataService::setHasManyService:0' => 
+        array (
+          0 => 'name',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::setHasManyService:1' => 
+        array (
+          0 => 'serviceName',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\AbstractDataService::setHasManyService:2' => 
+        array (
+          0 => 'options',
+          1 => NULL,
+          2 => false,
+          3 => 
+          array (
+          ),
+        ),
+      ),
+      'setQuery' => 
+      array (
+        'WebinoData\\AbstractDataService::setQuery:0' => 
+        array (
+          0 => 'query',
+          1 => 'WebinoData\\DataQuery',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\DataEvent' => 
   array (
     'supertypes' => 
@@ -392,7 +612,7 @@ return array (
       ),
     ),
   ),
-  'WebinoData\\Paginator\\Adapter\\WebinoDataSelect' => 
+  'WebinoData\\Paginator\\Adapter\\AbstractWebinoDataSelect' => 
   array (
     'supertypes' => 
     array (
@@ -412,6 +632,58 @@ return array (
     array (
       '__construct' => 
       array (
+        'WebinoData\\Paginator\\Adapter\\AbstractWebinoDataSelect::__construct:0' => 
+        array (
+          0 => 'select',
+          1 => 'WebinoData\\DataSelect',
+          2 => true,
+          3 => NULL,
+        ),
+        'WebinoData\\Paginator\\Adapter\\AbstractWebinoDataSelect::__construct:1' => 
+        array (
+          0 => 'service',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setOverflow' => 
+      array (
+        'WebinoData\\Paginator\\Adapter\\AbstractWebinoDataSelect::setOverflow:0' => 
+        array (
+          0 => 'overflow',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
+  'WebinoData\\Paginator\\Adapter\\WebinoDataSelect' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'Zend\\Paginator\\Adapter\\AdapterInterface',
+      1 => 'Countable',
+      2 => 'WebinoData\\Paginator\\Adapter\\AbstractWebinoDataSelect',
+      3 => 'Countable',
+      4 => 'Zend\\Paginator\\Adapter\\AdapterInterface',
+      5 => 'Zend\\Paginator\\Adapter\\DbSelect',
+      6 => 'Zend\\Paginator\\Adapter\\AdapterInterface',
+      7 => 'Countable',
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      '__construct' => 3,
+      'setCache' => 0,
+      'setCacheTags' => 0,
+      'setOverflow' => 0,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
         'WebinoData\\Paginator\\Adapter\\WebinoDataSelect::__construct:0' => 
         array (
           0 => 'select',
@@ -422,6 +694,26 @@ return array (
         'WebinoData\\Paginator\\Adapter\\WebinoDataSelect::__construct:1' => 
         array (
           0 => 'service',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setCache' => 
+      array (
+        'WebinoData\\Paginator\\Adapter\\WebinoDataSelect::setCache:0' => 
+        array (
+          0 => 'cache',
+          1 => 'Zend\\Cache\\Storage\\StorageInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setCacheTags' => 
+      array (
+        'WebinoData\\Paginator\\Adapter\\WebinoDataSelect::setCacheTags:0' => 
+        array (
+          0 => 'tags',
           1 => NULL,
           2 => true,
           3 => NULL,
@@ -581,15 +873,22 @@ return array (
   array (
     'supertypes' => 
     array (
-      0 => 'Zend\\EventManager\\EventManagerAwareInterface',
-      1 => 'Zend\\EventManager\\EventsCapableInterface',
-      2 => 'Zend\\ServiceManager\\ServiceManagerAwareInterface',
-      3 => 'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface',
+      0 => 'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface',
+      1 => 'Zend\\ServiceManager\\ServiceManagerAwareInterface',
+      2 => 'Zend\\EventManager\\EventsCapableInterface',
+      3 => 'Zend\\EventManager\\EventManagerAwareInterface',
+      4 => 'WebinoData\\AbstractDataService',
+      5 => 'Zend\\EventManager\\EventManagerAwareInterface',
+      6 => 'Zend\\EventManager\\EventsCapableInterface',
+      7 => 'Zend\\ServiceManager\\ServiceManagerAwareInterface',
+      8 => 'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface',
     ),
     'instantiator' => '__construct',
     'methods' => 
     array (
       '__construct' => 3,
+      'setCache' => 0,
+      'setCacheTags' => 0,
       'setEvent' => 0,
       'setEventManager' => 3,
       'setServiceManager' => 3,
@@ -616,6 +915,26 @@ return array (
         'WebinoData\\DataService::__construct:1' => 
         array (
           0 => 'config',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setCache' => 
+      array (
+        'WebinoData\\DataService::setCache:0' => 
+        array (
+          0 => 'cache',
+          1 => 'Zend\\Cache\\Storage\\StorageInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setCacheTags' => 
+      array (
+        'WebinoData\\DataService::setCacheTags:0' => 
+        array (
+          0 => 'tags',
           1 => NULL,
           2 => true,
           3 => NULL,
@@ -877,6 +1196,30 @@ return array (
       ),
     ),
   ),
+  'WebinoData\\DataCacheAwareInterface' => 
+  array (
+    'supertypes' => 
+    array (
+    ),
+    'instantiator' => NULL,
+    'methods' => 
+    array (
+      'setCache' => 0,
+    ),
+    'parameters' => 
+    array (
+      'setCache' => 
+      array (
+        'WebinoData\\DataCacheAwareInterface::setCache:0' => 
+        array (
+          0 => 'cache',
+          1 => 'Zend\\Cache\\Storage\\StorageInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface' => 
   array (
     'supertypes' => 
@@ -909,16 +1252,19 @@ return array (
       1 => 'Countable',
       2 => 'Zend\\InputFilter\\UnknownInputsCapableInterface',
       3 => 'Zend\\Stdlib\\InitializableInterface',
-      4 => 'Zend\\InputFilter\\InputFilter',
-      5 => 'Zend\\Stdlib\\InitializableInterface',
-      6 => 'Zend\\InputFilter\\UnknownInputsCapableInterface',
-      7 => 'Countable',
-      8 => 'Zend\\InputFilter\\InputFilterInterface',
-      9 => 'Zend\\InputFilter\\BaseInputFilter',
+      4 => 'Zend\\InputFilter\\ReplaceableInputInterface',
+      5 => 'Zend\\InputFilter\\InputFilter',
+      6 => 'Zend\\InputFilter\\ReplaceableInputInterface',
+      7 => 'Zend\\Stdlib\\InitializableInterface',
+      8 => 'Zend\\InputFilter\\UnknownInputsCapableInterface',
+      9 => 'Countable',
       10 => 'Zend\\InputFilter\\InputFilterInterface',
-      11 => 'Countable',
-      12 => 'Zend\\InputFilter\\UnknownInputsCapableInterface',
-      13 => 'Zend\\Stdlib\\InitializableInterface',
+      11 => 'Zend\\InputFilter\\BaseInputFilter',
+      12 => 'Zend\\InputFilter\\InputFilterInterface',
+      13 => 'Countable',
+      14 => 'Zend\\InputFilter\\UnknownInputsCapableInterface',
+      15 => 'Zend\\Stdlib\\InitializableInterface',
+      16 => 'Zend\\InputFilter\\ReplaceableInputInterface',
     ),
     'instantiator' => '__construct',
     'methods' => 
@@ -1115,6 +1461,74 @@ return array (
         'WebinoData\\DataPlugin\\CacheInvalidator::setOptions:0' => 
         array (
           0 => 'options',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
+  'WebinoData\\DataSelect\\ArrayColumn' => 
+  array (
+    'supertypes' => 
+    array (
+      0 => 'Countable',
+      1 => 'Serializable',
+      2 => 'ArrayAccess',
+      3 => 'Traversable',
+      4 => 'IteratorAggregate',
+      5 => 'ArrayObject',
+      6 => 'IteratorAggregate',
+      7 => 'Traversable',
+      8 => 'ArrayAccess',
+      9 => 'Serializable',
+      10 => 'Countable',
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      '__construct' => 3,
+      'setPattern' => 0,
+      'setFlags' => 0,
+      'setIteratorClass' => 0,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
+        'WebinoData\\DataSelect\\ArrayColumn::__construct:0' => 
+        array (
+          0 => 'array',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setPattern' => 
+      array (
+        'WebinoData\\DataSelect\\ArrayColumn::setPattern:0' => 
+        array (
+          0 => 'pattern',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setFlags' => 
+      array (
+        'WebinoData\\DataSelect\\ArrayColumn::setFlags:0' => 
+        array (
+          0 => 'flags',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setIteratorClass' => 
+      array (
+        'WebinoData\\DataSelect\\ArrayColumn::setIteratorClass:0' => 
+        array (
+          0 => 'iteratorClass',
           1 => NULL,
           2 => true,
           3 => NULL,

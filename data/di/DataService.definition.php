@@ -1,4 +1,5 @@
 <?php
+
 return array (
   'WebinoData\\DataService' =>
   array (
@@ -13,6 +14,7 @@ return array (
     'methods' =>
     array (
       '__construct' => 3,
+      'setCache' => 0,
       'setEvent' => 0,
       'setEventManager' => 3,
       'setServiceManager' => 3,
@@ -42,6 +44,16 @@ return array (
         array (
           0 => 'config',
           1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setCache' =>
+      array (
+        'WebinoData\\DataService::setCache:0' =>
+        array (
+          0 => 'cache',
+          1 => 'Zend\\Cache\\Storage\\StorageInterface',
           2 => true,
           3 => NULL,
         ),

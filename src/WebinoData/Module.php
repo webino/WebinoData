@@ -84,6 +84,13 @@ class Module
                 // todo create a service class
                 'WebinoData' => $this,
             ),
+            'initializers' => array(
+                'WebinoDataCacheAware' => function($service, $services) {
+                    if ($service instanceof DataCacheAwareInterface) {
+                        $service->setCache($services->get('WebinoDataCache'));
+                    }
+                }
+            ),
         );
     }
 

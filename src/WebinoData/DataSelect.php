@@ -3,11 +3,13 @@
 namespace WebinoData;
 
 use ArrayObject;
+use WebinoData\DataSelect\ArrayColumn;
 use Zend\Db\Adapter\Platform\PlatformInterface;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Sql;
 
 // todo refactor
 class DataSelect
@@ -73,6 +75,11 @@ class DataSelect
         return true;
     }
 
+    public function hash()
+    {
+        return md5((string) $this);
+    }
+
     public function columns(array $columns)
     {
         $serviceConfig = $this->service->getConfig();
@@ -127,6 +134,13 @@ class DataSelect
 
         // manipulate columns
         foreach ($columns as $key => &$idColumn) {
+
+            // fix an array column to be stringable
+            if (is_array($idColumn)) {
+                $idColumn = new ArrayColumn($idColumn);
+                continue;
+            }
+
             // store subselects
             if ($idColumn instanceof self) {
                 $this->subselect($key, $idColumn);
@@ -396,6 +410,24 @@ class DataSelect
             $this->whereNest($config['whereNest'], $where);
 
         return $this;
+    }
+
+    public function execute(Sql $sql, $parameters = [])
+    {
+        try {
+            return $sql->prepareStatementForSqlObject($this->sqlSelect)
+                        ->execute($parameters);
+
+        } catch (\Exception $exc) {
+            throw new Exception\RuntimeException(
+                sprintf(
+                    'Statement could not be executed %s',
+                    $sql->getSqlStringForSqlObject($this->sqlSelect, $this->service->getPlatform())
+                ) . '; ' . $exc->getPrevious()->getMessage(),
+                $exc->getCode(),
+                $exc
+            );
+        }
     }
 
     private function resolveOperatorArgs($predicate)
