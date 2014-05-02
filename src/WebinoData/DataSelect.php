@@ -214,6 +214,36 @@ class DataSelect
         return $this;
     }
 
+    // todo decouple (redesign)
+    private function replaceVars(array &$subject)
+    {
+        foreach ($subject as &$str) {
+            if (is_array($str)) {
+                $this->replaceVars($str);
+                continue;
+            }
+
+            if (false !== strpos($str, '{$tableName}')) {
+                $str = str_replace('{$tableName}', $this->service->getTableName(), $str);
+            }
+        }
+
+        return $this;
+    }
+
+    // todo decouple (redesign)
+    private function parsePredicate($predicate)
+    {
+        $newPredicate = [];
+        foreach ($predicate as $key => $value) {
+            $args = [$key, $value];
+            $this->replaceVars($args);
+            $newPredicate[$args[0]] = $args[1];
+        }
+
+        return $newPredicate;
+    }
+
     public function where($predicate, $combination = PredicateSet::OP_AND)
     {
         is_object($predicate) or
@@ -230,10 +260,8 @@ class DataSelect
         $this->service->getEventManager()
             ->trigger('data.select.where', $event);
 
-        !($predicate instanceof ArrayObject) or
-            $predicate = $predicate->getArrayCopy();
-
-        $this->sqlSelect->where($predicate, $combination);
+        // todo refactor parsePredicate()
+        $this->sqlSelect->where($this->parsePredicate($predicate), $combination);
 
         return $this;
     }
