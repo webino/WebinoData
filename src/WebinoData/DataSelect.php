@@ -218,6 +218,11 @@ class DataSelect
     private function replaceVars(array &$subject)
     {
         foreach ($subject as &$str) {
+            if (is_object($str)) {
+                // todo replace in sql select?
+                continue;
+            }
+            
             if (is_array($str)) {
                 $this->replaceVars($str);
                 continue;
