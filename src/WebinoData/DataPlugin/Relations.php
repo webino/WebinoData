@@ -4,6 +4,7 @@ namespace WebinoData\DataPlugin;
 
 use WebinoData\DataEvent;
 use WebinoData\DataService;
+use WebinoData\DataSelect\ArrayColumn;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\Db\Sql\Predicate\In as SqlIn;
@@ -58,8 +59,8 @@ class Relations
                     continue;
                 }
 
-                if (is_string($column) || is_array($column)) {
-                    $subSelect = $service->one($key)->configSelect($column);
+                if (is_string($column) || $column instanceof ArrayColumn) {
+                    $subSelect = $service->one($key)->configSelect((array) $column);
                     $select->subselect($key, $subSelect);
                 }
 
@@ -77,8 +78,8 @@ class Relations
                 continue;
             }
 
-            if (is_string($column) || is_array($column)) {
-                $subSelect = $service->many($key)->configSelect($column);
+            if (is_string($column) || $column instanceof ArrayColumn) {
+                $subSelect = $service->many($key)->configSelect((array) $column);
                 $select->subselect($key, $subSelect);
             }
 
