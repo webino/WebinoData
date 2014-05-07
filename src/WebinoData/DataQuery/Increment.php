@@ -8,6 +8,6 @@ class Increment extends Toggle
 {
     protected function createExpression($identifier, $increment)
     {
-        return new SqlExpression($identifier . '+' . $increment);
+        return new SqlExpression($identifier . '+' . is_numeric($increment) ? $increment : 1);
     }
 }

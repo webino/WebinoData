@@ -8,11 +8,11 @@ use Zend\Db\Sql\Update as SqlUpdate;
 
 class Toggle extends AbstractDataQuery
 {
-    protected $column;
+    protected $columns;
 
-    public function __construct($column, SqlUpdate $sql, PlatformInterface $platform)
+    public function __construct($columns, SqlUpdate $sql, PlatformInterface $platform)
     {
-        $this->column = $column;
+        $this->columns = (array) $columns;
 
         parent::__construct($sql, $platform);
     }
@@ -24,7 +24,7 @@ class Toggle extends AbstractDataQuery
 
     public function __toString()
     {
-        $columns = is_array($this->column) ? $this->column : array($this->column => 1);
+        $columns = $this->columns;
         $set     = array();
 
         foreach ($columns as $column => $value) {
