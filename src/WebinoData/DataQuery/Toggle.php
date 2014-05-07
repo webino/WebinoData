@@ -41,6 +41,9 @@ class Toggle extends AbstractDataQuery
 
     protected function createExpression($identifier, $value)
     {
+        if (is_numeric($value)) {
+            return $value;
+        }
         return new SqlExpression('NOT ' . $identifier);
     }
 }
