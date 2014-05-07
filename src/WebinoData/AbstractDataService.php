@@ -916,7 +916,7 @@ abstract class AbstractDataService implements
                     ->execute();
     }
 
-    public function toggle($column, array $where)
+    public function toggle($column, $where)
     {
         $this->init();
 
@@ -933,7 +933,7 @@ abstract class AbstractDataService implements
         return $this->executeQuery($query->toString());
     }
 
-    public function increment($column, array $where)
+    public function increment($column, $where)
     {
         $this->init();
 
@@ -950,7 +950,7 @@ abstract class AbstractDataService implements
         return $this->executeQuery($query->toString());
     }
 
-    public function decrement($column, array $where)
+    public function decrement($column, $where)
     {
         $this->init();
 
