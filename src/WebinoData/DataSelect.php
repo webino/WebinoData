@@ -222,7 +222,7 @@ class DataSelect
                 // todo replace in sql select?
                 continue;
             }
-            
+
             if (is_array($str)) {
                 $this->replaceVars($str);
                 continue;
@@ -350,6 +350,12 @@ class DataSelect
     public function group($group)
     {
         $this->sqlSelect->group($group);
+        return $this;
+    }
+
+    public function having($predicate, $combination = PredicateSet::OP_AND)
+    {
+        $this->sqlSelect->having($predicate, $combination);
         return $this;
     }
 
