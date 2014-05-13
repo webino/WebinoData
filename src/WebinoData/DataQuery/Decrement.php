@@ -8,6 +8,6 @@ class Decrement extends Toggle
 {
     protected function createExpression($identifier, $decrement)
     {
-        return new SqlExpression($identifier . '-' . is_numeric($decrement) ? $decrement : 1);
+        return new SqlExpression($identifier . '-' . (is_numeric($decrement) ? $decrement : 1));
     }
 }
