@@ -848,8 +848,7 @@ abstract class AbstractDataService implements
         $inputFilter = $this->getInputFilter();
 
         // on update filter by exchange
-        !$event->isUpdate() or
-            $this->filterInputFilter($array, $inputFilter);
+        $this->filterInputFilter($array, $inputFilter, $event->isUpdate());
 
         $inputFilter->getValidInput() or
             $inputFilter->validate($data->getArrayCopy());
@@ -883,11 +882,10 @@ abstract class AbstractDataService implements
         $validDataArray = $validData->getArrayCopy();
 
         try {
-            if ($event->isUpdate()) {
-                $affectedRows = $this->tableGateway->update($validDataArray, $updateWhere);
-            } else {
-                $affectedRows = $this->tableGateway->insert($validDataArray);
-            }
+            $affectedRows = $event->isUpdate()
+                          ? $this->tableGateway->update($validDataArray, $updateWhere)
+                          : $this->tableGateway->insert($validDataArray);
+
         } catch (\Exception $e) {
 
             throw new Exception\RuntimeException(
@@ -1000,15 +998,17 @@ abstract class AbstractDataService implements
         return '(' . join(' ' . $type . ' ', $where) . ')';
     }
 
-    protected function filterInputFilter(array $data, InputFilter $inputFilter)
+    protected function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
     {
         $exchange = array_flip(array_keys($data));
         foreach ($inputFilter->getInputs() as $input) {
-
             $inputName = $input->getName();
 
-            isset($exchange[$inputName]) or
+            if ((!$isUpdate && !isset($exchange[$inputName]) && $input->allowEmpty())
+                || ($isUpdate && !isset($exchange[$inputName]))
+            ) {
                 $inputFilter->remove($inputName);
+            }
         }
 
         return $this;
