@@ -10,8 +10,11 @@ return [
             'adapter' => [
                 'name' => 'filesystem',
                 'options' => [
-                    'namespace' => 'webinodata_cache',
-                    'cacheDir'  => 'data/cache',
+                    'namespace'      => 'webinodata_cache',
+                    'cacheDir'       => 'data/cache',
+                    'dirPermission'  => false,
+                    'filePermission' => false,
+                    'umask'          => 7,
                 ],
             ],
             'plugins' => [
