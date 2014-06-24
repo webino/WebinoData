@@ -186,6 +186,16 @@ class DataSelect
         return $this;
     }
 
+    public function removeColumn($name)
+    {
+        $columns = $this->getColumns();
+        if (isset($columns[$name])) {
+            unset($columns[$name]);
+        }
+        $this->columns($columns);
+        return $this;
+    }
+
     public function limit($limit)
     {
         $this->sqlSelect->limit((int) $limit);
