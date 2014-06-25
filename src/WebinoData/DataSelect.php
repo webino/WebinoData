@@ -18,9 +18,9 @@ class DataSelect
 
     protected $service;
     protected $sqlSelect;
-    protected $subselects = array();
-    protected $search = array();
-    protected $flags = array();
+    protected $subselects = [];
+    protected $search = [];
+    protected $flags = [];
 
     public function __construct(DataService $service, Select $select)
     {
@@ -294,7 +294,8 @@ class DataSelect
         return $this;
     }
 
-    public function search($term, array $columns = array(), $combination = PredicateSet::OP_OR)
+    // todo decouple logic
+    public function search($term, array $columns = [], $combination = PredicateSet::OP_OR)
     {
         if (empty($term) && !is_numeric($term)) {
             return $this;
@@ -311,9 +312,9 @@ class DataSelect
             return $this;
         }
 
-        $term     = preg_replace('~[^a-zA-Z0-9]+~', ' ', $term);
+        $term     = $this->sanitizeSearchTerm($term);
         $platform = $this->service->getPlatform();
-        $where    = array();
+        $where    = [];
 
         foreach (explode(' ', $term) as $word) {
 
@@ -335,7 +336,7 @@ class DataSelect
                     continue;
                 }
 
-                $word    = preg_replace('~[^a-zA-Z0-9]+~', '%', $word);
+                $word    = $this->sanitizeSearchTerm($word, '%');
                 $where[] = $identifier . ' LIKE ' . $platform->quoteValue('%' . $word . '%');
             }
         }
@@ -347,7 +348,7 @@ class DataSelect
         foreach ($columns as $column) {
 
             isset($this->search[$column]) or
-                $this->search[$column] = array();
+                $this->search[$column] = [];
 
             in_array($term, $this->search) or
                 $this->search[$column][] = $term;
@@ -355,6 +356,12 @@ class DataSelect
 
         $this->sqlSelect->where('(' . join(' ' . $combination . ' ', $where) . ')', PredicateSet::OP_AND);
         return $this;
+    }
+
+    // todo decouple
+    private function sanitizeSearchTerm($term, $replacement = ' ')
+    {
+        return preg_replace('~[^a-zA-Z0-9_-]+~', $replacement, $term);
     }
 
     public function group($group)
