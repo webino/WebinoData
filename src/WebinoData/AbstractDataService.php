@@ -127,11 +127,12 @@ abstract class AbstractDataService implements
         $serviceManager = $this->getServiceManager();
         $eventManager   = $this->getEventManager();
 
+        $attachedPlugins = [];
         foreach ($config as $pluginKey => $pluginName) {
 
-            $pluginOptions = array();
+            // resolve plugin settings
+            $pluginOptions = [];
             if (is_array($pluginName)) {
-
                 if (!empty($pluginName['plugin'])) {
                     $pluginName = $pluginName['plugin'];
                     unset($pluginName['plugin']);
@@ -143,6 +144,13 @@ abstract class AbstractDataService implements
                 }
             }
 
+            // do not attach the same plugin more than once
+            if (isset($attachedPlugins[$pluginName])) {
+                continue;
+            }
+            $attachedPlugins[$pluginName] = true;
+
+            // attach plugin
             $plugin = $serviceManager->get($pluginName);
             $plugin->attach($eventManager);
 
