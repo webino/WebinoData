@@ -731,6 +731,8 @@ abstract class AbstractDataService implements
             throw new \InvalidArgumentException('Provided `$callback` not callable');
         }
 
+        $this->init();
+
         $select = empty($select) ? $this->select() : $select;
         $result = $this->executeQuery((string) $select);
 
@@ -740,7 +742,6 @@ abstract class AbstractDataService implements
         $event->setResult($result);
 
         foreach ($result as $row) {
-
             $rowObject = new ArrayObject($row);
 
             $event
@@ -758,6 +759,8 @@ abstract class AbstractDataService implements
 
     public function import(array $data)
     {
+        $this->init();
+
         $dataObject = new ArrayObject($data);
 
         $events = $this->getEventManager();
