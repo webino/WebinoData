@@ -232,16 +232,20 @@ class Relations
             }
 
             foreach ($values as $value) {
+                $valueIsNumeric = is_numeric($value);
 
-                $manyToMany or
-                    $value[$tableName . '_id'] = $mainId;
+                if (!$valueIsNumeric) {
+                    $manyToMany or
+                        $value[$tableName . '_id'] = $mainId;
 
-                $subService->exchangeArray($value);
+                    $subService->exchangeArray($value);
+                }
 
                 if ($manyToMany) {
-                    $subId = !empty($value['id']) ? $value['id'] : $subService->getLastInsertValue();
+                    $subId = $valueIsNumeric
+                           ? $value
+                           : (!empty($value['id']) ? $value['id'] : $subService->getLastInsertValue());
 
-                    // create association
                     $this->assocInsert(
                         $service,
                         $subService,
