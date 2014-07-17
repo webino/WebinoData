@@ -377,14 +377,11 @@ class DataSelect
     }
 
     /**
-     * Get SQL string for statement
-     *
-     * @param  null|PlatformInterface $adapterPlatform If null, defaults to Sql92
      * @return string
      */
-    public function getSqlString(PlatformInterface $adapterPlatform = null)
+    public function getSqlString()
     {
-        return $this->sqlSelect->getSqlString($adapterPlatform);
+        return $this->service->getSql()->getSqlStringForSqlObject($this->sqlSelect, $this->service->getPlatform());
     }
 
     /**
@@ -549,11 +546,9 @@ class DataSelect
     public function __toString()
     {
         try {
-            $sql = $this->getSqlString($this->service->getPlatform());
+            return $this->getSqlString();
         } catch (\Exception $exc) {
             return $exc;
         }
-
-        return $sql;
     }
 }
