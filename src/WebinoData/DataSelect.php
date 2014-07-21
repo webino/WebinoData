@@ -295,7 +295,7 @@ class DataSelect
     }
 
     // todo decouple logic
-    public function search($term, array $columns = [], $combination = PredicateSet::OP_OR)
+    public function search($term, array $columns = [], $combination = PredicateSet::OP_AND)
     {
         if (empty($term) && !is_numeric($term)) {
             return $this;
@@ -354,7 +354,7 @@ class DataSelect
                 $this->search[$column][] = $term;
         }
 
-        $this->sqlSelect->where('(' . join(' ' . $combination . ' ', $where) . ')', PredicateSet::OP_AND);
+        $this->sqlSelect->where('(' . join(' ' . PredicateSet::OP_OR . ' ', $where) . ')', $combination);
         return $this;
     }
 
