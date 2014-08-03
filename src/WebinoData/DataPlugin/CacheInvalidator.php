@@ -5,18 +5,28 @@ namespace WebinoData\DataPlugin;
 use WebinoData\DataEvent;
 use Zend\EventManager\EventManager;
 
+/**
+ *
+ */
 class CacheInvalidator extends AbstractConfigurable
 {
     /**
      * @var array
      */
-    protected $clearByTags = array();
+    protected $clearByTags = [];
 
+    /**
+     * @return array
+     */
     public function getClearByTags()
     {
         return $this->clearByTags;
     }
 
+    /**
+     * @param array $clearByTags
+     * @return self
+     */
     public function setClearByTags(array $clearByTags)
     {
         $this->clearByTags = $clearByTags;
@@ -28,22 +38,19 @@ class CacheInvalidator extends AbstractConfigurable
      */
     public function attach(EventManager $eventManager)
     {
-        $eventManager->attach('data.exchange.post', array($this, 'clearCache'), 100);
-        $eventManager->attach('data.toggle', array($this, 'clearCache'), 100);
-        $eventManager->attach('data.increment', array($this, 'clearCache'), 100);
-        $eventManager->attach('data.decrement', array($this, 'clearCache'), 100);
-        $eventManager->attach('data.delete', array($this, 'clearCache'), 100);
+        $eventManager->attach('data.exchange.post', [$this, 'clearCache'], 100);
+        $eventManager->attach('data.toggle', [$this, 'clearCache'], 100);
+        $eventManager->attach('data.increment', [$this, 'clearCache'], 100);
+        $eventManager->attach('data.decrement', [$this, 'clearCache'], 100);
+        $eventManager->attach('data.delete', [$this, 'clearCache'], 100);
     }
 
+    /**
+     * @param DataEvent $event
+     */
     public function clearCache(DataEvent $event)
     {
-        // todo injection
-        $services = $event->getService()->getServiceManager();
-
-        foreach ($this->getClearByTags() as $cacheName => $tags) {
-
-            $services->get($cacheName)
-                ->clearByTags($tags);
-        }
+        $event->setparam('clearByTags', $this->getClearByTags());
+        $event->getService()->getEventManager()->trigger('data.cache.clear', $event);
     }
 }

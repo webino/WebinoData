@@ -5,16 +5,22 @@ return array (
   array (
     'supertypes' =>
     array (
-      0 => 'Zend\\EventManager\\EventManagerAwareInterface',
-      1 => 'Zend\\EventManager\\EventsCapableInterface',
-      2 => 'Zend\\ServiceManager\\ServiceManagerAwareInterface',
-      3 => 'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface',
+      0 => 'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface',
+      1 => 'Zend\\ServiceManager\\ServiceManagerAwareInterface',
+      2 => 'Zend\\EventManager\\EventsCapableInterface',
+      3 => 'Zend\\EventManager\\EventManagerAwareInterface',
+      4 => 'WebinoData\\AbstractDataService',
+      5 => 'Zend\\EventManager\\EventManagerAwareInterface',
+      6 => 'Zend\\EventManager\\EventsCapableInterface',
+      7 => 'Zend\\ServiceManager\\ServiceManagerAwareInterface',
+      8 => 'WebinoData\\InputFilter\\InputFilterFactoryAwareInterface',
     ),
     'instantiator' => '__construct',
     'methods' =>
     array (
       '__construct' => 3,
       'setCache' => 0,
+      'setCacheTags' => 0,
       'setEvent' => 0,
       'setEventManager' => 3,
       'setServiceManager' => 3,
@@ -26,8 +32,6 @@ return array (
       'setHasMany' => 0,
       'setHasManyService' => 0,
       'setQuery' => 0,
-      'getEventManager' => 3,
-      'getInputFilter' => 3,
     ),
     'parameters' =>
     array (
@@ -54,6 +58,16 @@ return array (
         array (
           0 => 'cache',
           1 => 'Zend\\Cache\\Storage\\StorageInterface',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setCacheTags' =>
+      array (
+        'WebinoData\\DataService::setCacheTags:0' =>
+        array (
+          0 => 'tags',
+          1 => NULL,
           2 => true,
           3 => NULL,
         ),

@@ -12,10 +12,9 @@ class Module
      */
     public function onBootstrap(MvcEvent $event)
     {
-        $app          = $event->getApplication();
-        $services     = $app->getServiceManager();
-        $sharedEvents = $services->get('SharedEventManager');
-        $sharedEvents->attachAggregate($services->get('WebinoData\Listener\CacheInvalidatorListener'));
+        $services = $event->getApplication()->getServiceManager();
+        $services->get('SharedEventManager')
+            ->attachAggregate($services->get('WebinoData\Listener\CacheInvalidatorListener'));
     }
 
     /**
