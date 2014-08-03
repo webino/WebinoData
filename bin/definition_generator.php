@@ -1,40 +1,40 @@
 #!/usr/bin/env php
 <?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2012-2014 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
+
+namespace WebinoData;
 
 use Zend\Code\Scanner\FileScanner as CodeFileScanner;
 use Zend\Di\Definition\CompilerDefinition;
 
-//define('__ZFLIB__', __DIR__ . '/../vendor/zendframework/zendframework/library');
-define('__ZFLIB__', '/var/www/dev2/behprezeny.sk-src/vendor/zendframework/zendframework/library');
-
 // Autoloader
-$loader = require __ZFLIB__ . '/../../../autoload.php';
-
-$loader->add('WebinoData', __DIR__ . '/../src');
+$vendorDir = __DIR__ . '/../vendor';
+$loader    = require $vendorDir . '/autoload.php';
+$loader->add(__NAMESPACE__, __DIR__ . '/../src');
 
 // Compile Di Definition
 $diCompiler = new CompilerDefinition;
-
 $diCompiler->addDirectory(__DIR__ . '/../src');
+foreach ([
+    $vendorDir . '/zendframework/zendframework/library/Zend/Db/TableGateway/TableGateway.php',
+    $vendorDir . '/zendframework/zendframework/library/Zend/Filter/FilterChain.php',
+    $vendorDir . '/zendframework/zendframework/library/Zend/InputFilter/Factory.php',
+    $vendorDir . '/zendframework/zendframework/library/Zend/Validator/ValidatorChain.php',
 
-foreach (array(
-
-    // add files
-    __ZFLIB__ . '/Zend/Db/TableGateway/TableGateway.php',
-    __ZFLIB__ . '/Zend/Filter/FilterChain.php',
-    __ZFLIB__ . '/Zend/InputFilter/Factory.php',
-    __ZFLIB__ . '/Zend/Validator/ValidatorChain.php',
-
-) as $file) {
+] as $file) {
     $diCompiler->addCodeScannerFile(new CodeFileScanner($file));
 }
-
 $diCompiler->compile();
-
 $definition = $diCompiler->toArrayDefinition()->toArray();
 
 $dir = __DIR__ . '/../data/di';
-
 is_dir($dir) or mkdir($dir);
 
 file_put_contents(

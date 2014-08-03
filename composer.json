@@ -1,27 +1,31 @@
 {
-    "name": "webino/webino-data",
+    "name":        "webino/webino-data",
     "description": "Modular Data service over Zend Db",
-    "type": "library",
-    "keywords": [
-        "webino", "data", "zf2"
-    ],
-    "homepage": "https://github.com/webino/WebinoData",
+    "type":        "library",
+    "license":     "BSD-3-Clause",
+    "keywords":    ["data", "service", "webino", "zf2"],
+    "homepage":    "https://github.com/webino/WebinoData",
     "authors": [
         {
-            "name": "Peter Bačinský",
-            "email": "peter@bacinsky.sk",
-            "homepage": "http://www.bacinsky.sk/",
-            "role": "Developer"
+            "name":     "Webino, s. r. o.",
+            "email":    "info@webino.sk",
+            "homepage": "http://webino.sk",
+            "role":     "Developer"
+        },
+        {
+            "name":     "Peter Bačinský",
+            "email":    "peter@bacinsky.sk",
+            "homepage": "http://bacinsky.sk",
+            "role":     "Developer"
         }
     ],
     "require": {
         "php": ">=5.4",
-        "zendframework/zendframework": "2.*"
+        "zendframework/zendframework": "dev-develop as 2.2.0"
     },
     "suggest": {
         "webino/zf2nette-debug": "User friendly Exception and Error handler ported from Nette Framework",
-        "webino/webino-draw": "XHTML Layout Renderer for Zend Framework",
-        "webino/webino-image-thumb": "Image Thumbnailer for Zend Framework"
+        "webino/webino-draw": "XHTML Layout Renderer for Zend Framework"
     },
     "autoload": {
         "psr-0": {

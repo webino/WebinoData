@@ -3,9 +3,21 @@
 namespace WebinoData;
 
 use ArrayObject;
+use Zend\Mvc\MvcEvent;
 
 class Module
 {
+    /**
+     * @param MvcEvent $event
+     */
+    public function onBootstrap(MvcEvent $event)
+    {
+        $app          = $event->getApplication();
+        $services     = $app->getServiceManager();
+        $sharedEvents = $services->get('SharedEventManager');
+        $sharedEvents->attachAggregate($services->get('WebinoData\Listener\CacheInvalidatorListener'));
+    }
+
     /**
      * Write data into the CSV file
      *
@@ -90,25 +102,6 @@ class Module
                         $service->setCache($services->get('WebinoDataCache'));
                     }
                 }
-            ),
-        );
-    }
-
-    /**
-     * Default autoloader config
-     *
-     * @return array
-     */
-    public function getAutoloaderConfig()
-    {
-        return array(
-            'Zend\Loader\ClassMapAutoloader' => array(
-                __DIR__ . '/autoload_classmap.php',
-            ),
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    __NAMESPACE__ => __DIR__,
-                ),
             ),
         );
     }

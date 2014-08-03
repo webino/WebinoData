@@ -1,12 +1,7 @@
 # pre-commit
 git stash -q --keep-index
-phing classmap
-git add autoload_classmap.php
-phing didef
-git add data/di/definition.php
-cd test && phpunit
+grunt precommit
 RESULT=$?
-cd ..
 env -i
 git stash pop -q
 [ $RESULT -ne 0 ] && exit 1
