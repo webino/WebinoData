@@ -20,6 +20,7 @@ class DataEvent extends Event
 {
     /**#@+
      * Ajax events
+     * @todo redesign
      */
     const EVENT_SELECT = 'data.select';
     const EVENT_DELETE = 'data.delete';
@@ -33,8 +34,11 @@ class DataEvent extends Event
     const EVENT_EXPORT = 'data.export';
     const EVENT_IMPORT = 'data.import';
     const EVENT_TOGGLE = 'data.toggle';
+    const EVENT_TOGGLE_POST = 'data.toggle.post';
     const EVENT_INCREMENT = 'data.increment';
+    const EVENT_INCREMENT_POST = 'data.increment.post';
     const EVENT_DECREMENT = 'data.decrement';
+    const EVENT_DECREMENT_POST = 'data.decrement.post';
     /**#@-*/
 
     protected $service;
@@ -44,6 +48,7 @@ class DataEvent extends Event
     protected $result;
     protected $rows;
     protected $row;
+    protected $affectedRows;
     protected $update;
     protected $arguments = array();
 
@@ -136,6 +141,17 @@ class DataEvent extends Event
     public function setRow(ArrayAccess $row)
     {
         $this->row = $row;
+        return $this;
+    }
+
+    public function getAffectedRows()
+    {
+        return $this->affectedRows;
+    }
+
+    public function setAffectedRows($affectedRows)
+    {
+        $this->affectedRows = $affectedRows;
         return $this;
     }
 

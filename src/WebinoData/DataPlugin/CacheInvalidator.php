@@ -39,10 +39,10 @@ class CacheInvalidator extends AbstractConfigurable
     public function attach(EventManager $eventManager)
     {
         $eventManager->attach('data.exchange.post', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.toggle', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.increment', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.decrement', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.delete', [$this, 'clearCache'], 100);
+        $eventManager->attach('data.toggle.post', [$this, 'clearCache'], 100);
+        $eventManager->attach('data.increment.post', [$this, 'clearCache'], 100);
+        $eventManager->attach('data.decrement.post', [$this, 'clearCache'], 100);
+        $eventManager->attach('data.delete.post', [$this, 'clearCache'], 100);
     }
 
     /**
@@ -50,6 +50,10 @@ class CacheInvalidator extends AbstractConfigurable
      */
     public function clearCache(DataEvent $event)
     {
+        if (!$event->getAffectedRows()) {
+            return;
+        }
+
         $event->setparam('clearByTags', $this->getClearByTags());
         $event->getService()->getEventManager()->trigger('data.cache.clear', $event);
     }

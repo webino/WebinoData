@@ -795,11 +795,10 @@ abstract class AbstractDataService implements
             return 0;
         }
 
-        $result = $this->tableGateway->delete($where);
-
+        $affectedRows = $this->tableGateway->delete($where);
+        $event->setAffectedRows($affectedRows);
         $events->trigger(DataEvent::EVENT_DELETE_POST, $event);
-
-        return $result;
+        return $affectedRows;
     }
 
     public function own(&$subject, $id)
@@ -898,7 +897,6 @@ abstract class AbstractDataService implements
                           : $this->tableGateway->insert($validDataArray);
 
         } catch (\Exception $e) {
-
             throw new Exception\RuntimeException(
                     sprintf(
                         'Statement could not be executed for the service table `%s`',
@@ -912,9 +910,11 @@ abstract class AbstractDataService implements
         // reset input filter
         $this->inputFilter = null;
 
+        // trigger event
+        $event->setAffectedRows($affectedRows);
         $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
 
-        return $affectedRows;
+        return $event->getAffectedRows();
     }
 
     public function executeQuery($query)
@@ -939,7 +939,10 @@ abstract class AbstractDataService implements
                       ->toggle($column)
                       ->where($where);
 
-        return $this->executeQuery($query->toString());
+        $result = $this->executeQuery($query->toString());
+        $event->setAffectedRows($result->getAffectedRows());
+        $events->trigger(DataEvent::EVENT_TOGGLE_POST, $event);
+        return $result;
     }
 
     public function increment($column, $where)
@@ -956,7 +959,10 @@ abstract class AbstractDataService implements
                       ->increment($column)
                       ->where($where);
 
-        return $this->executeQuery($query->toString());
+        $result = $this->executeQuery($query->toString());
+        $event->setAffectedRows($result->getAffectedRows());
+        $events->trigger(DataEvent::EVENT_INCREMENT_POST, $event);
+        return $result;
     }
 
     public function decrement($column, $where)
@@ -973,7 +979,10 @@ abstract class AbstractDataService implements
                       ->decrement($column)
                       ->where($where);
 
-        return $this->executeQuery($query->toString());
+        $result = $this->executeQuery($query->toString());
+        $event->setAffectedRows($result->getAffectedRows());
+        $events->trigger(DataEvent::EVENT_DECREMENT_POST, $event);
+        return $result;
     }
 
     public function getAdapter()
