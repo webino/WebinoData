@@ -405,6 +405,12 @@ class DataSelect
 
         $this->configureWhere($config, $this->where);
 
+        if (!empty($config['join'])) {
+            foreach ($config['join'] as $join) {
+                call_user_func_array([$this, 'join'], $join);
+            }
+        }
+
         empty($config['order']) or
             $this->order($config['order']);
 
@@ -413,6 +419,9 @@ class DataSelect
 
         empty($config['offset']) or
             $this->offset($config['offset']);
+
+        empty($config['group']) or
+            $this->group($config['group']);
 
         return $this;
     }
