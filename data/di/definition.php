@@ -197,16 +197,16 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
-      '__construct' => 3,
+      'setCache' => 0,
     ),
     'parameters' => 
     array (
-      '__construct' => 
+      'setCache' => 
       array (
-        'WebinoData\\Listener\\CacheInvalidatorListener::__construct:0' => 
+        'WebinoData\\Listener\\CacheInvalidatorListener::setCache:0' => 
         array (
-          0 => 'services',
-          1 => 'Zend\\ServiceManager\\ServiceManager',
+          0 => 'cache',
+          1 => 'Zend\\Cache\\Storage\\Adapter\\Filesystem',
           2 => true,
           3 => NULL,
         ),
@@ -1004,6 +1004,7 @@ return array (
     array (
       '__construct' => 3,
       'setClearByTags' => 0,
+      'setClearByDateTime' => 0,
       'setOptions' => 0,
     ),
     'parameters' => 
@@ -1023,6 +1024,16 @@ return array (
         'WebinoData\\DataPlugin\\CacheInvalidator::setClearByTags:0' => 
         array (
           0 => 'clearByTags',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setClearByDateTime' => 
+      array (
+        'WebinoData\\DataPlugin\\CacheInvalidator::setClearByDateTime:0' => 
+        array (
+          0 => 'clearByDateTime',
           1 => NULL,
           2 => true,
           3 => NULL,

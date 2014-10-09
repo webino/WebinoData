@@ -3,9 +3,9 @@
 namespace WebinoData\Listener;
 
 use WebinoData\DataEvent;
+use Zend\Cache\Storage\Adapter\Filesystem as Cache;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\EventManager\SharedListenerAggregateInterface;
-use Zend\ServiceManager\ServiceManager;
 
 /**
  *
@@ -18,22 +18,18 @@ class CacheInvalidatorListener implements SharedListenerAggregateInterface
     protected $listeners = [];
 
     /**
-     * @var ServiceManager
-     */
-    protected $services;
-
-    /**
      * @var array
      */
     protected $caches = [];
 
     /**
-     * @todo cache provider instead of service manager
-     * @param ServiceManager $services
+     * @param Cache $cache
+     * @return self
      */
-    public function __construct(ServiceManager $services)
+    public function setCache(Cache $cache)
     {
-        $this->services = $services;
+        $this->caches[] = $cache;
+        return $this;
     }
 
 
@@ -67,11 +63,10 @@ class CacheInvalidatorListener implements SharedListenerAggregateInterface
      */
     public function clearCache(DataEvent $event)
     {
-        foreach ($event->getParam('clearByTags') as $cacheName => $tags) {
-            if (empty($this->caches[$cacheName])) {
-                $this->caches[$cacheName] = $this->services->get($cacheName);
+        foreach ($event->getParam('clearByTags') as $tags) {
+            foreach ($this->caches as $cache) {
+                $cache->clearByTags((array) $tags);
             }
-            $this->caches[$cacheName]->clearByTags($tags);
         }
     }
 }

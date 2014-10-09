@@ -30,6 +30,11 @@ return [
                 'cache' => 'WebinoDataCache',
             ],
         ],
+        'WebinoData\Listener\CacheInvalidatorListener' => [
+            'injections' => [
+                'WebinoDataCache',
+            ],
+        ],
         'Zend\InputFilter\Factory' => [
             'injections' => [
                 'Zend\Filter\FilterChain',

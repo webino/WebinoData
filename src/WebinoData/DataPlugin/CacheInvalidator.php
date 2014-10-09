@@ -34,7 +34,7 @@ class CacheInvalidator extends AbstractConfigurable
         $this->cache = $cache;
     }
 
-        /**
+    /**
      * @return array
      */
     protected function getClearByTags()
@@ -99,7 +99,8 @@ class CacheInvalidator extends AbstractConfigurable
      */
     protected function internalClearCache(DataEvent $event)
     {
-        $event->setparam('clearByTags', $this->getClearByTags());
+        $tableName = $event->getService()->getTableName();
+        $event->setparam('clearByTags', array_merge([$tableName], $this->getClearByTags()));
         $event->getService()->getEventManager()->trigger('data.cache.clear', $event);
         return $this;
     }
