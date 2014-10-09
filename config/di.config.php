@@ -11,6 +11,7 @@ return [
     ],
     'instance' => [
         'alias' => [
+            'WebinoDataCache'         => 'Zend\Cache\Storage\Adapter\Filesystem',
             'WebinoDataRelations'     => 'WebinoData\DataPlugin\Relations',
             'WebinoDataDateTimeStamp' => 'WebinoData\DataPlugin\DateTimeStamp',
         ],
@@ -22,6 +23,11 @@ return [
         'WebinoData\DataPlugin\Order' => [
             'parameters' => [
                 'adapter' => 'Zend\Db\Adapter\Adapter',
+            ],
+        ],
+        'WebinoData\DataPlugin\CacheInvalidator' => [
+            'parameters' => [
+                'cache' => 'WebinoDataCache',
             ],
         ],
         'Zend\InputFilter\Factory' => [

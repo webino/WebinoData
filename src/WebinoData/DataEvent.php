@@ -31,6 +31,7 @@ class DataEvent extends Event
     const EVENT_FETCH_WITH = 'data.fetch.with';
     const EVENT_FETCH_PRE = 'data.fetch.pre';
     const EVENT_FETCH_POST = 'data.fetch.post';
+    const EVENT_FETCH_CACHE = 'data.fetch.cache';
     const EVENT_EXPORT = 'data.export';
     const EVENT_IMPORT = 'data.import';
     const EVENT_TOGGLE = 'data.toggle';

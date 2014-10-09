@@ -2,6 +2,7 @@
 
 namespace WebinoData;
 
+use ArrayObject;
 use WebinoData\Paginator\Adapter\WebinoDataSelect as PaginatorSelect;
 use Zend\Cache\Storage\StorageInterface as CacheInterface;
 use Zend\Paginator\Paginator;
@@ -47,14 +48,20 @@ class DataService extends AbstractDataService
             return parent::fetchWith($select, $parameters);
         }
 
+        $this->init();
+
         $cache   = $this->getCache();
         $cacheId = $select->hash();
-        $items   = $cache->getItem($cacheId);
+        $items   = new ArrayObject((array) $cache->getItem($cacheId));
+        $events  = $this->getEventManager();
+        $event   = clone $this->getEvent();
 
-        if (empty($items)) {
-            // fetch items
+        $event->setSelect($select);
+        $event->setRows($items);
+        $events->trigger(DataEvent::EVENT_FETCH_CACHE, $event);
+
+        if (!$items->count()) {
             $items = parent::fetchWith($select, $parameters);
-
             $cache->setItem($cacheId, $items);
             $cache->setTags($cacheId, $this->getCacheTags());
         }

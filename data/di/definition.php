@@ -855,6 +855,30 @@ return array (
       ),
     ),
   ),
+  'WebinoData\\Config\\InstanceConfigAutoloader' => 
+  array (
+    'supertypes' => 
+    array (
+    ),
+    'instantiator' => '__construct',
+    'methods' => 
+    array (
+      '__construct' => 3,
+    ),
+    'parameters' => 
+    array (
+      '__construct' => 
+      array (
+        'WebinoData\\Config\\InstanceConfigAutoloader::__construct:0' => 
+        array (
+          0 => 'dir',
+          1 => NULL,
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+    ),
+  ),
   'WebinoData\\DataSelect\\ArrayColumn' => 
   array (
     'supertypes' => 
@@ -978,11 +1002,22 @@ return array (
     'instantiator' => '__construct',
     'methods' => 
     array (
+      '__construct' => 3,
       'setClearByTags' => 0,
       'setOptions' => 0,
     ),
     'parameters' => 
     array (
+      '__construct' => 
+      array (
+        'WebinoData\\DataPlugin\\CacheInvalidator::__construct:0' => 
+        array (
+          0 => 'cache',
+          1 => 'Zend\\Cache\\Storage\\Adapter\\Filesystem',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
       'setClearByTags' => 
       array (
         'WebinoData\\DataPlugin\\CacheInvalidator::setClearByTags:0' => 
@@ -1452,6 +1487,7 @@ return array (
       'setResult' => 0,
       'setRows' => 0,
       'setRow' => 0,
+      'setAffectedRows' => 0,
       'setUpdate' => 0,
       'setArguments' => 0,
       'setParams' => 0,
@@ -1551,6 +1587,16 @@ return array (
         array (
           0 => 'row',
           1 => 'ArrayAccess',
+          2 => true,
+          3 => NULL,
+        ),
+      ),
+      'setAffectedRows' => 
+      array (
+        'WebinoData\\DataEvent::setAffectedRows:0' => 
+        array (
+          0 => 'affectedRows',
+          1 => NULL,
           2 => true,
           3 => NULL,
         ),
