@@ -4,13 +4,11 @@ namespace WebinoData;
 
 use ArrayObject;
 use WebinoData\Paginator\Adapter\WebinoDataSelect as PaginatorSelect;
-use Zend\Cache\Storage\StorageInterface as CacheInterface;
+use Zend\Cache\Storage\Adapter\Filesystem as Cache;
 use Zend\Paginator\Paginator;
 
 // todo refactor
 class DataService extends AbstractDataService
-      // TODO
-//    implements DataCacheAwareInterface
 {
     protected $cache;
     protected $cacheTags = [];
@@ -25,7 +23,7 @@ class DataService extends AbstractDataService
         return $this->cache;
     }
 
-    public function setCache(CacheInterface $cache)
+    public function setCache(Cache $cache)
     {
         $this->cache = $cache;
         return $this;
