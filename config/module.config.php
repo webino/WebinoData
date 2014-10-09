@@ -10,7 +10,7 @@ return [
             'adapter' => [
                 'name' => 'filesystem',
                 'options' => [
-                    'namespace'      => 'webinodata_cache',
+                    'namespace'      => 'webinodata',
                     'cacheDir'       => 'data/cache',
                     'dirPermission'  => false,
                     'filePermission' => false,
