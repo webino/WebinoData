@@ -12,28 +12,25 @@ return [
     'instance' => [
         'alias' => [
             'WebinoDataCache'         => 'Zend\Cache\Storage\Adapter\Filesystem',
+            // TODO deprecated, use FQCN
             'WebinoDataRelations'     => 'WebinoData\DataPlugin\Relations',
             'WebinoDataDateTimeStamp' => 'WebinoData\DataPlugin\DateTimeStamp',
         ],
+        // TODO deprecated, use FQCN
         'WebinoDataRelations' => [
-            'parameters' => [
-                'adapter' => 'Zend\Db\Adapter\Adapter',
-            ],
+            'parameters' => ['adapter' => 'Zend\Db\Adapter\Adapter'],
+        ],
+        'WebinoData\DataPlugin\Relations' => [
+            'parameters' => ['adapter' => 'Zend\Db\Adapter\Adapter'],
         ],
         'WebinoData\DataPlugin\Order' => [
-            'parameters' => [
-                'adapter' => 'Zend\Db\Adapter\Adapter',
-            ],
+            'parameters' => ['adapter' => 'Zend\Db\Adapter\Adapter'],
         ],
         'WebinoData\DataPlugin\CacheInvalidator' => [
-            'parameters' => [
-                'cache' => 'WebinoDataCache',
-            ],
+            'parameters' => ['cache' => 'WebinoDataCache'],
         ],
         'WebinoData\Listener\CacheInvalidatorListener' => [
-            'injections' => [
-                'WebinoDataCache',
-            ],
+            'injections' => ['WebinoDataCache'],
         ],
         'Zend\InputFilter\Factory' => [
             'injections' => [
@@ -42,14 +39,10 @@ return [
             ],
         ],
         'Zend\Filter\FilterChain' => [
-            'injections' => [
-                'FilterManager',
-            ],
+            'injections' => ['FilterManager'],
         ],
         'Zend\Validator\ValidatorChain' => [
-            'injections' => [
-                'ValidatorManager',
-            ],
+            'injections' => ['ValidatorManager'],
         ],
     ],
 ];
