@@ -8,7 +8,7 @@
  * @license     BSD-3-Clause
  */
 
-namespace WebinoData\Config\Input;
+namespace WebinoData\Config\InputFilter\Input;
 
 /**
  * Added datetime data type
