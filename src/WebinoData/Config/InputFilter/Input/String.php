@@ -15,6 +15,7 @@ namespace WebinoData\Config\InputFilter\Input;
  */
 class String extends AbstractInput
 {
+    use DefaultableTrait;
     use RequirableTrait;
 
     /**
