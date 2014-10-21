@@ -22,6 +22,7 @@ class String extends AbstractInput
      * {@inheritDoc}
      */
     protected $spec = [
+        'required' => false,
         'validators' => [
             'length' => [
                 'name'    => 'StringLength',
@@ -47,7 +48,6 @@ class String extends AbstractInput
      */
     public function setMin($min)
     {
-        empty($min) or $this->setRequired();
         $this->spec['validators']['length']['options']['min'] = (int) $min;
         return $this;
     }
