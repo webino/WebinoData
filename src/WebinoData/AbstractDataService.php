@@ -151,7 +151,7 @@ abstract class AbstractDataService implements
             $attachedPlugins[$pluginName] = true;
 
             // attach plugin
-            $plugin = $serviceManager->get($pluginName);
+            $plugin = clone $serviceManager->get($pluginName);
             $plugin->attach($eventManager);
 
             empty($pluginOptions) or
