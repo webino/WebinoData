@@ -28,6 +28,7 @@ class Relations
     public function attach(EventManager $eventManager)
     {
         $eventManager->attach('data.exchange.pre', array($this, 'preExchange'));
+        $eventManager->attach('data.exchange.invalid', array($this, 'preExchange'));
         $eventManager->attach('data.exchange.post', array($this, 'postExchange'));
         $eventManager->attach('data.fetch.pre', array($this, 'preFetch'));
         $eventManager->attach('data.fetch.post', array($this, 'postFetch'));
@@ -107,25 +108,22 @@ class Relations
             }
 
             $options = $service->oneOptions($key);
-
             if ($this->relationsDisabled($options)) {
                 continue;
             }
 
             $subService = $service->one($key);
-
             $subService->exchangeArray($value);
 
-            $validData[$key . '_id'] = !empty($value['id'])
-                                       ? $value['id']
-                                       : $subService->getLastInsertValue();
+            $idKey = $this->resolveSubKey($key . '_id', $options);
+            $data[$idKey] = !empty($value['id']) ? $value['id'] : $subService->getLastInsertValue();
+            $validData[$idKey] = $data[$idKey];
         }
     }
 
     protected function associateFetch(DataEvent $event)
     {
         $rows = $event->getRows();
-
         if (0 === $rows->count()) {
             return;
         }
