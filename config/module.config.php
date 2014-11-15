@@ -4,7 +4,6 @@ namespace WebinoData;
 
 return [
     'di' => include __DIR__ . '/di.config.php',
-
     'caches' => [
         'WebinoDataCache' => [
             'adapter' => [
@@ -12,9 +11,8 @@ return [
                 'options' => [
                     'namespace'      => 'webinodata',
                     'cacheDir'       => 'data/cache',
-                    'dirPermission'  => false,
-                    'filePermission' => false,
-                    'umask'          => 7,
+                    'dirPermission'  => 02770,
+                    'filePermission' => 02770,
                 ],
             ],
             'plugins' => [
