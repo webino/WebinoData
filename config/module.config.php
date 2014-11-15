@@ -9,10 +9,11 @@ return [
             'adapter' => [
                 'name' => 'filesystem',
                 'options' => [
-                    'namespace'      => 'webinodata',
-                    'cacheDir'       => 'data/cache',
-                    'dirPermission'  => 02770,
-                    'filePermission' => 02770,
+                    'namespace'       => 'webinodata',
+                    'cache_dir'       => 'data/cache',
+                    'dir_permission'  => false,
+                    'file_permission' => false,
+                    'umask'           => 7,
                 ],
             ],
             'plugins' => [
