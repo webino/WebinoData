@@ -51,7 +51,7 @@ class DateTimeStamp
             return;
         }
 
-        empty($inputs['added']) or
+        (empty($inputs['added']) or !empty($data['added'])) or
             $data['added'] = $dateTime;
     }
 
