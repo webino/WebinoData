@@ -835,7 +835,6 @@ abstract class AbstractDataService implements
         if ($event->isUpdate()) {
 
             if ($array['id'] instanceof DataSelect) {
-
                 $updateWhere = array(new Sql\Predicate\In('id', $array['id']->getSqlSelect()));
                 unset($array['id']);
 
@@ -849,6 +848,8 @@ abstract class AbstractDataService implements
             } else {
                 $updateWhere = array('id=?' => $array['id']);
             }
+
+            $event->setParam('updateWhere', $updateWhere);
         }
         // /update where
 
