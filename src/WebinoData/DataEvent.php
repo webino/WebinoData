@@ -11,6 +11,7 @@
 namespace WebinoData;
 
 use ArrayAccess;
+use ArrayObject;
 use Zend\EventManager\Event;
 
 /**
@@ -86,6 +87,9 @@ class DataEvent extends Event
      */
     public function getData()
     {
+        if (null === $this->data) {
+            $this->data = new ArrayObject([]);
+        }
         return $this->data;
     }
 
@@ -100,6 +104,9 @@ class DataEvent extends Event
      */
     public function getValidData()
     {
+        if (null === $this->validData) {
+            $this->validData = new ArrayObject([]);
+        }
         return $this->validData;
     }
 
@@ -130,6 +137,9 @@ class DataEvent extends Event
 
     public function setRows(ArrayAccess $rows)
     {
+        if (null === $this->rows) {
+            $this->rows = new ArrayObject([]);
+        }
         $this->rows = $rows;
         return $this;
     }
