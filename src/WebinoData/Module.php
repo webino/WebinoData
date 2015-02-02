@@ -67,7 +67,14 @@ class Module
                 }
 
                 // write data
-                fputcsv($file, $dataObjectArray);
+                $data = [];
+                foreach ($header as $headerCol) {
+                    $data[$headerCol] = isset($dataObjectArray[$headerCol])
+                                      ? $dataObjectArray[$headerCol]
+                                      : '';
+                }
+
+                fputcsv($file, $data);
             },
             $select
         );
