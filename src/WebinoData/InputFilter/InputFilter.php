@@ -8,6 +8,20 @@ use Zend\InputFilter\InputFilter as BaseInputFilter;
 class InputFilter extends BaseInputFilter
 {
     /**
+     * Merge another input filter into
+     *
+     * @param BaseInputFilter $inputFilter
+     * @return self
+     */
+    public function merge(BaseInputFilter $inputFilter)
+    {
+        foreach ($inputFilter->getInputs() as $input) {
+            $this->add($input);
+        }
+        return $this;
+    }
+
+    /**
      * @param array $data
      * @return bool
      */
