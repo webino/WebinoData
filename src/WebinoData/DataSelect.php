@@ -4,10 +4,9 @@ namespace WebinoData;
 
 use ArrayObject;
 use WebinoData\DataSelect\ArrayColumn;
-use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Predicate\PredicateSet;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Sql;
 
@@ -38,9 +37,19 @@ class DataSelect
         return $this->sqlSelect->getRawState('columns');
     }
 
+    public function getJoins()
+    {
+        return $this->sqlSelect->getRawState('joins');
+    }
+
     public function getWhere()
     {
         return $this->sqlSelect->getRawState('where');
+    }
+
+    public function getHaving()
+    {
+        return $this->sqlSelect->getRawState('having');
     }
 
     public function getOrder()
@@ -286,6 +295,12 @@ class DataSelect
         return $this;
     }
 
+    public function having($predicate, $combination = PredicateSet::OP_AND)
+    {
+        $this->sqlSelect->having($predicate, $combination);
+        return $this;
+    }
+
     public function subselect($name, DataSelect $select = null)
     {
         if (null === $select) {
@@ -319,16 +334,16 @@ class DataSelect
 
         $term     = $this->sanitizeSearchTerm($term);
         $platform = $this->service->getPlatform();
-        $where    = [];
+        $where    = new ArrayObject;
+        $having   = new ArrayObject;
+        $joinCols = array_column($this->getJoins(), 'columns');
 
         foreach (explode(' ', $term) as $word) {
-
             if (empty($word) && !is_numeric($word)) {
                 continue;
             }
 
             foreach ($columns as $column) {
-
                 $columnParts = explode('.', $column);
                 $identifier  = (2 === count($columnParts))
                                 ? $platform->quoteIdentifier($columnParts[0])
@@ -341,17 +356,19 @@ class DataSelect
                     continue;
                 }
 
-                $word    = $this->sanitizeSearchTerm($word, '%');
-                $where[] = $identifier . ' LIKE ' . $platform->quoteValue('%' . $word . '%');
+                $word     = $this->sanitizeSearchTerm($word, '%');
+                $joinCol  = current(array_column($joinCols, $column));
+                $isHaving = (!empty($joinCol) && $joinCol instanceof Expression);
+                $target   = ($isHaving ? $having : $where);
+                $target[] = $identifier . ' LIKE ' . $platform->quoteValue('%' . $word . '%');
             }
         }
 
-        if (empty($where)) {
+        if (!count($where) && !count($having)) {
             return $this;
         }
 
         foreach ($columns as $column) {
-
             isset($this->search[$column]) or
                 $this->search[$column] = [];
 
@@ -359,7 +376,13 @@ class DataSelect
                 $this->search[$column][] = $term;
         }
 
-        $this->sqlSelect->where('(' . join(' ' . PredicateSet::OP_OR . ' ', $where) . ')', $combination);
+        $predicate = function (ArrayObject $columns) {
+            return '(' . join(' ' . PredicateSet::OP_OR . ' ', $columns->getArrayCopy()) . ')';
+        };
+
+        count($where) and $this->sqlSelect->where($predicate($where), $combination);
+        count($having) and $this->sqlSelect->having($predicate($having), $combination);
+
         return $this;
     }
 
@@ -372,12 +395,6 @@ class DataSelect
     public function group($group)
     {
         $this->sqlSelect->group($group);
-        return $this;
-    }
-
-    public function having($predicate, $combination = PredicateSet::OP_AND)
-    {
-        $this->sqlSelect->having($predicate, $combination);
         return $this;
     }
 

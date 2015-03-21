@@ -60,14 +60,7 @@ class AbstractWebinoDataSelect extends DbSelect
         $select->reset(Select::LIMIT);
         $select->reset(Select::OFFSET);
         $select->reset(Select::ORDER);
-
-        // get join information, clear, and repopulate without columns
-        $joins = $select->getRawState(Select::JOINS);
-        $select->reset(Select::JOINS);
-        foreach ($joins as $join) {
-            $select->join($join['name'], $join['on'], array(), $join['type']);
-        }
-
+        
         $select->columns(array('c' => new Expression('COUNT(*)')));
 
         $sql       = $this->sql->getSqlStringForSqlObject($select);
