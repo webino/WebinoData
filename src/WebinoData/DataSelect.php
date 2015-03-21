@@ -180,7 +180,7 @@ class DataSelect
     {
         $columns = array_replace(
             $this->getColumns(),
-            array($name => $value)
+            [$name => $value]
         );
         $this->columns($columns);
         return $this;
@@ -204,6 +204,11 @@ class DataSelect
 
     public function join($name, $on, $columns = Select::SQL_STAR, $type = Select::JOIN_INNER)
     {
+        if (is_array($columns)) {
+            array_walk($columns, function (&$value) {
+                $value = $this->autoExpression($value);
+            });
+        }
         $this->sqlSelect->join($name, $on, $columns, $type);
         return $this;
     }
@@ -306,7 +311,7 @@ class DataSelect
                 foreach ((array) $subTerms as $subTerm) {
 
                     empty($subKey) || (empty($subTerm) && !is_numeric($subTerm)) or
-                        $this->search($subTerm, array($subKey), $combination);
+                        $this->search($subTerm, [$subKey], $combination);
                 }
             }
             return $this;
@@ -500,7 +505,7 @@ class DataSelect
         $leftType  = !empty($predicate['leftType']) ? $predicate['leftType'] : Expression::TYPE_IDENTIFIER;
         $rightType = !empty($predicate['rightType']) ? $predicate['rightType'] : Expression::TYPE_VALUE;
 
-        return array($left, $right, $op, $leftType, $rightType);
+        return [$left, $right, $op, $leftType, $rightType];
     }
 
     private function autoExpression($value)
