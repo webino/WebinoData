@@ -389,7 +389,27 @@ class DataSelect
     // todo decouple
     private function sanitizeSearchTerm($term, $replacement = ' ')
     {
+        // todo trigger event instead
+        $this->fixDateSearch($term);
+
         return preg_replace('~[^a-zA-Z0-9_-]+~', $replacement, $term);
+    }
+
+    // TODO decouple
+    private function fixDateSearch(&$term)
+    {
+        if (!preg_match('~^[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,4})?$~', $term)) {
+            return;
+        }
+        // fix year
+        substr_count($term, '.') >= 3 or $term.= '.';
+        list($day, $month, $year) = explode('.', $term);
+        $term = sprintf(
+            '%s-%s-%s',
+            $year,
+            str_repeat('0', 2 - strlen($month)) . $month,
+            str_repeat('0', 2 - strlen($day)) . $day
+        );
     }
 
     public function group($group)
