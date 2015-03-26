@@ -37,7 +37,7 @@ class DateTimeStamp
                 function($value) {
                     return $value['name'];
                 },
-                $config['input_filter']
+                array_filter($config['input_filter'])
             )
         );
 
