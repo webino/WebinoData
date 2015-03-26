@@ -14,6 +14,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
 use Zend\Filter\Word\DashToCamelCase;
+use Zend\Stdlib\ArrayUtils;
 
 /**
  *
@@ -33,16 +34,19 @@ class InstanceConfigAutoloader
 
     public function merge(array $subject)
     {
-        $this->merge = array_replace_recursive($this->merge, $subject);
+        $this->merge = ArrayUtils::merge($this->merge, $subject);
         return $this;
     }
 
     public function toArray()
     {
-        $dir         = $this->dir . self::DATA_DIR_NAME;
-        $dashToCamel = new DashToCamelCase;
-        $config      = [];
+        $dir = $this->dir . self::DATA_DIR_NAME;
+        if (!file_exists($dir)) {
+            return $this->merge;
+        }
 
+        $config = [];
+        $dashToCamel = new DashToCamelCase;
         foreach ($this->createDirIterator($dir) as $path) {
 
             $relPath   = substr($path[0], strlen($dir) + 1);
