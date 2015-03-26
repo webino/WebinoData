@@ -99,7 +99,10 @@ class DataSelect
 
         // collect input column names
         foreach ($inputFilter as $input) {
-            $inputColumns[$input['name']] = new Expression('`' . $tableName . '`.`' . $input['name'] . '`');
+            $input and
+                $inputColumns[$input['name']] = new Expression(
+                    '`' . $tableName . '`.`' . $input['name'] . '`'
+                );
         }
 
         // replace star with input columns
