@@ -51,20 +51,20 @@ class InstanceConfigAutoloader
 
             $relPath   = substr($path[0], strlen($dir) + 1);
             $namespace = explode('/', $relPath)[0];
-            $finfo     = pathinfo($path[0]);
+            $fInfo     = pathinfo($path[0]);
 
             $itemPath = join(
                 ' ',
                 array_filter([
                     trim(dirname(substr($relPath, strlen($namespace))), '/'),
                     '_',
-                    ucfirst($finfo['filename']),
+                    ucfirst($fInfo['filename']),
                 ])
             );
 
             $namePart   = str_replace(' ', '', ucwords(strtr($itemPath, ['-' => ' ', '.' => ' '])));
             $index      = $dashToCamel->filter($namespace) . ltrim($namePart, '_');
-            $itemName   = str_replace('-', '_', explode('.', $finfo['filename'], 2)[0]);
+            $itemName   = str_replace('-', '_', explode('.', $fInfo['filename'], 2)[0]);
             $tableIndex = substr($index, 0, strlen($index) - 4) . 'Table';
 
             $config['alias'][$tableIndex] = 'Zend\Db\TableGateway\TableGateway';
@@ -77,7 +77,9 @@ class InstanceConfigAutoloader
                 ],
             ];
 
-            $config[$index] = require $path[0];
+            /** @noinspection PhpIncludeInspection */
+            $dataConfig = require $path[0];
+            $config[$index] = is_array($dataConfig) ? $dataConfig : $dataConfig->toArray();
         }
 
         return array_replace_recursive($config, $this->merge);
