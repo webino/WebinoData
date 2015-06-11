@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=5.4",
-        "zendframework/zendframework": "dev-develop as 2.2.0"
+        "zendframework/zendframework": "2.3.*"
     },
     "suggest": {
         "webino/zf2nette-debug": "User friendly Exception and Error handler ported from Nette Framework",
