@@ -27,11 +27,11 @@ class Relations
 
     public function attach(EventManager $eventManager)
     {
-        $eventManager->attach('data.exchange.pre', array($this, 'preExchange'));
-        $eventManager->attach('data.exchange.invalid', array($this, 'preExchange'));
-        $eventManager->attach('data.exchange.post', array($this, 'postExchange'));
-        $eventManager->attach('data.fetch.pre', array($this, 'preFetch'));
-        $eventManager->attach('data.fetch.post', array($this, 'postFetch'));
+        $eventManager->attach('data.exchange.pre', [$this, 'preExchange'], 500);
+        $eventManager->attach('data.exchange.invalid', [$this, 'preExchange'], 500);
+        $eventManager->attach('data.exchange.post', [$this, 'postExchange'], 500);
+        $eventManager->attach('data.fetch.pre', [$this, 'preFetch'], 500);
+        $eventManager->attach('data.fetch.post', [$this, 'postFetch'], 500);
     }
 
     public function preExchange(DataEvent $event)
@@ -224,6 +224,8 @@ class Relations
                 // temporary fix, when one to many make it just update instead of delete all associations
                 !$manyToMany ? '_id' : 'id'
             );
+
+            $event->setAffectedRows($event->getAffectedRows() + 1);
 
             if (empty($values)) {
                 continue;
