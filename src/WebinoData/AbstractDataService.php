@@ -3,6 +3,7 @@
 namespace WebinoData;
 
 use ArrayObject;
+use WebinoData\DataSelect;
 use WebinoData\InputFilter\InputFilter;
 use WebinoData\InputFilter\InputFilterFactoryAwareInterface;
 use WebinoData\Exception;
@@ -31,7 +32,7 @@ abstract class AbstractDataService implements
     /**
      * @var array
      */
-    protected $config = array();
+    protected $config = [];
 
     /**
      * @var DataEvent
@@ -66,7 +67,7 @@ abstract class AbstractDataService implements
     /**
      * @var array
      */
-    protected $subServices = array();
+    protected $subServices = [];
 
     /**
      * @var type
@@ -78,11 +79,11 @@ abstract class AbstractDataService implements
     protected $query;
 
 
-    protected $hasOneList = array();
-    protected $hasManyList = array();
+    protected $hasOneList = [];
+    protected $hasManyList = [];
 
-    protected $hasOneService = array();
-    protected $hasManyService = array();
+    protected $hasOneService = [];
+    protected $hasManyService = [];
 
 
     /**
@@ -216,13 +217,13 @@ abstract class AbstractDataService implements
     public function setEventManager(EventManagerInterface $eventManager)
     {
         $eventManager->setIdentifiers(
-            array(
+            [
                 __CLASS__,
                 'WebinoData',
                 'WebinoData[' . $this->getTableName() . ']',
                 // todo deprecated
                 $this->getTableName()
-            )
+            ]
         );
 
         $this->eventManager = $eventManager;
@@ -332,10 +333,10 @@ abstract class AbstractDataService implements
      * @param DataService $service
      * @return DataService
      */
-    public function setHasOne($name, DataService $service, array $options = array())
+    public function setHasOne($name, DataService $service, array $options = [])
     {
         isset($this->hasOneList[$name]) or
-            $this->hasOneList[$name] = array();
+            $this->hasOneList[$name] = [];
 
         $this->hasOneList[$name]['service'] = $service;
         $this->hasOneList[$name]['options'] = $options;
@@ -346,14 +347,14 @@ abstract class AbstractDataService implements
      * @param DataService $service
      * @return DataService
      */
-    public function setHasOneService($name, $serviceName, array $options = array())
+    public function setHasOneService($name, $serviceName, array $options = [])
     {
         if (empty($name)) {
             throw new \InvalidArgumentException('Name cannot be null');
         }
 
         isset($this->hasOneService[$name]) or
-            $this->hasOneService[$name] = array();
+            $this->hasOneService[$name] = [];
 
         $this->hasOneService[$name]['serviceName'] = $serviceName;
         $this->hasOneService[$name]['options']     = $options;
@@ -444,10 +445,10 @@ abstract class AbstractDataService implements
      * @param DataService $service
      * @return DataService
      */
-    public function setHasMany($name, DataService $service, array $options = array())
+    public function setHasMany($name, DataService $service, array $options = [])
     {
         isset($this->hasManyList[$name]) or
-            $this->hasManyList[$name] = array();
+            $this->hasManyList[$name] = [];
 
         $this->hasManyList[$name]['service'] = $service;
         $this->hasManyList[$name]['options'] = $options;
@@ -459,14 +460,14 @@ abstract class AbstractDataService implements
      * @param string $serviceName
      * @return DataService
      */
-    public function setHasManyService($name, $serviceName, array $options = array())
+    public function setHasManyService($name, $serviceName, array $options = [])
     {
         if (empty($name)) {
             throw new \InvalidArgumentException('Name cannot be null');
         }
 
         isset($this->hasManyService[$name]) or
-            $this->hasManyService[$name] = array();
+            $this->hasManyService[$name] = [];
 
         $this->hasManyService[$name]['serviceName'] = $serviceName;
         $this->hasManyService[$name]['options']     = $options;
@@ -627,11 +628,15 @@ abstract class AbstractDataService implements
         return $this;
     }
 
-    public function select($columns = array())
+    /**
+     * @param array $columns
+     * @return DataSelect
+     */
+    public function select($columns = [])
     {
         $this->init();
 
-        $select = new \WebinoData\DataSelect(
+        $select = new DataSelect(
             $this,
             $this->getSql()->select()
         );
@@ -648,6 +653,10 @@ abstract class AbstractDataService implements
         return $select;
     }
 
+    /**
+     * @param string $name
+     * @return DataSelect
+     */
     public function configSelectset($name)
     {
         $select = $this->select();
@@ -658,13 +667,16 @@ abstract class AbstractDataService implements
         return $this->configSelect($this->config['selectset'][$name]);
     }
 
+    /**
+     * @return DataSelect
+     */
     public function configSelect()
     {
         $firstArg    = func_get_arg(0);
         $selectNames = is_array($firstArg) ? $firstArg : func_get_args();
         $select      = $this->select();
 
-        $selectConfig = array();
+        $selectConfig = [];
         foreach ($selectNames as $selectName) {
 
             if (!is_string($selectName)) {
@@ -683,12 +695,17 @@ abstract class AbstractDataService implements
         return $select;
     }
 
-    public function fetch($selectName, $parameters = array())
+    public function fetch($selectName, $parameters = [])
     {
         return $this->fetchWith($this->configSelect($selectName), $parameters);
     }
 
-    public function fetchWith(\WebinoData\DataSelect $select, $parameters = array())
+    /**
+     * @param DataSelect $select
+     * @param array $parameters
+     * @return ArrayObject|array
+     */
+    public function fetchWith(DataSelect $select, $parameters = [])
     {
         $this->init();
 
@@ -716,9 +733,9 @@ abstract class AbstractDataService implements
         return $event->getRows();
     }
 
-    public function fetchPairs(\WebinoData\DataSelect $select, $parameters = array())
+    public function fetchPairs(DataSelect $select, $parameters = [])
     {
-        $data = array();
+        $data = [];
         foreach ($this->fetchWith($select, $parameters) as $row) {
             $data[current($row)] = next($row);
         }
@@ -788,7 +805,7 @@ abstract class AbstractDataService implements
         $events = $this->getEventManager();
         $event  = $this->getEvent();
 
-        $event->setArguments(array($where));
+        $event->setArguments([$where]);
         $events->trigger(DataEvent::EVENT_DELETE, $event);
 
         if ($event->propagationIsStopped()) {
@@ -810,16 +827,20 @@ abstract class AbstractDataService implements
     public function owned($service, $id)
     {
         $column = $service->getTableName() . '_id=?';
-        $where  = array($column => $id);
+        $where  = [$column => $id];
 
         return $this->tableGateway->fetch($where)->toArray();
     }
 
     public function getArrayCopy()
     {
-        return array();
+        return [];
     }
 
+    /**
+     * @param array $array
+     * @return int Affected rows
+     */
     public function exchangeArray(array $array)
     {
         if (empty($array)) {
@@ -835,7 +856,7 @@ abstract class AbstractDataService implements
         $updateWhere = null;
         if ($event->isUpdate()) {
             if ($array['id'] instanceof DataSelect) {
-                $updateWhere = array(new Sql\Predicate\In('id', $array['id']->getSqlSelect()));
+                $updateWhere = [new Sql\Predicate\In('id', $array['id']->getSqlSelect())];
                 unset($array['id']);
 
             } elseif (is_array($array['id'])
@@ -846,7 +867,7 @@ abstract class AbstractDataService implements
                 unset($array['id']);
 
             } else {
-                $updateWhere = array('id=?' => $array['id']);
+                $updateWhere = ['id=?' => $array['id']];
             }
         }
         $event->setParam('updateWhere', $updateWhere);
@@ -932,7 +953,7 @@ abstract class AbstractDataService implements
         $events = $this->getEventManager();
         $event  = $this->getEvent();
 
-        $event->setArguments(array($column, $where));
+        $event->setArguments([$column, $where]);
         $events->trigger(DataEvent::EVENT_TOGGLE, $event);
 
         $query = $this->getQuery()
@@ -952,7 +973,7 @@ abstract class AbstractDataService implements
         $events = $this->getEventManager();
         $event  = $this->getEvent();
 
-        $event->setArguments(array($column, $where));
+        $event->setArguments([$column, $where]);
         $events->trigger(DataEvent::EVENT_INCREMENT, $event);
 
         $query = $this->getQuery()
@@ -965,6 +986,11 @@ abstract class AbstractDataService implements
         return $result;
     }
 
+    /**
+     * @param string $column
+     * @param $where
+     * @return mixed
+     */
     public function decrement($column, $where)
     {
         $this->init();
@@ -972,7 +998,7 @@ abstract class AbstractDataService implements
         $events = $this->getEventManager();
         $event  = $this->getEvent();
 
-        $event->setArguments(array($column, $where));
+        $event->setArguments([$column, $where]);
         $events->trigger(DataEvent::EVENT_DECREMENT, $event);
 
         $query = $this->getQuery()
@@ -999,7 +1025,7 @@ abstract class AbstractDataService implements
     {
         $term     = preg_replace('~[^a-zA-Z0-9]+~', ' ', $term);
         $platform = $this->getPlatform();
-        $where    = array();
+        $where    = [];
 
         foreach (explode(' ', $term) as $word) {
 
