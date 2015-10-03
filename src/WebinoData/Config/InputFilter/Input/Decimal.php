@@ -3,7 +3,7 @@
  * Webino (http://webino.sk)
  *
  * @link        https://github.com/webino/WebinoData for the canonical source repository
- * @copyright   Copyright (c) 2012-2014 Webino, s. r. o. (http://webino.sk)
+ * @copyright   Copyright (c) 2012-2015 Webino, s. r. o. (http://webino.sk)
  * @author      Peter Bačinský <peter@bacinsky.sk>
  * @license     BSD-3-Clause
  */
@@ -11,9 +11,9 @@
 namespace WebinoData\Config\InputFilter\Input;
 
 /**
- * Float data type
+ * Class Decimal
  */
-class Float extends AbstractInput
+class Decimal extends AbstractInput
 {
     use RequirableTrait;
     use DefaultableTrait;
@@ -23,7 +23,7 @@ class Float extends AbstractInput
      */
     protected $spec = [
         'validators' => [
-            'float' => ['name' => 'Float'],
+            'float' => ['name' => 'IsFloat'],
         ],
     ];
 
