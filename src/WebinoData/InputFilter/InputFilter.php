@@ -2,10 +2,14 @@
 
 namespace WebinoData\InputFilter;
 
+use Zend\InputFilter\BaseInputFilter;
 use Zend\InputFilter\Input;
-use Zend\InputFilter\InputFilter as BaseInputFilter;
+use Zend\InputFilter\InputFilter as ZendInputFilter;
 
-class InputFilter extends BaseInputFilter
+/**
+ * Class InputFilter
+ */
+class InputFilter extends ZendInputFilter
 {
     /**
      * Merge another input filter into
@@ -29,9 +33,7 @@ class InputFilter extends BaseInputFilter
     {
         // prepare input filter
         foreach ($this->getInputs() as $input) {
-
             if ($input instanceof BaseInputFilter) {
-
                 foreach ($input->getInputs() as $subInput) {
                     $this->prepareInputValidators($subInput, $data);
                 }
@@ -48,25 +50,28 @@ class InputFilter extends BaseInputFilter
         return $this->isValid();
     }
 
+    /**
+     * @param Input $input
+     * @param array $data
+     * @return $this
+     */
     protected function prepareInputValidators(Input $input, array $data)
     {
-        !empty($data['id']) or
-            $data['id'] = 0;
-
+        !empty($data['id']) or $data['id'] = 0;
         $data['inputName'] = $input->getName();
 
         foreach ($input->getValidatorChain()->getValidators() as $validator) {
-
             // Db validator
             if ($validator['instance'] instanceof \Zend\Validator\Db\AbstractDb) {
-
                 $exclude = $validator['instance']->getExclude();
 
-                !is_array($exclude) or
-                    $exclude['value'] = !empty($data[$exclude['value']]) ? $data[$exclude['value']] : $exclude['value'];
+                is_array($exclude)
+                    and $exclude['value'] = !empty($data[$exclude['value']])
+                                         ? $data[$exclude['value']]
+                                         : $exclude['value'];
 
-                !is_string($exclude) or
-                    $exclude = $this->translateExclude($exclude, $data);
+                is_string($exclude)
+                    and $exclude = $this->translateExclude($exclude, $data);
 
                 $validator['instance']->setExclude($exclude);
             }
@@ -75,6 +80,11 @@ class InputFilter extends BaseInputFilter
         return $this;
     }
 
+    /**
+     * @param string $exclude
+     * @param array $data
+     * @return string
+     */
     protected function translateExclude($exclude, array $data)
     {
         $translation = array();
@@ -85,8 +95,7 @@ class InputFilter extends BaseInputFilter
                 continue;
             }
             foreach ($value as $subKey => $subValue) {
-                is_array($subValue) or
-                    $translation['{$' . $key . '[' . $subKey . ']}'] = $subValue;
+                is_array($subValue) or $translation['{$' . $key . '[' . $subKey . ']}'] = $subValue;
             }
         }
 
