@@ -917,14 +917,14 @@ abstract class AbstractDataService implements
                           ? $this->tableGateway->update($validDataArray, $updateWhere)
                           : $this->tableGateway->insert($validDataArray);
 
-        } catch (\Exception $e) {
+        } catch (\Exception $exc) {
             throw new Exception\RuntimeException(
                     sprintf(
                         'Statement could not be executed for the service table `%s`',
                         $this->getTableName()
-                    ) . '; ' . $e->getPrevious()->getMessage(),
-                    $e->getCode(),
-                    $e
+                    ) . '; ' . ($exc->getPrevious() ? $exc->getPrevious()->getMessage() : $exc->getMessage()),
+                    $exc->getCode(),
+                    $exc
             );
         }
 
@@ -1047,12 +1047,12 @@ abstract class AbstractDataService implements
     protected function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
     {
         $exchange = array_flip(array_keys($data));
+
         foreach ($inputFilter->getInputs() as $input) {
             $inputName = $input->getName();
+            $exists = array_key_exists($inputName, $exchange);
 
-            if ((!$isUpdate && !isset($exchange[$inputName]) && $input->allowEmpty())
-                || ($isUpdate && !isset($exchange[$inputName]))
-            ) {
+            if ((!$isUpdate && !$exists) || ($isUpdate && !$exists)) {
                 $inputFilter->remove($inputName);
             }
         }
