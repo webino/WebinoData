@@ -909,21 +909,25 @@ abstract class AbstractDataService implements
 
         $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $event);
         $validDataArray = $validData->getArrayCopy();
+        $isEmpty = empty($validDataArray);
 
-        try {
-            $affectedRows = $event->isUpdate()
-                          ? $this->tableGateway->update($validDataArray, $updateWhere)
-                          : $this->tableGateway->insert($validDataArray);
+        $affectedRows = 0;
+        if (!$isEmpty) {
+            try {
+                $affectedRows = $event->isUpdate()
+                              ? $this->tableGateway->update($validDataArray, $updateWhere)
+                              : $this->tableGateway->insert($validDataArray);
 
-        } catch (\Exception $exc) {
-            throw new Exception\RuntimeException(
-                    sprintf(
-                        'Statement could not be executed for the service table `%s`',
-                        $this->getTableName()
-                    ) . '; ' . ($exc->getPrevious() ? $exc->getPrevious()->getMessage() : $exc->getMessage()),
-                    $exc->getCode(),
-                    $exc
-            );
+            } catch (\Exception $exc) {
+                throw new Exception\RuntimeException(
+                        sprintf(
+                            'Statement could not be executed for the service table `%s`',
+                            $this->getTableName()
+                        ) . '; ' . ($exc->getPrevious() ? $exc->getPrevious()->getMessage() : $exc->getMessage()),
+                        $exc->getCode(),
+                        $exc
+                );
+            }
         }
 
         // reset input filter
@@ -931,7 +935,7 @@ abstract class AbstractDataService implements
 
         // trigger event
         $event->setAffectedRows($affectedRows);
-        $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
+        $isEmpty or $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
 
         return $event->getAffectedRows();
     }
@@ -1059,7 +1063,7 @@ abstract class AbstractDataService implements
                 continue;
             }
 
-            if (!$isUpdate && ($input->getFallbackValue() || !$input->allowEmpty())) {
+            if (!$isUpdate && ($input->getFallbackValue() || 'id' === $inputName)) {
                 continue;
             }
 
