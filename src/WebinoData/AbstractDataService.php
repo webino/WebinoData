@@ -913,6 +913,8 @@ abstract class AbstractDataService implements
 
         $affectedRows = 0;
         if (!$isEmpty) {
+            $this->filterUnexistingNullValues($array, $validDataArray);
+
             try {
                 $affectedRows = $event->isUpdate()
                               ? $this->tableGateway->update($validDataArray, $updateWhere)
@@ -1047,6 +1049,26 @@ abstract class AbstractDataService implements
     }
 
     /**
+     * Remove null values that are no required
+     *
+     * @param array $data
+     * @param array &$validData
+     * @return $this
+     */
+    private function filterUnexistingNullValues(array $data, array &$validData)
+    {
+        foreach ($validData as $key => $value) {
+            if (null === $value) {
+                if (!array_key_exists($key, $data)) {
+                    unset($validData[$key]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Filter inputs by data
      *
      * @param array $data
@@ -1054,7 +1076,7 @@ abstract class AbstractDataService implements
      * @param bool $isUpdate
      * @return $this
      */
-    protected function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
+    private function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
     {
         if (!$isUpdate) {
             return $this;
