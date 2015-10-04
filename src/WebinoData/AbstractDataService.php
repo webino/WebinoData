@@ -1058,10 +1058,8 @@ abstract class AbstractDataService implements
     private function filterUnexistingNullValues(array $data, array &$validData)
     {
         foreach ($validData as $key => $value) {
-            if (null === $value) {
-                if (!array_key_exists($key, $data)) {
-                    unset($validData[$key]);
-                }
+            if (null === $value && 'id' !== $key && !array_key_exists($key, $data)) {
+                unset($validData[$key]);
             }
         }
 
