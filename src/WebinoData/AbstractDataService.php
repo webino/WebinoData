@@ -1056,18 +1056,16 @@ abstract class AbstractDataService implements
      */
     protected function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
     {
+        if (!$isUpdate) {
+            return $this;
+        }
+
         foreach ($inputFilter->getInputs() as $input) {
             $inputName = $input->getName();
 
-            if (array_key_exists($inputName, $data)) {
-                continue;
+            if (!array_key_exists($inputName, $data)) {
+                $inputFilter->remove($inputName);
             }
-
-            if (!$isUpdate && ($input->getFallbackValue() || 'id' === $inputName)) {
-                continue;
-            }
-
-            $inputFilter->remove($inputName);
         }
 
         return $this;
