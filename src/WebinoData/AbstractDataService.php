@@ -878,16 +878,14 @@ abstract class AbstractDataService implements
         $event->setData($data);
         $inputFilter = $this->getInputFilter();
 
-        // on update filter by exchange
         $this->filterInputFilter($array, $inputFilter, $event->isUpdate());
 
-        $inputFilter->getValidInput() or
-            $inputFilter->validate($data->getArrayCopy());
+        $inputFilter->getValidInput()
+            or $inputFilter->validate($data->getArrayCopy());
 
         $events = $this->getEventManager();
 
         if ($inputFilter->getInvalidInput()) {
-
             $events->trigger(DataEvent::EVENT_EXCHANGE_INVALID, $event);
 
             // post invalid validation
@@ -1044,17 +1042,28 @@ abstract class AbstractDataService implements
         return '(' . join(' ' . $type . ' ', $where) . ')';
     }
 
+    /**
+     * Filter inputs by data
+     *
+     * @param array $data
+     * @param InputFilter $inputFilter
+     * @param bool $isUpdate
+     * @return $this
+     */
     protected function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
     {
-        $exchange = array_flip(array_keys($data));
-
         foreach ($inputFilter->getInputs() as $input) {
             $inputName = $input->getName();
-            $exists = array_key_exists($inputName, $exchange);
 
-            if ((!$isUpdate && !$exists) || ($isUpdate && !$exists)) {
-                $inputFilter->remove($inputName);
+            if (array_key_exists($inputName, $data)) {
+                continue;
             }
+
+            if (!$isUpdate && ($input->getFallbackValue() || !$input->allowEmpty())) {
+                continue;
+            }
+
+            $inputFilter->remove($inputName);
         }
 
         return $this;
