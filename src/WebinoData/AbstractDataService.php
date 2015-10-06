@@ -1074,7 +1074,7 @@ abstract class AbstractDataService implements
      * @param bool $isUpdate
      * @return $this
      */
-    private function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
+    public function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
     {
         if (!$isUpdate) {
             return $this;
