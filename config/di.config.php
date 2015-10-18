@@ -2,6 +2,7 @@
 
 namespace WebinoData;
 
+// TODO remove deprecated DI config, use factories instead
 return [
     'definition' => [
         'compiler' => [

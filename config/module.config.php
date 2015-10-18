@@ -3,7 +3,9 @@
 namespace WebinoData;
 
 return [
+    // TODO remove deprecated DI config, use factories instead
     'di' => include __DIR__ . '/di.config.php',
+
     'caches' => [
         'WebinoDataCache' => [
             'adapter' => [
