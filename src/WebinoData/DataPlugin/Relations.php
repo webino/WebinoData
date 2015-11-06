@@ -222,7 +222,8 @@ class Relations
                 $mainId,
                 $options,
                 // temporary fix, when one to many make it just update instead of delete all associations
-                !$manyToMany ? '_id' : 'id'
+                !$manyToMany ? '_id' : 'id',
+                array_filter(array_column($values, 'id'))
             );
 
             $event->setAffectedRows($event->getAffectedRows() + 1);
@@ -361,8 +362,14 @@ class Relations
         $this->adapter->query($sql)->execute();
     }
 
-    protected function assocDelete(DataService $service, DataService $subService, $mainId, array $options, $idSuffix = 'id')
-    {
+    protected function assocDelete(
+        DataService $service,
+        DataService $subService,
+        $mainId,
+        array $options,
+        $idSuffix = 'id',
+        array $idsExclude = []
+    ) {
         $platform = $service->getPlatform();
 
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
@@ -374,6 +381,10 @@ class Relations
 
         $sql = 'DELETE FROM ' . $qi($assocTableName)
              . ' WHERE ' . $qi($tableName . $idSuffix) . ' = ' . $qv($mainId);
+
+        // exclude ids to update
+        empty($idsExclude)
+            or $sql.= ' AND ' . $qi($tableName . $idSuffix) . ' NOT IN (' . join(',', $idsExclude) . ')';
 
         $this->adapter->query($sql)->execute();
     }
