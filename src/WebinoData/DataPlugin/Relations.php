@@ -10,6 +10,9 @@ use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\Db\Sql\Predicate\In as SqlIn;
 use Zend\EventManager\EventManager;
 
+/**
+ * Class Relations
+ */
 class Relations
 {
     /**
@@ -131,7 +134,7 @@ class Relations
         $service  = $event->getService();
         $select   = $event->getSelect();
         $columns  = $select->getColumns();
-        $attached = array();
+        $attached = [];
 
         foreach (array_keys($columns) as $key) {
             if (!$service->hasOne($key)) {
@@ -146,8 +149,8 @@ class Relations
 
             $attached[$key] = $options;
 
-            $select->subselect($key) or
-                $select->subselect($key, $service->one($key)->select());
+            $select->subselect($key)
+                or $select->subselect($key, $service->one($key)->select());
         }
 
         if (empty($attached)) {
@@ -156,15 +159,11 @@ class Relations
 
         foreach ($attached as $key => $options) {
             $idKey  = $subKey = $this->resolveSubKey($key . '_id', $options);
-            $subIds = array();
+            $subIds = [];
 
             foreach ($rows as &$row) {
-
-                is_array($row[$key]) or
-                    $row[$key] = array();
-
-                empty($row[$idKey]) or
-                    $subIds[$row[$idKey]] = $row[$idKey];
+                is_array($row[$key]) or $row[$key] = [];
+                empty($row[$idKey])  or $subIds[$row[$idKey]] = $row[$idKey];
             }
 
             if (empty($subIds)) {
@@ -181,8 +180,8 @@ class Relations
 
             foreach ($rows as &$row) {
 
-                empty($row[$idKey]) || empty($subItems[$row[$idKey]]) or
-                    $row[$key] = $subItems[$row[$idKey]];
+                empty($row[$idKey]) || empty($subItems[$row[$idKey]])
+                    or $row[$key] = $subItems[$row[$idKey]];
             }
         }
     }
@@ -236,8 +235,7 @@ class Relations
                 $valueIsNumeric = is_numeric($value);
 
                 if (!$valueIsNumeric) {
-                    $manyToMany or
-                        $value[$tableName . '_id'] = $mainId;
+                    $manyToMany or $value[$tableName . '_id'] = $mainId;
 
                     $subService->exchangeArray($value);
                 }
@@ -270,7 +268,7 @@ class Relations
         $service  = $event->getService();
         $select   = $event->getSelect();
         $columns  = $select->getColumns();
-        $attached = array();
+        $attached = [];
 
         foreach (array_keys($columns) as $key) {
             if (!$service->hasMany($key)) {
@@ -285,8 +283,8 @@ class Relations
 
             $attached[$key] = $options;
 
-            $select->subselect($key) or
-                $select->subselect($key, $service->many($key)->select());
+            $select->subselect($key)
+                or $select->subselect($key, $service->many($key)->select());
         }
 
         if (empty($attached)) {
@@ -320,9 +318,7 @@ class Relations
             $subItems = $subService->fetchWith($subSelect);
 
             foreach ($rows as &$row) {
-
-                is_array($row[$key]) or
-                    $row[$key] = array();
+                is_array($row[$key]) or $row[$key] = [];
 
                 foreach ($subItems as $subItem) {
 
@@ -417,7 +413,6 @@ class Relations
      */
     protected function relationsDisabled(array $options)
     {
-        return array_key_exists('relations', $options)
-                && false === $options['relations'];
+        return array_key_exists('relations', $options) && false === $options['relations'];
     }
 }
