@@ -99,8 +99,7 @@ class DataSelect
 
         // collect input column names
         foreach ($inputFilter as $input) {
-            $input and
-                $inputColumns[$input['name']] = new Expression(
+            $input and $inputColumns[$input['name']] = new Expression(
                     '`' . $tableName . '`.`' . $input['name'] . '`'
                 );
         }
@@ -160,8 +159,8 @@ class DataSelect
             }
 
             // use auto expression?
-            !is_string($idColumn) or
-               $idColumn = $this->autoExpression($idColumn);
+            !is_string($idColumn)
+                or $idColumn = $this->autoExpression($idColumn);
         }
 
         $event = $this->service->getEvent();
@@ -221,7 +220,7 @@ class DataSelect
                 $value = $this->autoExpression($value);
             });
         }
-        $this->sqlSelect->join($name, $on, $columns, $type);
+        $this->sqlSelect->join($name, $this->autoExpression($on), $columns, $type);
         return $this;
     }
 
@@ -278,8 +277,8 @@ class DataSelect
 
     public function where($predicate, $combination = PredicateSet::OP_AND)
     {
-        is_object($predicate) or
-            $predicate = new ArrayObject($predicate);
+        is_object($predicate)
+            or $predicate = new ArrayObject($predicate);
 
         $event = $this->service->getEvent();
 
@@ -328,8 +327,8 @@ class DataSelect
             foreach ($term as $subKey => $subTerms) {
                 foreach ((array) $subTerms as $subTerm) {
 
-                    empty($subKey) || (empty($subTerm) && !is_numeric($subTerm)) or
-                        $this->search($subTerm, [$subKey], $combination);
+                    empty($subKey) || (empty($subTerm) && !is_numeric($subTerm))
+                        or $this->search($subTerm, [$subKey], $combination);
                 }
             }
             return $this;
@@ -372,18 +371,15 @@ class DataSelect
         }
 
         foreach ($columns as $column) {
-            isset($this->search[$column]) or
-                $this->search[$column] = [];
-
-            in_array($term, $this->search) or
-                $this->search[$column][] = $term;
+            isset($this->search[$column])  or $this->search[$column] = [];
+            in_array($term, $this->search) or $this->search[$column][] = $term;
         }
 
         $predicate = function (ArrayObject $columns) {
             return '(' . join(' ' . PredicateSet::OP_OR . ' ', $columns->getArrayCopy()) . ')';
         };
 
-        count($where) and $this->sqlSelect->where($predicate($where), $combination);
+        count($where)  and $this->sqlSelect->where($predicate($where), $combination);
         count($having) and $this->sqlSelect->having($predicate($having), $combination);
 
         return $this;
@@ -448,7 +444,8 @@ class DataSelect
             $this->columns($columns, $prefixColumnsWithTable);
         }
 
-        $this->configureWhere($config, $this->where);
+        $this->configureWhere($config, $this->where, 'where');
+        $this->configureWhere($config, $this->having, 'having');
 
         if (!empty($config['join'])) {
             foreach ($config['join'] as $join) {
@@ -456,65 +453,61 @@ class DataSelect
             }
         }
 
-        empty($config['order']) or
-            $this->order($config['order']);
-
-        empty($config['limit']) or
-            $this->limit($config['limit']);
-
-        empty($config['offset']) or
-            $this->offset($config['offset']);
-
-        empty($config['group']) or
-            $this->group($config['group']);
+        empty($config['order'])  or $this->order($config['order']);
+        empty($config['limit'])  or $this->limit($config['limit']);
+        empty($config['offset']) or $this->offset($config['offset']);
+        empty($config['group'])  or $this->group($config['group']);
 
         return $this;
     }
 
     // todo remain predicates
-    private function configureWhere(array $config, Predicate $where)
+    private function configureWhere(array $config, Predicate $where, $key)
     {
-        if (!empty($config['where'])) {
-
-            $predicate   = current($config['where']);
-            $combination = (2 === count($config['where']))
-                            ? next($config['where'])
+        if (!empty($config[$key])) {
+            $predicate = current($config[$key]);
+            $combination = (2 === count($config[$key]))
+                            ? next($config[$key])
                             : PredicateSet::OP_AND;
 
-            $this->where($predicate, $combination);
+            $this->{$key}($predicate, $combination);
 
         }
 
-        empty($config['whereEqualTo']) or
-            $this->processPredicate(
+        empty($config[$key . 'EqualTo'])
+            or $this->processPredicate(
                 'equalTo',
                 $config,
-                $where
+                $where,
+                $key
             );
 
-        empty($config['whereNotEqualTo']) or
-            $this->processPredicate(
+        empty($config[$key . 'NotEqualTo'])
+            or $this->processPredicate(
                 'notEqualTo',
                 $config,
-                $where
+                $where,
+                $key
             );
 
-        empty($config['whereLessThanOrEqualTo']) or
-            $this->processPredicate(
+        empty($config[$key . 'LessThanOrEqualTo'])
+            or $this->processPredicate(
                 'lessThanOrEqualTo',
                 $config,
-                $where
+                $where,
+                $key
             );
 
-        empty($config['whereGreaterThanOrEqualTo']) or
-            $this->processPredicate(
+        empty($config[$key . 'GreaterThanOrEqualTo'])
+            or $this->processPredicate(
                 'greaterThanOrEqualTo',
                 $config,
-                $where
+                $where,
+                $key
             );
 
-        empty($config['whereNest']) or
-            $this->whereNest($config['whereNest'], $where);
+        empty($config[$key . 'Nest'])
+            or $this->whereNest($config[$key . 'Nest'], $where, $key);
 
         return $this;
     }
@@ -554,13 +547,12 @@ class DataSelect
         if (0 === strpos($value, self::EXPRESSION_MARK)) {
             return new Expression(substr($value, strlen(self::EXPRESSION_MARK)));
         }
-
         return $value;
     }
 
-    private function processPredicate($type, array $config, Predicate $where)
+    private function processPredicate($type, array $config, Predicate $where, $key = 'where')
     {
-        foreach ($config['where' . ucfirst($type)] as $predicate) {
+        foreach ($config[$key . ucfirst($type)] as $predicate) {
 
             list($left, $right, $op, $leftType, $rightType) = $this->resolveOperatorArgs($predicate);
             $where->{$op}->{$type}($left, $right, $leftType, $rightType);
@@ -569,11 +561,10 @@ class DataSelect
         return $this;
     }
 
-    private function whereNest($config, Predicate $where)
+    private function whereNest($config, Predicate $where, $key)
     {
         $op = strtolower(!empty($config['op']) ? $config['op'] : PredicateSet::OP_AND);
-        $this->configureWhere($config, $where->{$op}->nest());
-
+        $this->configureWhere($config, $where->{$op}->nest(), $key);
         return $this;
     }
 
