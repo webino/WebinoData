@@ -474,6 +474,24 @@ class DataSelect
 
         }
 
+        // TODO support all predicate methods
+
+        empty($config[$key . 'IsNull'])
+            or $this->processPredicate(
+                'isNull',
+                $config,
+                $where,
+                $key
+            );
+
+        empty($config[$key . 'IsNotNull'])
+            or $this->processPredicate(
+                'isNotNull',
+                $config,
+                $where,
+                $key
+            );
+
         empty($config[$key . 'EqualTo'])
             or $this->processPredicate(
                 'equalTo',
