@@ -359,9 +359,7 @@ class DataSelect
                 }
 
                 $word     = $this->sanitizeSearchTerm($word, '%');
-                $joinCol  = current(array_column($joinCols, $column));
-                $isHaving = (!empty($joinCol) && $joinCol instanceof Expression);
-                $target   = ($isHaving ? $having : $where);
+                $target   = $this->isHaving($joinCols, $column) ? $having : $where;
                 $target[] = $identifier . ' LIKE ' . $platform->quoteValue('%' . $word . '%');
             }
         }
@@ -383,6 +381,21 @@ class DataSelect
         count($having) and $this->sqlSelect->having($predicate($having), $combination);
 
         return $this;
+    }
+
+    /**
+     * @param array $columns
+     * @param string $column
+     * @return bool
+     */
+    private function isHaving(array $columns, $column)
+    {
+        foreach ($columns as $joinCols) {
+            if (isset($joinCols[$column])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // todo decouple
