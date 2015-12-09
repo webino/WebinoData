@@ -932,6 +932,10 @@ abstract class AbstractDataService implements
             }
         }
 
+        // make sure we have an id
+        isset($data['id']) && is_numeric($data['id'])
+            or $data['id'] = $this->tableGateway->getLastInsertValue();
+
         // reset input filter
         $this->inputFilter = null;
 
