@@ -221,7 +221,7 @@ class Relations
                 $mainId,
                 $options,
                 // temporary fix, when one to many make it just update instead of delete all associations
-                !$manyToMany ? '_id' : 'id',
+                $manyToMany ? 'id' : '_id',
                 array_filter(array_column($values, 'id'))
             );
 
@@ -380,7 +380,7 @@ class Relations
 
         // exclude ids to update
         empty($idsExclude)
-            or $sql.= ' AND ' . $qi($tableName . $idSuffix) . ' NOT IN (' . join(',', $idsExclude) . ')';
+            or $sql.= ' AND ' . $qi($subTableName . $idSuffix) . ' NOT IN (' . join(',', $idsExclude) . ')';
 
         $this->adapter->query($sql)->execute();
     }
