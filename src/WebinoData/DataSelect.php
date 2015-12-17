@@ -396,7 +396,7 @@ class DataSelect
                 continue;
             }
 
-            foreach ($join['columns'] as $column) {
+            foreach (array_keys($join['columns']) as $column) {
                 $result[$column] = true;
             }
         }
