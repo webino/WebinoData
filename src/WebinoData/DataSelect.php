@@ -338,7 +338,7 @@ class DataSelect
         $platform = $this->service->getPlatform();
         $where    = new ArrayObject;
         $having   = new ArrayObject;
-        $joinCols = array_column($this->getJoins(), 'columns');
+        $joinCols = $this->resolveJoinColumns();
 
         foreach (explode(' ', $term) as $word) {
             if (empty($word) && !is_numeric($word)) {
@@ -359,7 +359,7 @@ class DataSelect
                 }
 
                 $word     = $this->sanitizeSearchTerm($word, '%');
-                $target   = $this->isHaving($joinCols, $column) ? $having : $where;
+                $target   = isset($joinCols[$column]) ? $having : $where;
                 $target[] = $identifier . ' LIKE ' . $platform->quoteValue('%' . $word . '%');
             }
         }
@@ -384,18 +384,23 @@ class DataSelect
     }
 
     /**
-     * @param array $columns
-     * @param string $column
-     * @return bool
+     * Returns array of columns to use having instead of where
+     *
+     * @return array
      */
-    private function isHaving(array $columns, $column)
+    private function resolveJoinColumns()
     {
-        foreach ($columns as $joinCols) {
-            if (isset($joinCols[$column])) {
-                return true;
+        $result = [];
+        foreach ($this->getJoins() as $join) {
+            if (Select::JOIN_INNER === $join['type']) {
+                continue;
+            }
+
+            foreach ($join['columns'] as $column) {
+                $result[$column] = true;
             }
         }
-        return false;
+        return $result;
     }
 
     // todo decouple
