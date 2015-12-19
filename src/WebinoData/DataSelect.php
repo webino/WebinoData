@@ -542,6 +542,22 @@ class DataSelect
                 $key
             );
 
+        empty($config[$key . 'In'])
+            or $this->processPredicate(
+                'in',
+                $config,
+                $where,
+                $key
+            );
+
+        empty($config[$key . 'NotIn'])
+            or $this->processPredicate(
+                'notIn',
+                $config,
+                $where,
+                $key
+            );
+
         empty($config[$key . 'Nest'])
             or $this->whereNest($config[$key . 'Nest'], $where, $key);
 
