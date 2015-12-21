@@ -595,15 +595,10 @@ class DataSelect
 
     private function autoExpression($value)
     {
-        if ($value instanceof Expression) {
-            return $value;
-        }
-
         // detect expression
-        if (0 === strpos($value, self::EXPRESSION_MARK)) {
+        if (is_string($value) && 0 === strpos($value, self::EXPRESSION_MARK)) {
             return new Expression(substr($value, strlen(self::EXPRESSION_MARK)));
         }
-
         return $value;
     }
 
