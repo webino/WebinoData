@@ -431,7 +431,7 @@ class DataSelect
 
     public function group($group)
     {
-        $this->sqlSelect->group($group);
+        $this->sqlSelect->group($this->autoExpression($group));
         return $this;
     }
 
@@ -440,7 +440,7 @@ class DataSelect
      */
     public function getSqlString()
     {
-        return $this->service->getSql()->getSqlStringForSqlObject($this->sqlSelect, $this->service->getPlatform());
+        return $this->service->getSql()->buildSqlString($this->sqlSelect);
     }
 
     /**
@@ -574,7 +574,7 @@ class DataSelect
             throw new Exception\RuntimeException(
                 sprintf(
                     'Statement could not be executed %s',
-                    $sql->getSqlStringForSqlObject($this->sqlSelect, $this->service->getPlatform())
+                    $sql->buildSqlString($this->sqlSelect)
                 ) . '; ' . $exc->getPrevious()->getMessage(),
                 $exc->getCode(),
                 $exc
