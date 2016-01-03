@@ -220,8 +220,8 @@ class Relations
                 $subService,
                 $mainId,
                 $options,
-                // temporary fix, when one to many make it just update instead of delete all associations
-                $manyToMany ? 'id' : '_id',
+                // TODO, for BC only (remove deprecated)
+                $manyToMany ? (isset($options['keySuffix']) ? $options['keySuffix'] : 'id') : '_id',
                 array_filter(array_column($values, 'id'))
             );
 
@@ -298,18 +298,19 @@ class Relations
 
             $subSelect  = clone $select->subselect($key);
             $subService = $service->many($key);
+            // TODO, for BC only (remove deprecated)
+            $keySuffix  = '_id';
 
             // decide relation
             $subKey = $this->resolveSubKey($tableName, $options);
             if ($subService->hasMany($subKey)) {
                 // bidirectional
-                $mainKey = $tableName . 'id';
+                // TODO, for BC only (remove deprecated)
+                $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
                 $this->assocJoin($subSelect, $service, $subService, $options);
-            } else {
-                // oneway
-                $mainKey = $tableName . '_id';
             }
 
+            $mainKey = $tableName . $keySuffix;
             $subSelect->where(new SqlIn($mainKey, $mainIds));
 
             $limit = $subSelect->getLimit();
@@ -351,8 +352,11 @@ class Relations
         $subTableName   = $subService->getTableName();
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
+        // TODO, for BC only (remove deprecated)
+        $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
+
         $sql = 'INSERT IGNORE INTO ' . $qi($assocTableName)
-             . ' (' . $qi($tableName . 'id') . ', ' . $qi($subTableName . 'id') . ')'
+             . ' (' . $qi($tableName . $keySuffix) . ', ' . $qi($subTableName . $keySuffix) . ')'
              . ' VALUES (' . $qv($mainId) . ', ' . $qv($subId) . ')';
 
         $this->adapter->query($sql)->execute();
@@ -363,7 +367,7 @@ class Relations
         DataService $subService,
         $mainId,
         array $options,
-        $idSuffix = 'id',
+        $idSuffix,
         array $idsExclude = []
     ) {
         $platform = $service->getPlatform();
@@ -392,7 +396,10 @@ class Relations
         $subTableName   = $subService->getTableName();
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
-        $select->join($assocTableName, $subTableName . '.id=' . $assocTableName . '.' . $subTableName . 'id');
+        // TODO, for BC only (remove deprecated)
+        $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
+
+        $select->join($assocTableName, $subTableName . '.id=' . $assocTableName . '.' . $subTableName . $keySuffix);
     }
 
     protected function resolveSubKey($tableName, array $options)
