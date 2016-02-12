@@ -8,7 +8,7 @@ use Zend\EventManager\SharedEventManagerInterface;
 use Zend\EventManager\SharedListenerAggregateInterface;
 
 /**
- *
+ * Class CacheInvalidatorListener
  */
 class CacheInvalidatorListener implements SharedListenerAggregateInterface
 {
@@ -65,7 +65,11 @@ class CacheInvalidatorListener implements SharedListenerAggregateInterface
     {
         foreach ($event->getParam('clearByTags') as $tags) {
             foreach ($this->caches as $cache) {
-                $cache->clearByTags((array) $tags);
+                try {
+                    $cache->clearByTags((array) $tags);
+                } catch (\Exception $exc) {
+                    error_log($exc);
+                }
             }
         }
     }
