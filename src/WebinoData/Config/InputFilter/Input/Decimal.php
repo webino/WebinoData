@@ -10,6 +10,8 @@
 
 namespace WebinoData\Config\InputFilter\Input;
 
+use WebinoData\Filter\ToFloat;
+
 /**
  * Class Decimal
  */
@@ -22,8 +24,8 @@ class Decimal extends AbstractInput
      * {@inheritDoc}
      */
     protected $spec = [
-        'validators' => [
-            'float' => ['name' => 'IsFloat'],
+        'filters' => [
+            'to-float' => ['name' => ToFloat::class],
         ],
     ];
 
