@@ -287,7 +287,7 @@ class DataSelect
         $this->service->getEventManager()
             ->trigger('data.select.join', $event);
 
-        $this->sqlSelect->join($name, $this->autoExpression($on), $columns, $type);
+        $this->sqlSelect->join($name, $this->autoExpression($event->getParam('on')), $columns, $type);
         return $this;
     }
 
