@@ -634,6 +634,10 @@ class DataSelect
         return [$left, $right, $op, $leftType, $rightType];
     }
 
+    /**
+     * @param mixed $value
+     * @return Expression
+     */
     private function autoExpression($value)
     {
         // detect expression
@@ -643,6 +647,13 @@ class DataSelect
         return $value;
     }
 
+    /**
+     * @param string $type
+     * @param array $config
+     * @param Predicate $where
+     * @param string $key
+     * @return $this
+     */
     private function processPredicate($type, array $config, Predicate $where, $key = 'where')
     {
         foreach ($config[$key . ucfirst($type)] as $predicate) {
@@ -654,7 +665,13 @@ class DataSelect
         return $this;
     }
 
-    private function whereNest($config, Predicate $where, $key)
+    /**
+     * @param array $config
+     * @param Predicate $where
+     * @param string $key
+     * @return $this
+     */
+    private function whereNest(array $config, Predicate $where, $key)
     {
         $op = strtolower(!empty($config['op']) ? $config['op'] : PredicateSet::OP_AND);
         $this->configureWhere($config, $where->{$op}->nest(), $key);
@@ -664,7 +681,7 @@ class DataSelect
     /**
      * Variable overloading
      *
-     * @param  string $name
+     * @param string $name
      * @throws \InvalidArgumentException
      * @return mixed
      */
@@ -676,11 +693,14 @@ class DataSelect
             case 'having':
                 return $this->sqlSelect->having;
             default:
+                // TODO exception
                 throw new \InvalidArgumentException('Not a valid magic property for this object');
         }
     }
 
-
+    /**
+     * @return \Exception|string
+     */
     public function __toString()
     {
         try {
@@ -688,5 +708,13 @@ class DataSelect
         } catch (\Exception $exc) {
             return $exc;
         }
+    }
+
+    /**
+     * Clone data select
+     */
+    public function __clone()
+    {
+        $this->sqlSelect = clone $this->sqlSelect;
     }
 }
