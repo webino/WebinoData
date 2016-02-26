@@ -12,7 +12,7 @@ use Zend\Db\Sql\Sql;
 
 /**
  * Class DataSelect
- * @todo refactor
+ * @todo refactor/redesign
  */
 class DataSelect
 {
@@ -48,12 +48,24 @@ class DataSelect
      */
     private $event;
 
+    /**
+     * @var string|null
+     */
+    private $hash;
+
+    /**
+     * @param DataService $service
+     * @param Select $select
+     */
     public function __construct(DataService $service, Select $select)
     {
         $this->service   = $service;
         $this->sqlSelect = $select;
     }
 
+    /**
+     * @return Select
+     */
     public function getSqlSelect()
     {
         return $this->sqlSelect;
@@ -94,28 +106,54 @@ class DataSelect
         return $this->search;
     }
 
+    /**
+     * @param string $name
+     * @param bool|true $value
+     * @return $this
+     */
     public function setFlag($name, $value = true)
     {
         if (null === $value) {
-            unset($this->flags[$name]);
+            unset($this->flags[(string) $name]);
         }
-        $this->flags[$name] = $value;
+        $this->flags[(string) $name] = (bool) $value;
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
     public function hasFlag($name)
     {
-        if (empty($this->flags[$name])) {
+        if (empty($this->flags[(string) $name])) {
             return false;
         }
         return true;
     }
 
-    public function hash()
+    /**
+     * @param null|string $hash
+     * @return $this
+     */
+    public function setHash($hash)
     {
-        return md5((string) $this);
+        $this->hash.= $hash;
+        return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function hash()
+    {
+        return md5((string) $this . $this->hash);
+    }
+
+    /**
+     * @param array $columns
+     * @return $this
+     */
     public function columns(array $columns)
     {
         $serviceConfig = $this->service->getConfig();
@@ -635,7 +673,7 @@ class DataSelect
     }
 
     /**
-     * @param mixed $value
+     * @param m$value
      * @return Expression
      */
     private function autoExpression($value)
