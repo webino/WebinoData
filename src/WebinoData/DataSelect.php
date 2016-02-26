@@ -10,16 +10,43 @@ use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Sql;
 
-// todo refactor
+/**
+ * Class DataSelect
+ * @todo refactor
+ */
 class DataSelect
 {
     const EXPRESSION_MARK = 'EXPRESSION:';
 
+    /**
+     * @var DataService
+     */
     protected $service;
+
+    /**
+     * @var Select
+     */
     protected $sqlSelect;
+
+    /**
+     * @var array
+     */
     protected $subselects = [];
+
+    /**
+     * @var array
+     */
     protected $search = [];
+
+    /**
+     * @var array
+     */
     protected $flags = [];
+
+    /**
+     * @var DataEvent
+     */
+    private $event;
 
     public function __construct(DataService $service, Select $select)
     {
@@ -159,16 +186,11 @@ class DataSelect
             }
 
             // use auto expression?
-            !is_string($idColumn)
-                or $idColumn = $this->autoExpression($idColumn);
+            is_string($idColumn) and $idColumn = $this->autoExpression($idColumn);
         }
 
-        $event = $this->service->getEvent();
-
-        $event
-            ->setSelect($this)
-            ->setService($this->service)
-            ->setParam('columns', $columns);
+        $event = $this->getEvent();
+        $event->setParam('columns', $columns);
 
         $this->service->getEventManager()
             ->trigger('data.select.columns', $event);
@@ -220,6 +242,13 @@ class DataSelect
                 $value = $this->autoExpression($value);
             });
         }
+
+        $event = $this->getEvent();
+        $event->setParam('on', $on);
+
+        $this->service->getEventManager()
+            ->trigger('data.select.join', $event);
+
         $this->sqlSelect->join($name, $this->autoExpression($on), $columns, $type);
         return $this;
     }
@@ -381,6 +410,18 @@ class DataSelect
         count($having) and $this->sqlSelect->having($predicate($having), $combination);
 
         return $this;
+    }
+
+    /**
+     * @return DataEvent
+     */
+    private function getEvent()
+    {
+        if (null === $this->event) {
+            $this->event = clone $this->service->getEvent();
+            $this->event->setSelect($this)->setService($this->service);
+        }
+        return $this->event;
     }
 
     /**
