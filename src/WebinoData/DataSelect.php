@@ -370,7 +370,7 @@ class DataSelect
         return $this;
     }
 
-    public function subselect($name, DataSelect $select = null)
+    public function subselect($name, self $select = null)
     {
         if (null === $select) {
             if (empty($this->subselects[$name])) {
@@ -508,9 +508,25 @@ class DataSelect
         );
     }
 
+    /**
+     * @param string $group
+     * @return $this
+     */
     public function group($group)
     {
         $this->sqlSelect->group($this->autoExpression($group));
+        return $this;
+    }
+
+    /**
+     * @param self $select
+     * @param string $type
+     * @param string $modifier
+     * @return $this
+     */
+    public function combine(self $select, $type = Select::COMBINE_UNION, $modifier = '')
+    {
+        $this->sqlSelect->combine($select->getSqlSelect(), $type, $modifier);
         return $this;
     }
 
