@@ -18,7 +18,10 @@ use Zend\InputFilter\InputFilterInterface;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 
-// todo refactor
+/**
+ * Class AbstractDataService
+ * @todo refactor/redesign
+ */
 abstract class AbstractDataService implements
     EventManagerAwareInterface,
     ServiceManagerAwareInterface,
@@ -70,7 +73,7 @@ abstract class AbstractDataService implements
     protected $subServices = [];
 
     /**
-     * @var type
+     * @var bool
      */
     protected $initialized = false;
 
@@ -78,13 +81,11 @@ abstract class AbstractDataService implements
     //todo
     protected $query;
 
-
     protected $hasOneList = [];
     protected $hasManyList = [];
 
     protected $hasOneService = [];
     protected $hasManyService = [];
-
 
     /**
      * @param TableGateway $tableGateway
@@ -96,6 +97,9 @@ abstract class AbstractDataService implements
         $this->config       = $config;
     }
 
+    /**
+     * @return array
+     */
     public function getConfig()
     {
         return $this->config;
@@ -113,8 +117,8 @@ abstract class AbstractDataService implements
 
         $this->getEvent()->setService($this);
 
-        empty($this->config['plugin']) or
-            $this->initPlugin($this->config['plugin']);
+        empty($this->config['plugin'])
+            or $this->initPlugin($this->config['plugin']);
     }
 
     /**
@@ -155,8 +159,8 @@ abstract class AbstractDataService implements
             $plugin = clone $serviceManager->get($pluginName);
             $plugin->attach($eventManager);
 
-            empty($pluginOptions) or
-                $plugin->setOptions($pluginOptions);
+            empty($pluginOptions)
+                or $plugin->setOptions($pluginOptions);
         }
 
         return $this;
@@ -232,12 +236,13 @@ abstract class AbstractDataService implements
 
     /**
      * @return ServiceManager
-     * @throws Exception
+     * @throws Exception\RuntimeException
      */
     public function getServiceManager()
     {
         if (null === $this->serviceManager) {
-            throw new Exception('Expected serviceManager injected');
+            // TODO exception
+            throw new Exception\RuntimeException('Expected serviceManager injected');
         }
 
         return $this->serviceManager;
@@ -330,13 +335,14 @@ abstract class AbstractDataService implements
 
     /**
      * @deprecated Use setHasManyService instead, it prevents circular dependency exception
+     * @param string $name
      * @param DataService $service
      * @return DataService
      */
     public function setHasOne($name, DataService $service, array $options = [])
     {
-        isset($this->hasOneList[$name]) or
-            $this->hasOneList[$name] = [];
+        isset($this->hasOneList[$name])
+            or $this->hasOneList[$name] = [];
 
         $this->hasOneList[$name]['service'] = $service;
         $this->hasOneList[$name]['options'] = $options;
@@ -344,7 +350,9 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * @param DataService $service
+     * @param string $name
+     * @param string $serviceName
+     * @param array $options
      * @return DataService
      */
     public function setHasOneService($name, $serviceName, array $options = [])
@@ -382,6 +390,7 @@ abstract class AbstractDataService implements
     {
         if (empty($this->hasOneList[$name])) {
             if (empty($this->hasOneService[$name])) {
+                // TODO exception
                 throw new \OutOfBoundsException('Hasn\'t one ' . $name . '; ' . $this->getTableName());
             } else {
                 $serviceName = $this->hasOneService[$name]['serviceName'];
@@ -443,12 +452,13 @@ abstract class AbstractDataService implements
      * @deprecated Use setHasManyService instead, it prevents circular dependency exception
      * @param string $name
      * @param DataService $service
+     * @param array $options
      * @return DataService
      */
     public function setHasMany($name, DataService $service, array $options = [])
     {
-        isset($this->hasManyList[$name]) or
-            $this->hasManyList[$name] = [];
+        isset($this->hasManyList[$name])
+            or $this->hasManyList[$name] = [];
 
         $this->hasManyList[$name]['service'] = $service;
         $this->hasManyList[$name]['options'] = $options;
@@ -458,16 +468,18 @@ abstract class AbstractDataService implements
     /**
      * @param string $name
      * @param string $serviceName
+     * @param array $options
      * @return DataService
      */
     public function setHasManyService($name, $serviceName, array $options = [])
     {
         if (empty($name)) {
+            // TODO exception
             throw new \InvalidArgumentException('Name cannot be null');
         }
 
-        isset($this->hasManyService[$name]) or
-            $this->hasManyService[$name] = [];
+        isset($this->hasManyService[$name])
+            or $this->hasManyService[$name] = [];
 
         $this->hasManyService[$name]['serviceName'] = $serviceName;
         $this->hasManyService[$name]['options']     = $options;
@@ -495,6 +507,7 @@ abstract class AbstractDataService implements
     {
         if (empty($this->hasManyList[$name])) {
             if (empty($this->hasManyService[$name])) {
+                // TODO exception
                 throw new \OutOfBoundsException('Hasn\'t many ' . $name . '; ' . $this->getTableName());
             } else {
                 $serviceName = $this->hasManyService[$name]['serviceName'];
@@ -535,8 +548,8 @@ abstract class AbstractDataService implements
         if (!empty($this->hasManyService)) {
             foreach ($this->hasManyService as $name => $item) {
 
-                !empty($item['service']) or
-                    $item = $this->resolveMany($name);
+                empty($item['service'])
+                    and $item = $this->resolveMany($name);
 
                 $hasMany[$name] = $item;
             }
@@ -564,7 +577,6 @@ abstract class AbstractDataService implements
     public function bind($object)
     {
         if (!is_object($object)) {
-
             throw new Exception\InvalidArgumentException(
                 sprintf(
                     '%s expects an object as an argument; %s provided',
@@ -575,7 +587,6 @@ abstract class AbstractDataService implements
         }
 
         if (!method_exists($object, 'bind')) {
-
             throw new Exception\RuntimeException(
                 sprintf(
                     '%s expects an object with bind() method',
@@ -586,7 +597,6 @@ abstract class AbstractDataService implements
         }
 
         if (!method_exists($object, 'setInputFilter')) {
-
             throw new Exception\RuntimeException(
                 sprintf(
                     '%s expects an object with setInputFilter() method',
@@ -602,12 +612,18 @@ abstract class AbstractDataService implements
         return $this;
     }
 
+    /**
+     * @return Sql\Sql
+     */
     public function getSql()
     {
         return $this->tableGateway->getSql();
     }
 
-    // todo
+    /**
+     * @todo
+     * @return DataQuery
+     */
     public function getQuery()
     {
         if (null === $this->query) {
@@ -622,6 +638,10 @@ abstract class AbstractDataService implements
         return $this->query;
     }
 
+    /**
+     * @param DataQuery $query
+     * @return $this
+     */
     public function setQuery(DataQuery $query)
     {
         $this->query = $query;
@@ -636,13 +656,9 @@ abstract class AbstractDataService implements
     {
         $this->init();
 
-        $select = new DataSelect(
-            $this,
-            $this->getSql()->select()
-        );
+        $select = new DataSelect($this, $this->getSql()->select());
 
-        empty($columns) or
-            $select->columns($columns, false);
+        empty($columns) or $select->columns($columns, false);
 
         $events = $this->getEventManager();
         $event  = $this->getEvent();
@@ -695,6 +711,11 @@ abstract class AbstractDataService implements
         return $select;
     }
 
+    /**
+     * @param $selectName
+     * @param array $parameters
+     * @return array|ArrayObject
+     */
     public function fetch($selectName, $parameters = [])
     {
         return $this->fetchWith($this->configSelect($selectName), $parameters);
@@ -718,21 +739,25 @@ abstract class AbstractDataService implements
         $rows = new ArrayObject;
         foreach ($select->execute($this->getSql(), $parameters) as $row) {
 
-            if (!empty($row['id'])
-                && empty($rows[$row['id']])
-            ) {
+            if (empty($row['id'])) {
+                $rows[] = $row;
+            } elseif (empty($rows[$row['id']])) {
                 $rows[$row['id']] = $row;
             } else {
-                $rows[] = $row;
+                $rows[$row['id'] . '/' . count($rows)] = $row;
             }
         }
 
         $event->setRows($rows);
         $events->trigger(DataEvent::EVENT_FETCH_POST, $event);
-
         return $event->getRows();
     }
 
+    /**
+     * @param DataSelect $select
+     * @param array $parameters
+     * @return array
+     */
     public function fetchPairs(DataSelect $select, $parameters = [])
     {
         $data = [];
@@ -742,9 +767,15 @@ abstract class AbstractDataService implements
         return $data;
     }
 
+    /**
+     * @param $callback
+     * @param DataSelect|null $select
+     * @return $this
+     */
     public function export($callback, DataSelect $select = null)
     {
         if (!is_callable($callback)) {
+            // TODO exception
             throw new \InvalidArgumentException('Provided `$callback` not callable');
         }
 
@@ -767,13 +798,16 @@ abstract class AbstractDataService implements
 
             $events->trigger(DataEvent::EVENT_EXPORT, $event);
 
-            !$rowObject->count() or
-                $callback($rowObject->getArrayCopy());
+            $rowObject->count() and $callback($rowObject->getArrayCopy());
         }
 
         return $this;
     }
 
+    /**
+     * @param array $data
+     * @return $this
+     */
     public function import(array $data)
     {
         $this->init();
@@ -786,16 +820,14 @@ abstract class AbstractDataService implements
         $event->setData($dataObject);
         $events->trigger(DataEvent::EVENT_IMPORT, $event);
 
-        !$dataObject->count() or
-            $this->exchangeArray($dataObject->getArrayCopy());
+        $dataObject->count()
+            and $this->exchangeArray($dataObject->getArrayCopy());
 
         return $this;
     }
 
     /**
-     * Delete
-     *
-     * @param  Where|\Closure|string|array $where
+     * @param Sql\Where|\Closure|string|array $where
      * @return int
      */
     public function delete($where)
@@ -818,12 +850,22 @@ abstract class AbstractDataService implements
         return $affectedRows;
     }
 
+    /**
+     * @param array $subject
+     * @param int $id
+     * @return mixed
+     */
     public function own(&$subject, $id)
     {
         $subject[$this->key()] = $id;
         return $subject;
     }
 
+    /**
+     * @param self $service
+     * @param int $id
+     * @return mixed
+     */
     public function owned($service, $id)
     {
         $column = $service->getTableName() . '_id=?';
@@ -832,6 +874,9 @@ abstract class AbstractDataService implements
         return $this->tableGateway->fetch($where)->toArray();
     }
 
+    /**
+     * @return array
+     */
     public function getArrayCopy()
     {
         return [];
@@ -844,6 +889,7 @@ abstract class AbstractDataService implements
     public function exchangeArray(array $array)
     {
         if (empty($array)) {
+            // TODO exception
             throw new \InvalidArgumentException('Expected data but empty');
         }
 
@@ -913,7 +959,7 @@ abstract class AbstractDataService implements
 
         $affectedRows = 0;
         if (!$isEmpty) {
-            $this->filterUnexistingNullValues($array, $validDataArray);
+            $this->filterNonexistentNullValues($array, $validDataArray);
 
             try {
                 $affectedRows = $event->isUpdate()
@@ -946,6 +992,10 @@ abstract class AbstractDataService implements
         return $event->getAffectedRows();
     }
 
+    /**
+     * @param $query
+     * @return mixed
+     */
     public function executeQuery($query)
     {
         return $this->tableGateway
@@ -954,6 +1004,11 @@ abstract class AbstractDataService implements
                     ->execute();
     }
 
+    /**
+     * @param string $column
+     * @param mixed $where
+     * @return mixed
+     */
     public function toggle($column, $where)
     {
         $this->init();
@@ -974,6 +1029,11 @@ abstract class AbstractDataService implements
         return $result;
     }
 
+    /**
+     * @param string $column
+     * @param mixed $where
+     * @return mixed
+     */
     public function increment($column, $where)
     {
         $this->init();
@@ -996,7 +1056,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string $column
-     * @param $where
+     * @param mixed $where
      * @return mixed
      */
     public function decrement($column, $where)
@@ -1019,16 +1079,30 @@ abstract class AbstractDataService implements
         return $result;
     }
 
+    /**
+     * @return \Zend\Db\Adapter\AdapterInterface
+     */
     public function getAdapter()
     {
         return $this->tableGateway->getAdapter();
     }
 
+    /**
+     * @param string $postfix
+     * @param string $idPostfix
+     * @return string
+     */
     protected function key($postfix = '', $idPostfix = '_id')
     {
         return $this->getTableName() . $idPostfix . $postfix;
     }
 
+    /**
+     * @param $term
+     * @param array $columns
+     * @param string $type
+     * @return string
+     */
     protected function search($term, array $columns, $type = 'AND')
     {
         $term     = preg_replace('~[^a-zA-Z0-9]+~', ' ', $term);
@@ -1059,7 +1133,7 @@ abstract class AbstractDataService implements
      * @param array &$validData
      * @return $this
      */
-    private function filterUnexistingNullValues(array $data, array &$validData)
+    private function filterNonexistentNullValues(array $data, array &$validData)
     {
         foreach ($validData as $key => $value) {
             if (null === $value && 'id' !== $key && !array_key_exists($key, $data)) {
@@ -1087,9 +1161,8 @@ abstract class AbstractDataService implements
         foreach ($inputFilter->getInputs() as $input) {
             $inputName = $input->getName();
 
-            if (!array_key_exists($inputName, $data)) {
-                $inputFilter->remove($inputName);
-            }
+            array_key_exists($inputName, $data)
+                or $inputFilter->remove($inputName);
         }
 
         return $this;
