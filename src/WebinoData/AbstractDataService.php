@@ -401,6 +401,7 @@ abstract class AbstractDataService implements
 
         return $this->hasOneList[$name];
     }
+
     /**
      * @param string $name
      * @return DataService
