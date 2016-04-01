@@ -7,39 +7,71 @@ use WebinoData\Paginator\Adapter\WebinoDataSelect as PaginatorSelect;
 use Zend\Cache\Storage\Adapter\Filesystem as Cache;
 use Zend\Paginator\Paginator;
 
-// todo refactor
+/**
+ * Class DataService
+ * @todo refactor
+ */
 class DataService extends AbstractDataService
 {
+    /**
+     * @var Cache
+     */
     protected $cache;
+
+    /**
+     * @var array
+     */
     protected $cacheTags = [];
 
+    /**
+     * @return bool
+     */
     public function hasCache()
     {
         return null !== $this->cache;
     }
 
+    /**
+     * @return Cache|null
+     */
     protected function getCache()
     {
         return $this->cache;
     }
 
-    public function setCache(Cache $cache)
+    /**
+     * @param Cache|null $cache
+     * @return $this
+     */
+    public function setCache(Cache $cache = null)
     {
         $this->cache = $cache;
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getCacheTags()
     {
         return array_merge([$this->getTableName()], $this->cacheTags);
     }
 
+    /**
+     * @param array $tags
+     * @return $this
+     */
     public function setCacheTags(array $tags)
     {
         $this->cacheTags = $tags;
         return $this;
     }
 
+    /**
+     * @param DataSelect $select
+     * @param array $parameters
+     * @return array|ArrayObject
+     */
     public function fetchWith(DataSelect $select, $parameters = [])
     {
         if (!$this->hasCache()) {
@@ -67,13 +99,17 @@ class DataService extends AbstractDataService
         return $items;
     }
 
+    /**
+     * @param DataSelect $select
+     * @return Paginator
+     */
     public function createPaginator(DataSelect $select)
     {
         $paginatorSelect = new PaginatorSelect($select, $this);
         $paginator       = new Paginator($paginatorSelect);
 
-        !$this->hasCache() or
-            $paginatorSelect
+        $this->hasCache()
+            and $paginatorSelect
                 ->setCache($this->getCache())
                 ->setCacheTags($this->getCacheTags());
 

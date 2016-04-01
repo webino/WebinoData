@@ -187,9 +187,7 @@ abstract class AbstractDataService implements
      */
     public function getEvent()
     {
-        if (null === $this->event) {
-            $this->setEvent(new DataEvent);
-        }
+        (null === $this->event) and $this->newEvent();
         return $this->event;
     }
 
@@ -201,6 +199,15 @@ abstract class AbstractDataService implements
     {
         $this->event = $event;
         return $this;
+    }
+
+    /**
+     * @return DataService
+     */
+    protected function newEvent()
+    {
+        $this->setEvent(new DataEvent);
+        return $this->getEvent();
     }
 
     /**
