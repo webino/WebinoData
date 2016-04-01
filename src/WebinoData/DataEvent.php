@@ -10,11 +10,14 @@
 
 namespace WebinoData;
 
+use WebinoData\Event\DataEventInterface;
+use Zend\EventManager\Event;
+
 /**
  * Class DataEvent
  * @deprecated use Event\DataEvent instead
  */
-class DataEvent extends Event\DataEvent
+class DataEvent extends Event implements DataEventInterface
 {
 
 }

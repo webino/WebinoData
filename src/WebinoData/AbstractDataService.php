@@ -205,8 +205,10 @@ abstract class AbstractDataService implements
      */
     protected function newEvent()
     {
-        $this->setEvent(new DataEvent);
-        return $this->getEvent();
+        $event = new DataEvent;
+        $event->setService($this);
+        $this->setEvent($event);
+        return $event;
     }
 
     /**
