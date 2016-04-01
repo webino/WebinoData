@@ -669,7 +669,7 @@ abstract class AbstractDataService implements
         empty($columns) or $select->columns($columns, false);
 
         $events = $this->getEventManager();
-        $event  = $this->getEvent();
+        $event  = $this->newEvent();
 
         $event->setSelect($select);
         $events->trigger(DataEvent::EVENT_SELECT, $event);
