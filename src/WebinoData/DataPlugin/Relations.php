@@ -2,9 +2,9 @@
 
 namespace WebinoData\DataPlugin;
 
-use WebinoData\DataEvent;
 use WebinoData\DataService;
 use WebinoData\DataSelect\ArrayColumn;
+use WebinoData\Event\DataEvent;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\Db\Sql\Predicate\In as SqlIn;

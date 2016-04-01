@@ -2,7 +2,7 @@
 
 namespace WebinoData\DataPlugin;
 
-use WebinoData\DataEvent;
+use WebinoData\Event\DataEvent;
 use Zend\EventManager\EventManager;
 use Zend\Cache\Storage\Adapter\Filesystem as Cache;
 

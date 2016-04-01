@@ -4,9 +4,10 @@ namespace WebinoData;
 
 use ArrayObject;
 use WebinoData\DataSelect;
+use WebinoData\Event\DataEvent;
+use WebinoData\Exception;
 use WebinoData\InputFilter\InputFilter;
 use WebinoData\InputFilter\InputFilterFactoryAwareInterface;
-use WebinoData\Exception;
 use Zend\Db\Adapter\Platform\PlatformInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -114,8 +115,6 @@ abstract class AbstractDataService implements
             return;
         }
         $this->initialized = true;
-
-        $this->getEvent()->setService($this);
 
         empty($this->config['plugin'])
             or $this->initPlugin($this->config['plugin']);
