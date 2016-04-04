@@ -35,8 +35,7 @@ class AutoValue
             }
         );
 
-        $autoInputs = array_column($autoInputs, 'auto_value');
-        foreach ($autoInputs as $target => $source) {
+        foreach (array_column($autoInputs, 'auto_value', 'name') as $target => $source) {
             if (is_array($data[$source])) {
 
                 foreach ($data[$source] as $index => $value ) {
