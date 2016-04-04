@@ -36,7 +36,7 @@ class DateTimeStamp
 
         $dateTimeFormatter = new DateTimeFormatter;
         $dateTime = $dateTimeFormatter->filter('now');
-        $inputs = array_column(array_filter($config['input_filter']), 'name');
+        $inputs   = array_column(array_filter($config['input_filter']), 'name', 'name');
 
         empty($inputs['updated'])
             or $data['updated'] = $dateTime;
