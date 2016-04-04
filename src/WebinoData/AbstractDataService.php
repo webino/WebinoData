@@ -186,7 +186,7 @@ abstract class AbstractDataService implements
      */
     public function getEvent()
     {
-        (null === $this->event) and $this->newEvent();
+        (null === $this->event) and $this->createEvent();
         return $this->event;
     }
 
@@ -203,7 +203,7 @@ abstract class AbstractDataService implements
     /**
      * @return DataService
      */
-    protected function newEvent()
+    protected function createEvent()
     {
         $event = new DataEvent;
         $event->setService($this);
@@ -670,7 +670,7 @@ abstract class AbstractDataService implements
         empty($columns) or $select->columns($columns, false);
 
         $events = $this->getEventManager();
-        $event  = $this->newEvent();
+        $event  = $this->createEvent();
 
         $event->setSelect($select);
         $events->trigger(DataEvent::EVENT_SELECT, $event);
