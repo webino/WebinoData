@@ -42,7 +42,7 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     protected $validData;
 
     /**
-     * @var array
+     * @var mixed
      */
     protected $result;
 
@@ -150,7 +150,7 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     }
 
     /**
-     * @return array
+     * @return mixed
      */
     public function getResult()
     {
@@ -158,10 +158,10 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     }
 
     /**
-     * @param array $result
+     * @param mixed $result
      * @return $this
      */
-    public function setResult(array $result)
+    public function setResult($result)
     {
         $this->result = $result;
         return $this;
