@@ -1179,7 +1179,7 @@ abstract class AbstractDataService implements
 
     public function __clone()
     {
-        $this->event = clone $this->event;
-        $this->inputFilter = clone $this->inputFilter;
+        $this->event and $this->event = clone $this->event;
+        $this->inputFilter and $this->inputFilter = clone $this->inputFilter;
     }
 }
