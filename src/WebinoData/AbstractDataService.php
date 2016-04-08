@@ -1176,4 +1176,10 @@ abstract class AbstractDataService implements
 
         return $this;
     }
+
+    public function __clone()
+    {
+        $this->event = clone $this->event;
+        $this->inputFilter = clone $this->inputFilter;
+    }
 }
