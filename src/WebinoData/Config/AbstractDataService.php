@@ -21,11 +21,6 @@ abstract class AbstractDataService
     protected $options = [];
 
     /**
-     * @return array
-     */
-    abstract protected function getSpec();
-
-    /**
      * @param array $options
      * @return $this
      */
@@ -47,6 +42,6 @@ abstract class AbstractDataService
      */
     public function toArray()
     {
-        return array_replace_recursive($this->getSpec(), $this->options);
+        return $this->options;
     }
 }
