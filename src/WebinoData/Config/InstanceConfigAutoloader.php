@@ -13,7 +13,7 @@ namespace WebinoData\Config;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
-use WebinoData\DataService;
+use WebinoData\DataService as DataStore;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Filter\Word\DashToCamelCase;
@@ -89,7 +89,7 @@ class InstanceConfigAutoloader
             $tableIndex = substr($index, 0, strlen($index) - 4) . 'Table';
 
             $config['alias'][$tableIndex] = TableGateway::class;
-            $config['alias'][$index]      = DataService::class;
+            $config['alias'][$index]      = DataStore::class;
 
             $config[$tableIndex] = [
                 'parameters' => [
