@@ -3,7 +3,7 @@
  * Webino (http://webino.sk)
  *
  * @link        https://github.com/webino/WebinoData for the canonical source repository
- * @copyright   Copyright (c) 2012-2015 Webino, s. r. o. (http://webino.sk)
+ * @copyright   Copyright (c) 2012-2016 Webino, s. r. o. (http://webino.sk)
  * @author      Peter Bačinský <peter@bacinsky.sk>
  * @license     BSD-3-Clause
  */
@@ -38,7 +38,14 @@ class InputFilter
      */
     public function push(Input\InputInterface $input)
     {
-        $this->spec[$input->getName()] = $input->toArray();
+        $name = $input->getName();
+        if ('type' === $name) {
+            // todo issue: can't use named index cause it changes the name of the input (report the issue!)
+            // issue conflicts with the input filter type key
+            $this->spec[] = $input->toArray();
+        } else {
+            $this->spec[$name] = $input->toArray();
+        }
         return $this;
     }
 
