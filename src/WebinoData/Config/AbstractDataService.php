@@ -28,7 +28,14 @@ abstract class AbstractDataService
     {
         foreach ($options as $key => $option) {
             if ($option instanceof InputFilter\InputFilter) {
-                $this->options['parameters']['config']['input_filter'] = $option->toArray();
+                // TODO something better
+                $this->options['parameters']['config']['input_filter'] =
+                    isset($this->options['parameters']['config']['input_filter'])
+                    ? array_replace_recursive(
+                        $this->options['parameters']['config']['input_filter'],
+                        $option->toArray()
+                    )
+                    : $option->toArray();
 
             } elseif (isset($this->options[$key])) {
                 $this->options[$key] = array_replace_recursive($this->options[$key], $option);
