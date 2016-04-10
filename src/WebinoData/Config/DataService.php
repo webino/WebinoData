@@ -22,13 +22,7 @@ class DataService extends AbstractDataService
      */
     public function __construct(array $options)
     {
-        foreach ($options as $key => $option) {
-            if ($option instanceof InputFilter\InputFilter) {
-                $this->options['parameters']['config']['input_filter'] = $option->toArray();
-            } else {
-                $this->options[$key] = $option;
-            }
-        }
+        $this->setOptions($options);
     }
 
     /**
