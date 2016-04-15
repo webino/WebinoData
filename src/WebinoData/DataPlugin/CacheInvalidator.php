@@ -7,7 +7,7 @@ use Zend\EventManager\EventManager;
 use Zend\Cache\Storage\Adapter\Filesystem as Cache;
 
 /**
- *
+ * Class CacheInvalidator
  */
 class CacheInvalidator extends AbstractConfigurable
 {
@@ -44,7 +44,7 @@ class CacheInvalidator extends AbstractConfigurable
 
     /**
      * @param array $clearByTags
-     * @return self
+     * @return $this
      */
     public function setClearByTags(array $clearByTags)
     {
@@ -62,7 +62,7 @@ class CacheInvalidator extends AbstractConfigurable
 
     /**
      * @param array $clearByDateTime
-     * @return self
+     * @return $this
      */
     public function setClearByDateTime(array $clearByDateTime)
     {
@@ -89,13 +89,12 @@ class CacheInvalidator extends AbstractConfigurable
      */
     public function clearCache(DataEvent $event)
     {
-        !$event->getAffectedRows() or
-            $this->internalClearCache($event);
+        $event->getAffectedRows() and $this->internalClearCache($event);
     }
-
 
     /**
      * @param DataEvent $event
+     * @return $this
      */
     protected function internalClearCache(DataEvent $event)
     {

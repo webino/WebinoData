@@ -345,6 +345,7 @@ abstract class AbstractDataService implements
      * @deprecated Use setHasManyService instead, it prevents circular dependency exception
      * @param string $name
      * @param DataService $service
+     * @param array $options
      * @return DataService
      */
     public function setHasOne($name, DataService $service, array $options = [])
@@ -366,11 +367,12 @@ abstract class AbstractDataService implements
     public function setHasOneService($name, $serviceName, array $options = [])
     {
         if (empty($name)) {
+            // TODO exception
             throw new \InvalidArgumentException('Name cannot be null');
         }
 
-        isset($this->hasOneService[$name]) or
-            $this->hasOneService[$name] = [];
+        isset($this->hasOneService[$name])
+            or $this->hasOneService[$name] = [];
 
         $this->hasOneService[$name]['serviceName'] = $serviceName;
         $this->hasOneService[$name]['options']     = $options;
@@ -439,8 +441,8 @@ abstract class AbstractDataService implements
         if (!empty($this->hasOneService)) {
             foreach ($this->hasOneService as $name => $item) {
 
-                !empty($item['service']) or
-                    $item = $this->resolveOne($name);
+                empty($item['service'])
+                    and $item = $this->resolveOne($name);
 
                 $hasOne[$name] = $item;
             }

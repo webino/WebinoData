@@ -19,7 +19,7 @@ class DataSelect
     const EXPRESSION_MARK = 'EXPRESSION:';
 
     /**
-     * @var DataService
+     * @var AbstractDataService
      */
     protected $service;
 
@@ -54,10 +54,10 @@ class DataSelect
     private $hash;
 
     /**
-     * @param DataService $service
+     * @param AbstractDataService $service
      * @param Select $select
      */
-    public function __construct(DataService $service, Select $select)
+    public function __construct(AbstractDataService $service, Select $select)
     {
         $this->service   = $service;
         $this->sqlSelect = $select;
@@ -163,10 +163,13 @@ class DataSelect
         unset($inputFilter['type']);
 
         // collect input column names
+        $inputColumns = [];
         foreach ($inputFilter as $input) {
-            $input and $inputColumns[$input['name']] = new Expression(
+            if ($input) {
+                $inputColumns[$input['name']] = new Expression(
                     '`' . $tableName . '`.`' . $input['name'] . '`'
                 );
+            }
         }
 
         // replace star with input columns
@@ -689,7 +692,7 @@ class DataSelect
     }
 
     /**
-     * @param m$value
+     * @param string|Expression $value
      * @return Expression
      */
     private function autoExpression($value)
