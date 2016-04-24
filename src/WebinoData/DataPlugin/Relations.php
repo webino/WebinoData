@@ -193,11 +193,12 @@ class Relations
         $data      = $event->getData();
         $mainId    = !empty($data['id']) ? $data['id'] : $service->getLastInsertValue();
 
-        foreach ($data->getArrayCopy() as $key => $values) {
+        foreach ($data->getArrayCopy() as $key => $_values) {
             if (!$service->hasMany($key)) {
                 continue;
             }
 
+            $values  = is_array($_values) ? $_values : explode(PHP_EOL, $_values);
             $options = $service->manyOptions($key);
 
             if ($this->relationsDisabled($options)) {
@@ -222,7 +223,7 @@ class Relations
                 $options,
                 // TODO, for BC only (remove deprecated)
                 $manyToMany ? (isset($options['keySuffix']) ? $options['keySuffix'] : 'id') : '_id',
-                array_filter(array_column($values, 'id'))
+                (array) array_filter(array_column($values, 'id'))
             );
 
             $event->setAffectedRows($event->getAffectedRows() + 1);
