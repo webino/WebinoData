@@ -793,8 +793,7 @@ abstract class AbstractDataService implements
         $this->init();
 
         $select = empty($select) ? $this->select() : $select;
-        $result = $this->executeQuery((string) $select);
-
+        $result = $this->fetchWith($select);
         $events = $this->getEventManager();
         $event  = $this->getEvent();
 
@@ -808,7 +807,6 @@ abstract class AbstractDataService implements
                 ->setParam('callback', $callback);
 
             $events->trigger(DataEvent::EVENT_EXPORT, $event);
-
             $rowObject->count() and $callback($rowObject->getArrayCopy());
         }
 
