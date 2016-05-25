@@ -2,6 +2,7 @@
 
 namespace WebinoData\DataPlugin;
 
+use WebinoData\DataSelect;
 use WebinoData\DataService;
 use WebinoData\DataSelect\ArrayColumn;
 use WebinoData\Event\DataEvent;
@@ -28,6 +29,9 @@ class Relations
         $this->adapter = $adapter;
     }
 
+    /**
+     * @param EventManager $eventManager
+     */
     public function attach(EventManager $eventManager)
     {
         $eventManager->attach('data.exchange.pre', [$this, 'preExchange'], 500);
@@ -37,16 +41,25 @@ class Relations
         $eventManager->attach('data.fetch.post', [$this, 'postFetch'], 500);
     }
 
+    /**
+     * @param DataEvent $event
+     */
     public function preExchange(DataEvent $event)
     {
         $this->associateExchange($event);
     }
 
+    /**
+     * @param DataEvent $event
+     */
     public function postExchange(DataEvent $event)
     {
         $this->compositeExchange($event);
     }
 
+    /**
+     * @param DataEvent $event
+     */
     public function preFetch(DataEvent $event)
     {
         $service = $event->getService();
@@ -54,11 +67,9 @@ class Relations
         $columns = $select->getColumns();
 
         foreach ($columns as $key => $column) {
-
             if ($service->hasOne($key)) {
 
                 $options = $service->oneOptions($key);
-
                 if ($this->relationsDisabled($options)) {
                     continue;
                 }
@@ -77,7 +88,6 @@ class Relations
             }
 
             $options = $service->manyOptions($key);
-
             if ($this->relationsDisabled($options)) {
                 continue;
             }
@@ -91,12 +101,18 @@ class Relations
         }
     }
 
+    /**
+     * @param DataEvent $event
+     */
     public function postFetch(DataEvent $event)
     {
         $this->associateFetch($event);
         $this->compositeFetch($event);
     }
 
+    /**
+     * @param DataEvent $event
+     */
     protected function associateExchange(DataEvent $event)
     {
         $service   = $event->getService();
@@ -104,9 +120,7 @@ class Relations
         $validData = $event->getValidData();
 
         foreach ($data->getArrayCopy() as $key => $value) {
-            if (!$service->hasOne($key)
-                || !is_array($value)
-            ) {
+            if (!$service->hasOne($key) || !is_array($value)) {
                 continue;
             }
 
@@ -124,6 +138,9 @@ class Relations
         }
     }
 
+    /**
+     * @param DataEvent $event
+     */
     protected function associateFetch(DataEvent $event)
     {
         $rows = $event->getRows();
@@ -142,7 +159,6 @@ class Relations
             }
 
             $options = $service->oneOptions($key);
-
             if ($this->relationsDisabled($options)) {
                 continue;
             }
@@ -175,7 +191,6 @@ class Relations
             $tableName  = $subService->getTableName();
 
             $subSelect->where(new SqlIn($tableName . '.id', $subIds));
-
             $subItems = $subService->fetchWith($subSelect);
 
             foreach ($rows as &$row) {
@@ -186,6 +201,9 @@ class Relations
         }
     }
 
+    /**
+     * @param DataEvent $event
+     */
     protected function compositeExchange(DataEvent $event)
     {
         $service   = $event->getService();
@@ -236,7 +254,8 @@ class Relations
                 $valueIsNumeric = is_numeric($value);
 
                 if (!$valueIsNumeric) {
-                    $manyToMany or $value[$tableName . '_id'] = $mainId;
+                    $assocSubKey = $this->resolveSubKey($tableName . '_id', $options);
+                    $manyToMany or $value[$assocSubKey] = $mainId;
 
                     $subService->exchangeArray($value);
                 }
@@ -258,10 +277,12 @@ class Relations
         }
     }
 
+    /**
+     * @param DataEvent $event
+     */
     protected function compositeFetch(DataEvent $event)
     {
         $rows = $event->getRows();
-
         if (0 === $rows->count()) {
             return;
         }
@@ -311,12 +332,11 @@ class Relations
                 $this->assocJoin($subSelect, $service, $subService, $options);
             }
 
-            $mainKey = $tableName . $keySuffix;
+            $mainKey = $this->resolveSubKey($tableName . $keySuffix, $options);
             $subSelect->where(new SqlIn($mainKey, $mainIds));
 
             $limit = $subSelect->getLimit();
             $subSelect->reset('limit');
-
             $subItems = $subService->fetchWith($subSelect);
 
             foreach ($rows as &$row) {
@@ -342,6 +362,13 @@ class Relations
         }
     }
 
+    /**
+     * @param DataService $service
+     * @param DataService $subService
+     * @param int $mainId
+     * @param int $subId
+     * @param array $options
+     */
     protected function assocInsert(DataService $service, DataService $subService, $mainId, $subId, array $options)
     {
         $platform = $service->getPlatform();
@@ -363,6 +390,14 @@ class Relations
         $this->adapter->query($sql)->execute();
     }
 
+    /**
+     * @param DataService $service
+     * @param DataService $subService
+     * @param int $mainId
+     * @param array $options
+     * @param string $idSuffix
+     * @param array $idsExclude
+     */
     protected function assocDelete(
         DataService $service,
         DataService $subService,
@@ -378,10 +413,10 @@ class Relations
 
         $tableName      = $service->getTableName();
         $subTableName   = $subService->getTableName();
+        $assocSubKey    = $this->resolveSubKey($tableName . $idSuffix, $options);
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
-        $sql = 'DELETE FROM ' . $qi($assocTableName)
-             . ' WHERE ' . $qi($tableName . $idSuffix) . ' = ' . $qv($mainId);
+        $sql = 'DELETE FROM ' . $qi($assocTableName) . ' WHERE ' . $qi($assocSubKey) . ' = ' . $qv($mainId);
 
         // exclude ids to update
         empty($idsExclude)
@@ -390,6 +425,12 @@ class Relations
         $this->adapter->query($sql)->execute();
     }
 
+    /**
+     * @param DataSelect $select
+     * @param DataService $service
+     * @param DataService $subService
+     * @param array $options
+     */
     protected function assocJoin($select, DataService $service, DataService $subService, array $options)
     {
         // todo DRY
@@ -403,11 +444,22 @@ class Relations
         $select->join($assocTableName, $subTableName . '.id=' . $assocTableName . '.' . $subTableName . $keySuffix);
     }
 
+    /**
+     * @param string $tableName
+     * @param array $options
+     * @return mixed
+     */
     protected function resolveSubKey($tableName, array $options)
     {
         return !empty($options['key']) ? $options['key'] : $tableName;
     }
 
+    /**
+     * @param string $tableName
+     * @param string $subTableName
+     * @param array $options
+     * @return string
+     */
     protected function resolveAssocTableName($tableName, $subTableName, array $options)
     {
         return !empty($options['tableName']) ? $options['tableName'] : $tableName . '_' . $subTableName;
