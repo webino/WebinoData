@@ -132,7 +132,7 @@ class Relations
             $subService = $service->one($key);
             $subService->exchangeArray($value);
 
-            $idKey = $this->resolveSubKey($key . '_id', $options);
+            $idKey = $this->resolveSubKey($key, $options) . '_id';
             $data[$idKey] = !empty($value['id']) ? $value['id'] : $subService->getLastInsertValue();
             $validData[$idKey] = $data[$idKey];
         }
@@ -174,7 +174,7 @@ class Relations
         }
 
         foreach ($attached as $key => $options) {
-            $idKey  = $subKey = $this->resolveSubKey($key . '_id', $options);
+            $idKey  = $subKey = $this->resolveSubKey($key, $options) . '_id';
             $subIds = [];
 
             foreach ($rows as &$row) {
@@ -254,7 +254,7 @@ class Relations
                 $valueIsNumeric = is_numeric($value);
 
                 if (!$valueIsNumeric) {
-                    $assocSubKey = $this->resolveSubKey($tableName . '_id', $options);
+                    $assocSubKey = $this->resolveSubKey($tableName, $options) . '_id';
                     $manyToMany or $value[$assocSubKey] = $mainId;
 
                     $subService->exchangeArray($value);
@@ -332,7 +332,7 @@ class Relations
                 $this->assocJoin($subSelect, $service, $subService, $options);
             }
 
-            $mainKey = $this->resolveSubKey($tableName . $keySuffix, $options);
+            $mainKey = $this->resolveSubKey($tableName, $options) . $keySuffix;
             $subSelect->where(new SqlIn($mainKey, $mainIds));
 
             $limit = $subSelect->getLimit();
@@ -413,7 +413,7 @@ class Relations
 
         $tableName      = $service->getTableName();
         $subTableName   = $subService->getTableName();
-        $assocSubKey    = $this->resolveSubKey($tableName . $idSuffix, $options);
+        $assocSubKey    = $this->resolveSubKey($tableName, $options) . $idSuffix;
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
         $sql = 'DELETE FROM ' . $qi($assocTableName) . ' WHERE ' . $qi($assocSubKey) . ' = ' . $qv($mainId);
