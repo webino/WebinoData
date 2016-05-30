@@ -44,6 +44,18 @@ abstract class AbstractInput implements InputInterface
     }
 
     /**
+     * @param array $filters
+     * @return AbstractInput
+     */
+    public function setFilters(array $filters)
+    {
+        foreach ($filters as $key => $filter) {
+            $this->spec['filters'][is_string($key) ? $key : (string) $filter] = ['name' => (string) $filter];
+        }
+        return $this;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function toArray()
