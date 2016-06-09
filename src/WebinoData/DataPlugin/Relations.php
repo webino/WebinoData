@@ -328,8 +328,10 @@ class Relations
             if ($subService->hasMany($subKey)) {
                 // bidirectional
                 // TODO, for BC only (remove deprecated)
-                $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
-                $this->assocJoin($subSelect, $service, $subService, $options);
+                $keySuffix  = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
+                $subOptions = $subService->manyOptions($subKey);
+
+                $this->assocJoin($subSelect, $service, $subService, $subOptions);
             }
 
             $mainKey = $this->resolveSubKey($tableName, $options) . $keySuffix;
@@ -436,12 +438,13 @@ class Relations
         // todo DRY
         $tableName      = $service->getTableName();
         $subTableName   = $subService->getTableName();
+        $assocSubKey    = $this->resolveSubKey($subTableName, $options);
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
         // TODO, for BC only (remove deprecated)
         $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
 
-        $select->join($assocTableName, $subTableName . '.id=' . $assocTableName . '.' . $subTableName . $keySuffix);
+        $select->join($assocTableName, $subTableName . '.id=' . $assocTableName . '.' . $assocSubKey . $keySuffix);
     }
 
     /**
