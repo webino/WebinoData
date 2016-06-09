@@ -252,9 +252,10 @@ class Relations
 
             foreach ($values as $value) {
                 $valueIsNumeric = is_numeric($value);
+                $subKey = $this->resolveSubKey($tableName, $options);
 
                 if (!$valueIsNumeric) {
-                    $assocSubKey = $this->resolveSubKey($tableName, $options) . '_id';
+                    $assocSubKey = $subKey . '_id';
                     $manyToMany or $value[$assocSubKey] = $mainId;
 
                     $subService->exchangeArray($value);
@@ -270,7 +271,8 @@ class Relations
                         $subService,
                         $mainId,
                         $subId,
-                        $options
+                        $options,
+                        $subService->manyOptions($subKey)
                     );
                 }
             }
@@ -370,9 +372,16 @@ class Relations
      * @param int $mainId
      * @param int $subId
      * @param array $options
+     * @param array $subOptions
      */
-    protected function assocInsert(DataService $service, DataService $subService, $mainId, $subId, array $options)
-    {
+    protected function assocInsert(
+        DataService $service,
+        DataService $subService,
+        $mainId,
+        $subId,
+        array $options,
+        array $subOptions
+    ) {
         $platform = $service->getPlatform();
 
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
@@ -382,11 +391,14 @@ class Relations
         $subTableName   = $subService->getTableName();
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
+        $key = $this->resolveSubKey($tableName, $options);
+        $subKey = $this->resolveSubKey($subTableName, $subOptions);
+
         // TODO, for BC only (remove deprecated)
         $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
 
         $sql = 'INSERT IGNORE INTO ' . $qi($assocTableName)
-             . ' (' . $qi($tableName . $keySuffix) . ', ' . $qi($subTableName . $keySuffix) . ')'
+             . ' (' . $qi($key . $keySuffix) . ', ' . $qi($subKey . $keySuffix) . ')'
              . ' VALUES (' . $qv($mainId) . ', ' . $qv($subId) . ')';
 
         $this->adapter->query($sql)->execute();
