@@ -230,11 +230,13 @@ class Relations
                 continue;
             }
 
+            $subOptions = $subService->hasMany($subKey)
+                        ? $subService->manyOptions($subKey)
+                        : [];
+
             $manyToMany = array_key_exists('oneToMany', $options)
                         ? !$options['oneToMany']
                         : true;
-
-            $subOptions = $subService->manyOptions($subKey);
 
             // delete association
             $this->assocDelete(
