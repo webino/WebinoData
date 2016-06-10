@@ -223,6 +223,7 @@ class Relations
                 continue;
             }
 
+            $subKey = $this->resolveSubKey($tableName, $options);
             $subService = $service->many($key);
 
             if (!isset($values)) {
@@ -233,15 +234,17 @@ class Relations
                         ? !$options['oneToMany']
                         : true;
 
+            $subOptions = $subService->manyOptions($subKey);
+
             // delete association
             $this->assocDelete(
                 $service,
                 $subService,
                 $mainId,
                 $options,
-                // TODO, for BC only (remove deprecated)
-                $manyToMany ? (isset($options['keySuffix']) ? $options['keySuffix'] : 'id') : '_id',
-                (array) array_filter(array_column($values, 'id'))
+                $subOptions,
+                (array) array_filter(array_column($values, 'id')),
+                $manyToMany
             );
 
             $event->setAffectedRows($event->getAffectedRows() + 1);
@@ -252,7 +255,6 @@ class Relations
 
             foreach ($values as $value) {
                 $valueIsNumeric = is_numeric($value);
-                $subKey = $this->resolveSubKey($tableName, $options);
 
                 if (!$valueIsNumeric) {
                     $assocSubKey = $subKey . '_id';
@@ -272,7 +274,7 @@ class Relations
                         $mainId,
                         $subId,
                         $options,
-                        $subService->manyOptions($subKey)
+                        $subOptions
                     );
                 }
             }
@@ -384,6 +386,7 @@ class Relations
     ) {
         $platform = $service->getPlatform();
 
+        // TODO common with assocDelete
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
         $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
 
@@ -393,6 +396,7 @@ class Relations
 
         $key = $this->resolveSubKey($tableName, $options);
         $subKey = $this->resolveSubKey($subTableName, $subOptions);
+        // /TODO common with assocDelete
 
         // TODO, for BC only (remove deprecated)
         $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
@@ -409,32 +413,41 @@ class Relations
      * @param DataService $subService
      * @param int $mainId
      * @param array $options
-     * @param string $idSuffix
+     * @param array $subOptions
      * @param array $idsExclude
+     * @param bool $manyToMany
      */
     protected function assocDelete(
         DataService $service,
         DataService $subService,
         $mainId,
         array $options,
-        $idSuffix,
-        array $idsExclude = []
+        array $subOptions,
+        array $idsExclude = [],
+        $manyToMany
     ) {
         $platform = $service->getPlatform();
 
+        // TODO common with assocInsert
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
         $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
 
         $tableName      = $service->getTableName();
         $subTableName   = $subService->getTableName();
-        $assocSubKey    = $this->resolveSubKey($tableName, $options) . $idSuffix;
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
-        $sql = 'DELETE FROM ' . $qi($assocTableName) . ' WHERE ' . $qi($assocSubKey) . ' = ' . $qv($mainId);
+        $key = $this->resolveSubKey($tableName, $options);
+        $subKey = $this->resolveSubKey($subTableName, $subOptions);
+        // /TODO common with assocInsert
+
+        // TODO, for BC only (remove deprecated)
+        $keySuffix = $manyToMany ? (isset($options['keySuffix']) ? $options['keySuffix'] : 'id') : '_id';
+
+        $sql = 'DELETE FROM ' . $qi($assocTableName) . ' WHERE ' . $qi($key . $keySuffix) . ' = ' . $qv($mainId);
 
         // exclude ids to update
         empty($idsExclude)
-            or $sql.= ' AND ' . $qi($subTableName . $idSuffix) . ' NOT IN (' . join(',', $idsExclude) . ')';
+            or $sql.= ' AND ' . $qi($subKey . $keySuffix) . ' NOT IN (' . join(',', $idsExclude) . ')';
 
         $this->adapter->query($sql)->execute();
     }

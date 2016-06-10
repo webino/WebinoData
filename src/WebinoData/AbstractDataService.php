@@ -124,7 +124,7 @@ abstract class AbstractDataService implements
      * Initialize the data service plugin handlers
      *
      * @param array $config
-     * @return DataService
+     * @return $this
      */
     protected function initPlugin(array $config)
     {
@@ -192,7 +192,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param DataEvent $event
-     * @return DataService
+     * @return $this
      */
     public function setEvent(DataEvent $event)
     {
@@ -201,7 +201,7 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * @return DataService
+     * @return $this
      */
     protected function createEvent()
     {
@@ -224,7 +224,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param EventManagerInterface $eventManager
-     * @return DataService
+     * @return $this
      */
     public function setEventManager(EventManagerInterface $eventManager)
     {
@@ -258,7 +258,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param ServiceManager $serviceManager
-     * @return DataService
+     * @return $this
      */
     public function setServiceManager(ServiceManager $serviceManager)
     {
@@ -282,7 +282,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param PlatformInterface $platform
-     * @return DataService
+     * @return $this
      */
     public function setPlatform(PlatformInterface $platform)
     {
@@ -303,7 +303,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param InputFilterFactory $factory
-     * @return DataService
+     * @return $this
      */
     public function setInputFilterFactory(InputFilterFactory $factory)
     {
@@ -327,7 +327,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param InputFilterInterface $inputFilter
-     * @return DataService
+     * @return $this
      */
     public function setInputFilter(InputFilterInterface $inputFilter)
     {
@@ -346,7 +346,7 @@ abstract class AbstractDataService implements
      * @param string $name
      * @param DataService $service
      * @param array $options
-     * @return DataService
+     * @return $this
      */
     public function setHasOne($name, DataService $service, array $options = [])
     {
@@ -362,7 +362,7 @@ abstract class AbstractDataService implements
      * @param string $name
      * @param string $serviceName
      * @param array $options
-     * @return DataService
+     * @return $this
      */
     public function setHasOneService($name, $serviceName, array $options = [])
     {
@@ -393,7 +393,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string $name
-     * @return DataService
+     * @return $this
      * @throws \OutOfBoundsException
      */
     protected function resolveOne($name)
@@ -414,7 +414,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string $name
-     * @return DataService
+     * @return $this
      */
     public function one($name)
     {
@@ -424,7 +424,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string $name
-     * @return DataService
+     * @return array
      */
     public function oneOptions($name)
     {
@@ -464,7 +464,7 @@ abstract class AbstractDataService implements
      * @param string $name
      * @param DataService $service
      * @param array $options
-     * @return DataService
+     * @return $this
      */
     public function setHasMany($name, DataService $service, array $options = [])
     {
@@ -480,7 +480,7 @@ abstract class AbstractDataService implements
      * @param string $name
      * @param string $serviceName
      * @param array $options
-     * @return DataService
+     * @return $this
      */
     public function setHasManyService($name, $serviceName, array $options = [])
     {
@@ -511,7 +511,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string $name
-     * @return DataService
+     * @return $this
      * @throws \OutOfBoundsException
      */
     protected function resolveMany($name)
@@ -532,7 +532,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string $name
-     * @return DataService
+     * @return $this
      */
     public function many($name)
     {
@@ -542,7 +542,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string $name
-     * @return DataService
+     * @return array
      */
     public function manyOptions($name)
     {
@@ -581,7 +581,7 @@ abstract class AbstractDataService implements
      * Bind the data service to the form
      *
      * @param object $object Object to bind into
-     * @return DataService
+     * @return $this
      * @throws Exception\InvalidArgumentException
      * @throws Exception\RuntimeException
      */

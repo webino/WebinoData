@@ -373,6 +373,11 @@ class DataSelect
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @param DataSelect|null $select
+     * @return $this
+     */
     public function subselect($name, self $select = null)
     {
         if (null === $select) {
