@@ -10,6 +10,8 @@
 
 namespace WebinoData\Config;
 
+use Zend\Stdlib\ArrayUtils;
+
 /**
  * Data service abstract configurator
  */
@@ -40,6 +42,9 @@ abstract class AbstractDataService
             } elseif (isset($this->options[$key])) {
                 $this->options[$key] = array_merge_recursive($this->options[$key], $option);
 
+            } elseif (is_object($option)) {
+                // TODO if interface
+                $this->options = ArrayUtils::merge($this->options, $option->setStore($this)->toArray());
             } else {
                 $this->options[$key] = $option;
             }
