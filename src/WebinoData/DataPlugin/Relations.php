@@ -76,7 +76,7 @@ class Relations
 
                 if (is_string($column) || $column instanceof ArrayColumn) {
                     $subSelect = $service->one($key)->configSelect((array) $column);
-                    $select->subselect($key, $subSelect);
+                    $select->subSelect($key, $subSelect);
                 }
 
                 $select->addColumn($key, new SqlExpression('\'0\''));
@@ -94,7 +94,7 @@ class Relations
 
             if (is_string($column) || $column instanceof ArrayColumn) {
                 $subSelect = $service->many($key)->configSelect((array) $column);
-                $select->subselect($key, $subSelect);
+                $select->subSelect($key, $subSelect);
             }
 
             $select->addColumn($key, new SqlExpression('\'0\''));
@@ -165,8 +165,8 @@ class Relations
 
             $attached[$key] = $options;
 
-            $select->subselect($key)
-                or $select->subselect($key, $service->one($key)->select());
+            $select->subSelect($key)
+                or $select->subSelect($key, $service->one($key)->select());
         }
 
         if (empty($attached)) {
@@ -186,7 +186,7 @@ class Relations
                 continue;
             }
 
-            $subSelect  = clone $select->subselect($key);
+            $subSelect  = clone $select->subSelect($key);
             $subService = $service->one($key);
             $tableName  = $subService->getTableName();
 
@@ -223,16 +223,11 @@ class Relations
                 continue;
             }
 
-            $subKey = $this->resolveSubKey($tableName, $options);
             $subService = $service->many($key);
 
             if (!isset($values)) {
                 continue;
             }
-
-            $subOptions = $subService->hasMany($subKey)
-                        ? $subService->manyOptions($subKey)
-                        : [];
 
             $manyToMany = array_key_exists('oneToMany', $options)
                         ? !$options['oneToMany']
@@ -244,9 +239,9 @@ class Relations
                 $subService,
                 $mainId,
                 $options,
-                $subOptions,
-                (array) array_filter(array_column($values, 'id')),
-                $manyToMany
+                // TODO, for BC only (remove deprecated)
+                $manyToMany ? (isset($options['keySuffix']) ? $options['keySuffix'] : 'id') : '_id',
+                (array) array_filter(array_column($values, 'id'))
             );
 
             $event->setAffectedRows($event->getAffectedRows() + 1);
@@ -257,6 +252,7 @@ class Relations
 
             foreach ($values as $value) {
                 $valueIsNumeric = is_numeric($value);
+                $subKey = $this->resolveSubKey($tableName, $options);
 
                 if (!$valueIsNumeric) {
                     $assocSubKey = $subKey . '_id';
@@ -276,7 +272,7 @@ class Relations
                         $mainId,
                         $subId,
                         $options,
-                        $subOptions
+                        $subService->manyOptions($subKey)
                     );
                 }
             }
@@ -311,8 +307,8 @@ class Relations
 
             $attached[$key] = $options;
 
-            $select->subselect($key)
-                or $select->subselect($key, $service->many($key)->select());
+            $select->subSelect($key)
+                or $select->subSelect($key, $service->many($key)->select());
         }
 
         if (empty($attached)) {
@@ -324,7 +320,7 @@ class Relations
 
         foreach ($attached as $key => $options) {
 
-            $subSelect  = clone $select->subselect($key);
+            $subSelect  = clone $select->subSelect($key);
             $subService = $service->many($key);
             // TODO, for BC only (remove deprecated)
             $keySuffix  = '_id';
@@ -345,7 +341,7 @@ class Relations
 
             $limit = $subSelect->getLimit();
             $subSelect->reset('limit');
-            $subItems = $subService->fetchWith($subSelect);
+            $subItems = $subService->fetchWith($subSelect, $select->subParams($key));
 
             foreach ($rows as &$row) {
                 is_array($row[$key]) or $row[$key] = [];
@@ -388,7 +384,6 @@ class Relations
     ) {
         $platform = $service->getPlatform();
 
-        // TODO common with assocDelete
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
         $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
 
@@ -398,7 +393,6 @@ class Relations
 
         $key = $this->resolveSubKey($tableName, $options);
         $subKey = $this->resolveSubKey($subTableName, $subOptions);
-        // /TODO common with assocDelete
 
         // TODO, for BC only (remove deprecated)
         $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
@@ -415,41 +409,32 @@ class Relations
      * @param DataService $subService
      * @param int $mainId
      * @param array $options
-     * @param array $subOptions
+     * @param string $idSuffix
      * @param array $idsExclude
-     * @param bool $manyToMany
      */
     protected function assocDelete(
         DataService $service,
         DataService $subService,
         $mainId,
         array $options,
-        array $subOptions,
-        array $idsExclude = [],
-        $manyToMany
+        $idSuffix,
+        array $idsExclude = []
     ) {
         $platform = $service->getPlatform();
 
-        // TODO common with assocInsert
         $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
         $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
 
         $tableName      = $service->getTableName();
         $subTableName   = $subService->getTableName();
+        $assocSubKey    = $this->resolveSubKey($tableName, $options) . $idSuffix;
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
-        $key = $this->resolveSubKey($tableName, $options);
-        $subKey = $this->resolveSubKey($subTableName, $subOptions);
-        // /TODO common with assocInsert
-
-        // TODO, for BC only (remove deprecated)
-        $keySuffix = $manyToMany ? (isset($options['keySuffix']) ? $options['keySuffix'] : 'id') : '_id';
-
-        $sql = 'DELETE FROM ' . $qi($assocTableName) . ' WHERE ' . $qi($key . $keySuffix) . ' = ' . $qv($mainId);
+        $sql = 'DELETE FROM ' . $qi($assocTableName) . ' WHERE ' . $qi($assocSubKey) . ' = ' . $qv($mainId);
 
         // exclude ids to update
         empty($idsExclude)
-            or $sql.= ' AND ' . $qi($subKey . $keySuffix) . ' NOT IN (' . join(',', $idsExclude) . ')';
+            or $sql.= ' AND ' . $qi($subTableName . $idSuffix) . ' NOT IN (' . join(',', $idsExclude) . ')';
 
         $this->adapter->query($sql)->execute();
     }

@@ -31,7 +31,12 @@ class DataSelect
     /**
      * @var array
      */
-    protected $subselects = [];
+    protected $subSelects = [];
+
+    /**
+     * @var array
+     */
+    protected $subParams = [];
 
     /**
      * @var array
@@ -71,36 +76,57 @@ class DataSelect
         return $this->sqlSelect;
     }
 
+    /**
+     * @return array
+     */
     public function getColumns()
     {
         return $this->sqlSelect->getRawState('columns');
     }
 
+    /**
+     * @return array
+     */
     public function getJoins()
     {
         return $this->sqlSelect->getRawState('joins');
     }
 
+    /**
+     * @return array
+     */
     public function getWhere()
     {
         return $this->sqlSelect->getRawState('where');
     }
 
+    /**
+     * @return array
+     */
     public function getHaving()
     {
         return $this->sqlSelect->getRawState('having');
     }
 
+    /**
+     * @return array
+     */
     public function getOrder()
     {
         return $this->sqlSelect->getRawState('order');
     }
 
+    /**
+     * @return array
+     */
     public function getLimit()
     {
         return $this->sqlSelect->getRawState('limit');
     }
 
+    /**
+     * @return array
+     */
     public function getSearch()
     {
         return $this->search;
@@ -126,10 +152,7 @@ class DataSelect
      */
     public function hasFlag($name)
     {
-        if (empty($this->flags[(string) $name])) {
-            return false;
-        }
-        return true;
+        return !empty($this->flags[(string) $name]);
     }
 
     /**
@@ -138,7 +161,7 @@ class DataSelect
      */
     public function setHash($hash)
     {
-        $this->hash.= $hash;
+        $this->hash .= $hash;
         return $this;
     }
 
@@ -220,7 +243,7 @@ class DataSelect
                 continue;
             }
 
-            // store subselects
+            // store subSelects
             if ($idColumn instanceof self) {
                 $this->subselect($key, $idColumn);
                 continue;
@@ -240,6 +263,10 @@ class DataSelect
         return $this;
     }
 
+    /**
+     * @param array $columns
+     * @return $this
+     */
     public function addColumns(array $columns)
     {
         $selectColumns = $this->getColumns();
@@ -250,16 +277,22 @@ class DataSelect
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @param string|array $value
+     * @return $this
+     */
     public function addColumn($name, $value)
     {
-        $columns = array_replace(
-            $this->getColumns(),
-            [$name => $value]
-        );
+        $columns = array_replace($this->getColumns(), [$name => $value]);
         $this->columns($columns);
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @return $this
+     */
     public function removeColumn($name)
     {
         $columns = $this->getColumns();
@@ -270,12 +303,23 @@ class DataSelect
         return $this;
     }
 
+    /**
+     * @param string $limit
+     * @return $this
+     */
     public function limit($limit)
     {
         $this->sqlSelect->limit((int) $limit);
         return $this;
     }
 
+    /**
+     * @param string|array $name
+     * @param string $on
+     * @param string|array $columns
+     * @param string $type
+     * @return $this
+     */
     public function join($name, $on, $columns = Select::SQL_STAR, $type = Select::JOIN_INNER)
     {
         if (is_array($columns)) {
@@ -294,12 +338,20 @@ class DataSelect
         return $this;
     }
 
+    /**
+     * @param int $offset
+     * @return $this
+     */
     public function offset($offset)
     {
         $this->sqlSelect->offset((int) $offset);
         return $this;
     }
 
+    /**
+     * @param string $order
+     * @return $this
+     */
     public function order($order)
     {
         if (is_string($order) && strpos($order, '(')) {
@@ -310,7 +362,11 @@ class DataSelect
         return $this;
     }
 
-    // todo decouple (redesign)
+    /**
+     * @param array $subject
+     * @return $this
+     * @todo decouple (redesign)
+     */
     private function replaceVars(array &$subject)
     {
         foreach ($subject as &$str) {
@@ -332,7 +388,11 @@ class DataSelect
         return $this;
     }
 
-    // todo decouple (redesign)
+    /**
+     * @param array|ArrayObject $predicate
+     * @return array
+     * @todo decouple (redesign)
+     */
     private function parsePredicate($predicate)
     {
         $newPredicate = [];
@@ -345,6 +405,11 @@ class DataSelect
         return $newPredicate;
     }
 
+    /**
+     * @param mixed $predicate
+     * @param string $combination
+     * @return $this
+     */
     public function where($predicate, $combination = PredicateSet::OP_AND)
     {
         is_object($predicate)
@@ -367,6 +432,11 @@ class DataSelect
         return $this;
     }
 
+    /**
+     * @param mixed $predicate
+     * @param string $combination
+     * @return $this
+     */
     public function having($predicate, $combination = PredicateSet::OP_AND)
     {
         $this->sqlSelect->having($predicate, $combination);
@@ -375,23 +445,59 @@ class DataSelect
 
     /**
      * @param string $name
-     * @param DataSelect|null $select
+     * @param string $key
+     * @param string $value
      * @return $this
      */
-    public function subselect($name, self $select = null)
+    public function havingRelation($name, $key, $value)
     {
-        if (null === $select) {
-            if (empty($this->subselects[$name])) {
-                return null;
-            }
-            return $this->subselects[$name];
-        }
-
-        $this->subselects[$name] = $select;
+        // TODO DRY
+        $this->having([$key . '_id' => $value]);
+        $this->subParams($name, [$key . '_id' => $value]);
         return $this;
     }
 
-    // todo decouple logic
+    /**
+     * @param string $name
+     * @param DataSelect|null $select
+     * @return $this|null
+     */
+    public function subSelect($name, self $select = null)
+    {
+        if (null === $select) {
+            if (empty($this->subSelects[$name])) {
+                return null;
+            }
+            return $this->subSelects[$name];
+        }
+
+        $this->subSelects[$name] = $select;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param array $params
+     * @return $this
+     */
+    public function subParams($name, array $params = [])
+    {
+        if (empty($params)) {
+            return isset($this->subParams[$name]) ? $this->subParams[$name] : [];
+        }
+
+        isset($this->subParams[$name]) or $this->subParams[$name] = [];
+        $this->subParams[$name] = array_replace($this->subParams[$name], $params);
+        return $this;
+    }
+
+    /**
+     * @param mixed $term
+     * @param array $columns
+     * @param string $combination
+     * @return $this
+     * @todo decouple logic
+     */
     public function search($term, array $columns = [], $combination = PredicateSet::OP_AND)
     {
         if (empty($term) && !is_numeric($term)) {
@@ -499,7 +605,10 @@ class DataSelect
         return preg_replace('~[^a-zA-Z0-9_-]+~', $replacement, $term);
     }
 
-    // TODO decouple
+    /**
+     * @param $term
+     * @TODO decouple
+     */
     private function fixDateSearch(&$term)
     {
         if (!preg_match('~^[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,4})?$~', $term)) {
@@ -555,6 +664,10 @@ class DataSelect
         return $this->sqlSelect->reset($part);
     }
 
+    /**
+     * @param array $config
+     * @return $this
+     */
     public function configure(array $config)
     {
         if (isset($config['columns'])) {
@@ -582,7 +695,13 @@ class DataSelect
         return $this;
     }
 
-    // todo remain predicates
+    /**
+     * @param array $config
+     * @param Predicate $where
+     * @param string $key
+     * @return $this
+     * @todo remain predicates
+     */
     private function configureWhere(array $config, Predicate $where, $key)
     {
         if (!empty($config[$key])) {
@@ -667,6 +786,11 @@ class DataSelect
         return $this;
     }
 
+    /**
+     * @param Sql $sql
+     * @param array $parameters
+     * @return \Zend\Db\Adapter\Driver\ResultInterface
+     */
     public function execute(Sql $sql, $parameters = [])
     {
         try {
@@ -685,6 +809,10 @@ class DataSelect
         }
     }
 
+    /**
+     * @param array|ArrayObject $predicate
+     * @return array
+     */
     private function resolveOperatorArgs($predicate)
     {
         $left      = $this->autoExpression(key($predicate));
