@@ -433,8 +433,7 @@ class Relations
         $sql = 'DELETE FROM ' . $qi($assocTableName) . ' WHERE ' . $qi($assocSubKey) . ' = ' . $qv($mainId);
 
         // exclude ids to update
-        empty($idsExclude)
-            or $sql.= ' AND ' . $qi($subTableName . $idSuffix) . ' NOT IN (' . join(',', $idsExclude) . ')';
+        empty($idsExclude) or $sql.= ' AND id NOT IN (' . join(',', $idsExclude) . ')';
 
         $this->adapter->query($sql)->execute();
     }
