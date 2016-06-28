@@ -74,6 +74,8 @@ class DataService extends AbstractDataService
      */
     public function fetchWith(DataSelect $select, $parameters = [])
     {
+        $select->setHash($parameters);
+
         if (!$this->hasCache()) {
             return parent::fetchWith($select, $parameters);
         }

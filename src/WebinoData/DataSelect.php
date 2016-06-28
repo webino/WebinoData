@@ -161,7 +161,7 @@ class DataSelect
      */
     public function setHash($hash)
     {
-        $this->hash .= $hash;
+        $this->hash .= is_array($hash) ? md5(serialize($hash)) : $hash;
         return $this;
     }
 
@@ -170,7 +170,7 @@ class DataSelect
      */
     public function hash()
     {
-        return md5((string) $this . $this->hash);
+        return md5((string) $this . serialize($this->subParams) . $this->hash);
     }
 
     /**
