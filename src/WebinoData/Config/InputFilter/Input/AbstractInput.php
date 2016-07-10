@@ -56,6 +56,17 @@ abstract class AbstractInput implements InputInterface
     }
 
     /**
+     * @param array $values
+     * @return $this
+     */
+    public function setAllowedValues(array $values)
+    {
+        isset($this->spec['validators']['inArray']) or $this->spec['validators']['inArray'] = ['name' => 'InArray'];
+        $this->spec['validators']['inArray']['options']['haystack'] = $values;
+        return $this;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function toArray()
