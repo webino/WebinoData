@@ -4,6 +4,7 @@ namespace WebinoData\Listener;
 
 use WebinoData\Event\DataEvent;
 use Zend\Cache\Storage\Adapter\Filesystem as Cache;
+use Zend\Cache\Storage\Adapter\Filesystem;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\EventManager\SharedListenerAggregateInterface;
 
@@ -63,6 +64,7 @@ class CacheInvalidatorListener implements SharedListenerAggregateInterface
     public function clearCache(DataEvent $event)
     {
         foreach ($event->getParam('clearByTags') as $tags) {
+            /** @var Filesystem $cache */
             foreach ($this->caches as $cache) {
                 try {
                     $cache->clearByTags((array) $tags);

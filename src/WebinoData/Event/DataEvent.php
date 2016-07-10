@@ -24,7 +24,7 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     /**
      * @var AbstractDataService
      */
-    protected $service;
+    protected $store;
 
     /**
      * @var DataSelect
@@ -74,18 +74,38 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     /**
      * @return DataService
      */
-    public function getService()
+    public function getStore()
     {
-        return $this->service;
+        return $this->store;
     }
 
     /**
-     * @param AbstractDataService $service
+     * @return DataService
+     * @deprecated use getStore()
+     */
+    public function getService()
+    {
+        return $this->store;
+    }
+
+    /**
+     * @param AbstractDataService $store
      * @return $this
      */
-    public function setService(AbstractDataService $service)
+    public function setStore(AbstractDataService $store)
     {
-        $this->service = $service;
+        $this->store = $store;
+        return $this;
+    }
+
+    /**
+     * @param AbstractDataService $store
+     * @return $this
+     * @deprecated use setStore()
+     */
+    public function setService(AbstractDataService $store)
+    {
+        $this->store = $store;
         return $this;
     }
 

@@ -2,6 +2,7 @@
 
 namespace WebinoData\DataPlugin;
 
+use WebinoData\DataService;
 use WebinoData\Event\DataEvent;
 use Zend\EventManager\EventManager;
 use Zend\Cache\Storage\Adapter\Filesystem as Cache;
@@ -98,9 +99,24 @@ class CacheInvalidator extends AbstractConfigurable
      */
     protected function internalClearCache(DataEvent $event)
     {
-        $tableName = $event->getService()->getTableName();
-        $event->setparam('clearByTags', array_merge([$tableName], $this->getClearByTags()));
-        $event->getService()->getEventManager()->trigger('data.cache.clear', $event);
+        $tableName = $event->getStore()->getTableName();
+        $tags = array_merge([$tableName], $this->getClearByTags());
+
+        $store = $event->getStore();
+        foreach ($store->one() as $subItem) {
+            /** @var self $plugin */
+            $plugin = $subItem['service']->plugin(self::class);
+            $plugin and $tags = array_merge($tags, $plugin->getClearByTags());
+        }
+
+        foreach ($store->many() as $subItem) {
+            /** @var self $plugin */
+            $plugin = $subItem['service']->plugin(self::class);
+            $plugin and $tags = array_merge($tags, $plugin->getClearByTags());
+        }
+
+        $event->setparam('clearByTags', array_unique($tags));
+        $event->getStore()->getEventManager()->trigger('data.cache.clear', $event);
         return $this;
     }
 
@@ -116,7 +132,7 @@ class CacheInvalidator extends AbstractConfigurable
 
         foreach ($dateTimeClear as $dateTimeKey) {
 
-            $service = $event->getService();
+            $service = $event->getStore();
             $select  = $service->select([$dateTimeKey])->limit(1);
 
             $select->where(['`' . $dateTimeKey . '` > NOW()']);
@@ -167,6 +183,6 @@ class CacheInvalidator extends AbstractConfigurable
      */
     private function createTimeDeltaCacheKey(DataEvent $event, $dateTimeKey)
     {
-        return md5($event->getService()->getTableName() . __CLASS__ . $dateTimeKey);
+        return md5($event->getStore()->getTableName() . __CLASS__ . $dateTimeKey);
     }
 }

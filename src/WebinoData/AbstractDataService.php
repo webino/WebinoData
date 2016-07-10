@@ -3,6 +3,7 @@
 namespace WebinoData;
 
 use ArrayObject;
+use OutOfBoundsException;
 use WebinoData\DataSelect;
 use WebinoData\Event\DataEvent;
 use WebinoData\Exception;
@@ -69,9 +70,14 @@ abstract class AbstractDataService implements
     protected $inputFilter;
 
     /**
-     * @var array
+     * @var $this[]
      */
     protected $subServices = [];
+
+    /**
+     * @var object[]
+     */
+    protected $plugins = [];
 
     /**
      * @var bool
@@ -157,12 +163,28 @@ abstract class AbstractDataService implements
             // attach plugin
             $plugin = clone $serviceManager->get($pluginName);
             $plugin->attach($eventManager);
+            $this->plugins[$pluginName] = $plugin;
 
             empty($pluginOptions)
                 or $plugin->setOptions($pluginOptions);
         }
 
         return $this;
+    }
+
+    /**
+     * @param string|null $name
+     * @return object
+     */
+    public function plugin($name = null)
+    {
+        if (null === $name) {
+            return $this->plugins;
+        }
+        if (empty($this->plugins[$name])) {
+            return null;
+        }
+        return $this->plugins[$name];
     }
 
     /**
@@ -206,7 +228,7 @@ abstract class AbstractDataService implements
     protected function createEvent()
     {
         $event = new DataEvent;
-        $event->setService($this);
+        $event->setStore($this);
         $this->setEvent($event);
         return $event;
     }
@@ -273,9 +295,7 @@ abstract class AbstractDataService implements
     {
         if (null === $this->platform) {
             $adapter = $this->getAdapter();
-            $this->setPlatform(
-                $adapter->getPlatform()->setDriver($adapter->getDriver())
-            );
+            $this->setPlatform($adapter->getPlatform()->setDriver($adapter->getDriver()));
         }
         return $this->platform;
     }
@@ -394,14 +414,14 @@ abstract class AbstractDataService implements
     /**
      * @param string $name
      * @return $this
-     * @throws \OutOfBoundsException
+     * @throws OutOfBoundsException
      */
     protected function resolveOne($name)
     {
         if (empty($this->hasOneList[$name])) {
             if (empty($this->hasOneService[$name])) {
                 // TODO exception
-                throw new \OutOfBoundsException('Hasn\'t one ' . $name . '; ' . $this->getTableName());
+                throw new OutOfBoundsException('Hasn\'t one ' . $name . '; ' . $this->getTableName());
             } else {
                 $serviceName = $this->hasOneService[$name]['serviceName'];
                 $this->hasOneService[$name]['service'] = $this->serviceManager->get($serviceName);
@@ -413,11 +433,14 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * @param string $name
-     * @return $this
+     * @param string|null $name
+     * @return $this|$this[]
      */
-    public function one($name)
+    public function one($name = null)
     {
+        if (null === $name) {
+            return $this->getHasOneList();
+        }
         $item = $this->resolveOne($name);
         return $item['service'];
     }
@@ -434,6 +457,7 @@ abstract class AbstractDataService implements
 
     /**
      * @return array
+     * @deprecated use one()
      */
     public function getHasOneList()
     {
@@ -512,14 +536,14 @@ abstract class AbstractDataService implements
     /**
      * @param string $name
      * @return $this
-     * @throws \OutOfBoundsException
+     * @throws OutOfBoundsException
      */
     protected function resolveMany($name)
     {
         if (empty($this->hasManyList[$name])) {
             if (empty($this->hasManyService[$name])) {
                 // TODO exception
-                throw new \OutOfBoundsException('Hasn\'t many ' . $name . '; ' . $this->getTableName());
+                throw new OutOfBoundsException('Hasn\'t many ' . $name . '; ' . $this->getTableName());
             } else {
                 $serviceName = $this->hasManyService[$name]['serviceName'];
                 $this->hasManyService[$name]['service'] = $this->serviceManager->get($serviceName);
@@ -531,11 +555,14 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      * @return $this
      */
-    public function many($name)
+    public function many($name = null)
     {
+        if (null === $name) {
+            return $this->getHasManyList();
+        }
         $item = $this->resolveMany($name);
         return $item['service'];
     }
@@ -552,6 +579,7 @@ abstract class AbstractDataService implements
 
     /**
      * @return array
+     * @deprecated use many()
      */
     public function getHasManyList()
     {
@@ -638,14 +666,8 @@ abstract class AbstractDataService implements
     public function getQuery()
     {
         if (null === $this->query) {
-            $this->setQuery(
-                new DataQuery(
-                    $this->getSql(),
-                    $this->getPlatform()
-                )
-            );
+            $this->setQuery(new DataQuery($this->getSql(), $this->getPlatform()));
         }
-
         return $this->query;
     }
 
@@ -668,7 +690,6 @@ abstract class AbstractDataService implements
         $this->init();
 
         $select = new DataSelect($this, $this->getSql()->select());
-
         empty($columns) or $select->columns($columns, false);
 
         $events = $this->getEventManager();
@@ -690,7 +711,6 @@ abstract class AbstractDataService implements
         if (empty($this->config['selectset'][$name])) {
             return $select;
         }
-
         return $this->configSelect($this->config['selectset'][$name]);
     }
 
@@ -714,11 +734,13 @@ abstract class AbstractDataService implements
                 continue;
             }
 
-            $selectConfig = array_replace_recursive($selectConfig, $this->config['select'][$selectName]);
+            $selectConfig = array_replace_recursive(
+                $selectConfig,
+                $this->config['select'][$selectName]
+            );
         }
 
         $select->configure($selectConfig);
-
         return $select;
     }
 
@@ -945,7 +967,6 @@ abstract class AbstractDataService implements
 
             // post invalid validation
             if (!$inputFilter->validate($data->getArrayCopy())) {
-
                 // reset input filter
                 $this->inputFilter = null;
 
@@ -1177,6 +1198,9 @@ abstract class AbstractDataService implements
         return $this;
     }
 
+    /**
+     * Clone data store
+     */
     public function __clone()
     {
         $this->event and $this->event = clone $this->event;
