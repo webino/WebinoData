@@ -63,15 +63,15 @@ class CacheInvalidatorListener implements SharedListenerAggregateInterface
      */
     public function clearCache(DataEvent $event)
     {
-        foreach ($event->getParam('clearByTags') as $tags) {
-            /** @var Filesystem $cache */
-            foreach ($this->caches as $cache) {
-                try {
-                    $cache->clearByTags((array) $tags);
-                } catch (\Exception $exc) {
-                    // TODO logger
-                    error_log($exc);
-                }
+        $tags = $event->getParam('clearByTags');
+
+        /** @var Filesystem $cache */
+        foreach ($this->caches as $cache) {
+            try {
+                $cache->clearByTags($tags, true);
+            } catch (\Exception $exc) {
+                // TODO logger
+                error_log($exc);
             }
         }
     }

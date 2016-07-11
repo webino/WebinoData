@@ -2,7 +2,6 @@
 
 namespace WebinoData\DataPlugin;
 
-use WebinoData\DataService;
 use WebinoData\Event\DataEvent;
 use Zend\EventManager\EventManager;
 use Zend\Cache\Storage\Adapter\Filesystem as Cache;
@@ -115,7 +114,7 @@ class CacheInvalidator extends AbstractConfigurable
             $plugin and $tags = array_merge($tags, $plugin->getClearByTags());
         }
 
-        $event->setparam('clearByTags', array_unique($tags));
+        $event->setParam('clearByTags', array_unique($tags));
         $event->getStore()->getEventManager()->trigger('data.cache.clear', $event);
         return $this;
     }
