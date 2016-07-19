@@ -1178,7 +1178,7 @@ abstract class AbstractDataService implements
      * Filter inputs by data
      *
      * @param array $data
-     * @param InputFilter $inputFilter
+     * @param InputFilter|InputFilterInterface $inputFilter
      * @param bool $isUpdate
      * @return $this
      */
