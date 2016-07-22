@@ -8,13 +8,12 @@ use WebinoData\DataSelect\ArrayColumn;
 use WebinoData\Event\DataEvent;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Expression as SqlExpression;
-use Zend\Db\Sql\Predicate\In as SqlIn;
 use Zend\EventManager\EventManager;
 
 /**
  * Class Relations
  */
-class Relations
+final class Relations
 {
     /**
      * @var AdapterInterface
@@ -34,35 +33,22 @@ class Relations
      */
     public function attach(EventManager $eventManager)
     {
-        $eventManager->attach('data.exchange.pre', [$this, 'preExchange'], 500);
-        $eventManager->attach('data.exchange.invalid', [$this, 'preExchange'], 500);
-        $eventManager->attach('data.exchange.post', [$this, 'postExchange'], 500);
-        $eventManager->attach('data.fetch.pre', [$this, 'preFetch'], 500);
-        $eventManager->attach('data.fetch.post', [$this, 'postFetch'], 500);
+        $eventManager->attach('data.exchange.pre', [$this, 'exchangeOne'], 500);
+        $eventManager->attach('data.exchange.invalid', [$this, 'exchangeOne'], 500);
+        $eventManager->attach('data.exchange.post', [$this, 'exchangeMany'], 500);
+        $eventManager->attach('data.fetch.pre', [$this, 'fetch'], 500);
+        $eventManager->attach('data.fetch.post', [$this, 'fetchOne'], 500);
+        $eventManager->attach('data.fetch.post', [$this, 'fetchMany'], 500);
     }
 
     /**
+     * Prepare fetch
+     *
      * @param DataEvent $event
      */
-    public function preExchange(DataEvent $event)
+    public function fetch(DataEvent $event)
     {
-        $this->associateExchange($event);
-    }
-
-    /**
-     * @param DataEvent $event
-     */
-    public function postExchange(DataEvent $event)
-    {
-        $this->compositeExchange($event);
-    }
-
-    /**
-     * @param DataEvent $event
-     */
-    public function preFetch(DataEvent $event)
-    {
-        $service = $event->getService();
+        $service = $event->getStore();
         $select  = $event->getSelect();
         $columns = $select->getColumns();
 
@@ -102,20 +88,13 @@ class Relations
     }
 
     /**
+     * Exchange One to One
+     *
      * @param DataEvent $event
      */
-    public function postFetch(DataEvent $event)
+    public function exchangeOne(DataEvent $event)
     {
-        $this->associateFetch($event);
-        $this->compositeFetch($event);
-    }
-
-    /**
-     * @param DataEvent $event
-     */
-    protected function associateExchange(DataEvent $event)
-    {
-        $service   = $event->getService();
+        $service   = $event->getStore();
         $data      = $event->getData();
         $validData = $event->getValidData();
 
@@ -129,6 +108,7 @@ class Relations
                 continue;
             }
 
+            /** @var DataService $subService */
             $subService = $service->one($key);
             $subService->exchangeArray($value);
 
@@ -139,16 +119,18 @@ class Relations
     }
 
     /**
+     * Fetch One to One
+     *
      * @param DataEvent $event
      */
-    protected function associateFetch(DataEvent $event)
+    public function fetchOne(DataEvent $event)
     {
         $rows = $event->getRows();
         if (0 === $rows->count()) {
             return;
         }
 
-        $service  = $event->getService();
+        $service  = $event->getStore();
         $select   = $event->getSelect();
         $columns  = $select->getColumns();
         $attached = [];
@@ -186,11 +168,13 @@ class Relations
                 continue;
             }
 
+            /** @var DataSelect $subSelect */
             $subSelect  = clone $select->subSelect($key);
+            /** @var DataService $subService */
             $subService = $service->one($key);
             $tableName  = $subService->getTableName();
 
-            $subSelect->where(new SqlIn($tableName . '.id', $subIds));
+            $subSelect->where([$tableName . '.id' => $subIds]);
             $subItems = $subService->fetchWith($subSelect);
 
             foreach ($rows as &$row) {
@@ -202,11 +186,13 @@ class Relations
     }
 
     /**
+     * Exchange One/Many to Many
+     *
      * @param DataEvent $event
      */
-    protected function compositeExchange(DataEvent $event)
+    public function exchangeMany(DataEvent $event)
     {
-        $service   = $event->getService();
+        $service   = $event->getStore();
         $tableName = $service->getTableName();
         $data      = $event->getData();
         $mainId    = !empty($data['id']) ? $data['id'] : $service->getLastInsertValue();
@@ -236,7 +222,6 @@ class Relations
                         ? !$options['oneToMany']
                         : true;
 
-            // delete association
             $this->assocDelete(
                 $service,
                 $subService,
@@ -282,16 +267,18 @@ class Relations
     }
 
     /**
+     * Fetch One/Many to Many
+     *
      * @param DataEvent $event
      */
-    protected function compositeFetch(DataEvent $event)
+    public function fetchMany(DataEvent $event)
     {
         $rows = $event->getRows();
         if (0 === $rows->count()) {
             return;
         }
 
-        $service  = $event->getService();
+        $service  = $event->getStore();
         $select   = $event->getSelect();
         $columns  = $select->getColumns();
         $attached = [];
@@ -322,6 +309,7 @@ class Relations
 
         foreach ($attached as $key => $options) {
 
+            /** @var DataSelect $subSelect */
             $subSelect  = clone $select->subSelect($key);
             $subService = $service->many($key);
             // TODO, for BC only (remove deprecated)
@@ -339,10 +327,11 @@ class Relations
             }
 
             $mainKey = $this->resolveSubKey($tableName, $options) . $keySuffix;
-            $subSelect->where(new SqlIn($mainKey, $mainIds));
+            $subSelect->where([$mainKey => $mainIds]);
 
             $limit = $subSelect->getLimit();
             $subSelect->reset('limit');
+
             $subItems = $subService->fetchWith($subSelect, $select->subParams($key));
 
             foreach ($rows as &$row) {
@@ -376,7 +365,7 @@ class Relations
      * @param array $options
      * @param array $subOptions
      */
-    protected function assocInsert(
+    private function assocInsert(
         DataService $service,
         DataService $subService,
         $mainId,
@@ -419,7 +408,7 @@ class Relations
      * @param array $idsExclude
      * @param $manyToMany
      */
-    protected function assocDelete(
+    private function assocDelete(
         DataService $service,
         DataService $subService,
         $mainId,
@@ -460,7 +449,7 @@ class Relations
      * @param DataService $subService
      * @param array $options
      */
-    protected function assocJoin($select, DataService $service, DataService $subService, array $options)
+    private function assocJoin($select, DataService $service, DataService $subService, array $options)
     {
         // todo DRY
         $tableName      = $service->getTableName();
@@ -478,7 +467,7 @@ class Relations
      * @param array $options
      * @return mixed
      */
-    protected function resolveSubKey($tableName, array $options)
+    private function resolveSubKey($tableName, array $options)
     {
         return !empty($options['key']) ? $options['key'] : $tableName;
     }
@@ -489,7 +478,7 @@ class Relations
      * @param array $options
      * @return string
      */
-    protected function resolveAssocTableName($tableName, $subTableName, array $options)
+    private function resolveAssocTableName($tableName, $subTableName, array $options)
     {
         return !empty($options['tableName']) ? $options['tableName'] : $tableName . '_' . $subTableName;
     }
@@ -500,7 +489,7 @@ class Relations
      * @param array $options
      * @return bool
      */
-    protected function relationsDisabled(array $options)
+    private function relationsDisabled(array $options)
     {
         return array_key_exists('relations', $options) && false === $options['relations'];
     }
