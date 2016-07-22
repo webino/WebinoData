@@ -15,17 +15,16 @@ class AutoValue
      */
     public function attach(EventManager $eventManager)
     {
-        $eventManager->attach('data.exchange.invalid', [$this, 'invalidExchange']);
+        $eventManager->attach('data.exchange.pre', [$this, 'preExchange'], 300);
     }
 
     /**
      * @param DataEvent $event
-     * @return void
      */
-    public function invalidExchange(DataEvent $event)
+    public function preExchange(DataEvent $event)
     {
         $data    = $event->getData();
-        $service = $event->getService();
+        $service = $event->getStore();
         $config  = $service->getConfig();
 
         $autoInputs = array_filter(
@@ -40,15 +39,18 @@ class AutoValue
 
                 foreach ($data[$source] as $index => $value ) {
 
-                    !empty($data[$target][$index]) || empty($value)
+                    (!empty($data[$target][$index]) || empty($value))
+                    && empty($autoInputs[$target]['auto_value_force'])
                         or $data[$target] = $data[$source];
                 }
 
                 continue;
             }
 
-            !empty($data[$target]) || empty($data[$source])
+            (!empty($data[$target]) || empty($data[$source]))
+            && empty($autoInputs[$target]['auto_value_force'])
                 or $data[$target] = $data[$source];
+                $data[$target] = $data[$source];
         }
     }
 }

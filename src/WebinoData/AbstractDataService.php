@@ -332,7 +332,7 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * @return InputFilterInterface
+     * @return InputFilterInterface|\WebinoData\InputFilter\InputFilter
      */
     public function getInputFilter()
     {
@@ -957,31 +957,51 @@ abstract class AbstractDataService implements
 
         $this->filterInputFilter($array, $inputFilter, $event->isUpdate());
 
-        $inputFilter->getValidInput()
-            or $inputFilter->validate($data->getArrayCopy());
-
         $events = $this->getEventManager();
 
-        if ($inputFilter->getInvalidInput()) {
-            $events->trigger(DataEvent::EVENT_EXCHANGE_INVALID, $event);
+        $events->attach(
+            DataEvent::EVENT_EXCHANGE_PRE,
+            function () use ($data, $inputFilter) {
 
-            // post invalid validation
-            if (!$inputFilter->validate($data->getArrayCopy())) {
-                // reset input filter
-                $this->inputFilter = null;
+                $inputFilter->getValidInput()
+                    or $inputFilter->validate($data->getArrayCopy());
+            },
+            250
+        );
 
-                throw new Exception\RuntimeException(
-                    sprintf(
-                        'Expected valid data: %s %s',
-                        print_r($inputFilter->getMessages(), true),
-                        print_r($data, true)
-                    )
-                );
-            }
-        }
+        $events->attach(
+            DataEvent::EVENT_EXCHANGE_PRE,
+            function (DataEvent $event) use ($data, $inputFilter, $events) {
+                if ($inputFilter->getInvalidInput()) {
+                    $events->trigger(DataEvent::EVENT_EXCHANGE_INVALID, $event);
 
-        $validData = new ArrayObject($inputFilter->getValues());
-        $event->setValidData($validData);
+                    // post invalid validation
+                    if (!$inputFilter->validate($data->getArrayCopy())) {
+                        // reset input filter
+                        $this->inputFilter = null;
+
+                        throw new Exception\RuntimeException(
+                            sprintf(
+                                'Expected valid data: %s %s',
+                                print_r($inputFilter->getMessages(), true),
+                                print_r($data, true)
+                            )
+                        );
+                    }
+                }
+            },
+            200
+        );
+
+        $validData = new ArrayObject;
+        $events->attach(
+            DataEvent::EVENT_EXCHANGE_PRE,
+            function (DataEvent $event) use ($validData, $inputFilter) {
+                $validData->exchangeArray($inputFilter->getValues());
+                $event->setValidData($validData);
+            },
+            100
+        );
 
         $events->trigger(DataEvent::EVENT_EXCHANGE_PRE, $event);
         $validDataArray = $validData->getArrayCopy();
