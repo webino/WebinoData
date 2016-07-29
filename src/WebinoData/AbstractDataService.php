@@ -196,6 +196,21 @@ abstract class AbstractDataService implements
     }
 
     /**
+     * @return int
+     * @TODO support others platforms than MySQL only
+     */
+    public function getNextAutoIncrement()
+    {
+        $sql = sprintf(
+            'SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES '
+            . 'WHERE TABLE_SCHEMA = (SELECT DATABASE()) AND TABLE_NAME = \'%s\'',
+            $this->getTableName()
+        );
+
+        return (int) current($this->executeQuery($sql)->current());
+    }
+
+    /**
      * @return string
      */
     public function getTableName()
@@ -861,21 +876,22 @@ abstract class AbstractDataService implements
      * @param Sql\Where|\Closure|string|array $where
      * @return int
      */
-    public function delete($where)
+    public function delete($where = null)
     {
         $this->init();
 
         $events = $this->getEventManager();
         $event  = $this->getEvent();
 
-        $event->setArguments([$where]);
+        $_where = $where ? $where : 1;
+        $event->setArguments([$_where]);
         $events->trigger(DataEvent::EVENT_DELETE, $event);
 
         if ($event->propagationIsStopped()) {
             return 0;
         }
 
-        $affectedRows = $this->tableGateway->delete($where);
+        $affectedRows = $this->tableGateway->delete($_where);
         $event->setAffectedRows($affectedRows);
         $events->trigger(DataEvent::EVENT_DELETE_POST, $event);
         return $affectedRows;
