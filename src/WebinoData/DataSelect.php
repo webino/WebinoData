@@ -398,8 +398,12 @@ class DataSelect
      */
     private function replaceVarsInternal(&$str)
     {
+        // TODO remove, {$tableName} deprecated, use {$this}
         if (false !== strpos($str, '{$tableName}')) {
             $str = str_replace('{$tableName}', $this->service->getTableName(), $str);
+        }
+        if (false !== strpos($str, '{$this}')) {
+            $str = str_replace('{$this}', $this->service->getTableName(), $str);
         }
         return $this;
     }
