@@ -433,13 +433,13 @@ class DataSelect
     public function where($predicate, $combination = PredicateSet::OP_AND)
     {
         is_object($predicate)
-            or $predicate = new ArrayObject($predicate);
+            or $predicate = new ArrayObject((array) $predicate);
 
         $event = $this->service->getEvent();
 
         $event
             ->setSelect($this)
-            ->setService($this->service)
+            ->setStore($this->service)
             ->setParam('predicate', $predicate)
             ->setParam('combination', $combination);
 
@@ -578,8 +578,8 @@ class DataSelect
             return '(' . join(' ' . PredicateSet::OP_OR . ' ', $columns->getArrayCopy()) . ')';
         };
 
-        count($where)  and $this->sqlSelect->where($predicate($where), $combination);
-        count($having) and $this->sqlSelect->having($predicate($having), $combination);
+        count($where)  and $this->where($predicate($where), $combination);
+        count($having) and $this->having($predicate($having), $combination);
 
         return $this;
     }
