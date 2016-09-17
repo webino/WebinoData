@@ -50,7 +50,6 @@ class AutoValue
             (!empty($data[$target]) || empty($data[$source]))
             && empty($autoInputs[$target]['auto_value_force'])
                 or $data[$target] = $data[$source];
-                $data[$target] = $data[$source];
         }
     }
 }
