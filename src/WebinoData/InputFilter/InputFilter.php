@@ -34,6 +34,7 @@ class InputFilter extends ZendInputFilter
     {
         // prepare input filter
         foreach ($this->getInputs() as $input) {
+
             if ($input instanceof BaseInputFilter) {
                 foreach ($input->getInputs() as $subInput) {
                     $this->prepareInputValidators($subInput, $data);
@@ -45,6 +46,11 @@ class InputFilter extends ZendInputFilter
             }
 
             $this->prepareInputValidators($input, $data);
+
+            // clear fallback value
+            if (false === $input->getFallbackValue()) {
+                $input->clearFallbackValue();
+            }
         }
 
         $this->setData($data);
