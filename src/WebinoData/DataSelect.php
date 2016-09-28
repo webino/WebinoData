@@ -535,13 +535,13 @@ class DataSelect
             return $this;
         }
 
-        $term     = $this->sanitizeSearchTerm($term);
+        $_term    = $this->sanitizeSearchTerm($term);
         $platform = $this->service->getPlatform();
         $where    = new ArrayObject;
         $having   = new ArrayObject;
         $joinCols = $this->resolveJoinColumns();
 
-        foreach (explode(' ', $term) as $word) {
+        foreach ($this->resolveSearchTermParts($term, $_term) as $word) {
             if (empty($word) && !is_numeric($word)) {
                 continue;
             }
@@ -571,7 +571,7 @@ class DataSelect
 
         foreach ($columns as $column) {
             isset($this->search[$column])  or $this->search[$column] = [];
-            in_array($term, $this->search) or $this->search[$column][] = $term;
+            in_array($_term, $this->search) or $this->search[$column][] = $_term;
         }
 
         $predicate = function (ArrayObject $columns) {
@@ -617,12 +617,28 @@ class DataSelect
     }
 
     // todo decouple
+    private function resolveSearchTermParts($term, $_term)
+    {
+        if ('"' === $term[0]
+            && '"' === $term[mb_strlen($term, 'utf-8') - 1]
+        ) {
+            // exact term
+            return [trim($_term, '"')];
+        }
+
+        return explode(' ', $_term);
+    }
+
+    // todo decouple
     private function sanitizeSearchTerm($term, $replacement = ' ')
     {
-        // todo trigger event instead
-        $this->fixDateSearch($term);
+        $_term = trim($term);
+        if (is_numeric($_term)) {
+            return $_term;
+        }
 
-        return preg_replace('~[^a-zA-Z0-9_-]+~', $replacement, $term);
+        $this->fixDateSearch($_term); // TODO pluggable
+        return preg_replace('~[^a-zA-Z0-9_-]+~', $replacement, $_term);
     }
 
     /**
