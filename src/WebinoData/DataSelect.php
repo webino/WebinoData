@@ -111,6 +111,14 @@ class DataSelect
     /**
      * @return array
      */
+    public function getGroup()
+    {
+        return $this->sqlSelect->getRawState('group');
+    }
+
+    /**
+     * @return array
+     */
     public function getOrder()
     {
         return $this->sqlSelect->getRawState('order');
