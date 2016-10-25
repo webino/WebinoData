@@ -1146,7 +1146,7 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * @return \Zend\Db\Adapter\AdapterInterface
+     * @return \Zend\Db\Adapter\AdapterInterface|\Zend\Db\Adapter\Adapter
      */
     public function getAdapter()
     {

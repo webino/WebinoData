@@ -84,12 +84,12 @@ class AbstractWebinoDataSelect extends DbSelect
         $select->reset(Select::ORDER);
 
         $group = $select->getRawState('group');
-        $expr  = empty($group) ? 'COUNT(*)' : 'COUNT(DISTINCT ' . current($group) . ')';
+        $expr  = !empty($group) && is_string($group) ? 'COUNT(DISTINCT ' . current($group) . ')' : 'COUNT(*)';
 
         $select->columns(['c' => new Expression($expr)]);
 
         $sql = $this->sql->buildSqlString($select);
-        $statement = $this->sql->getAdapter()->createStatement($sql);
+        $statement = $this->service->getAdapter()->createStatement($sql);
 
         try {
             $result = $statement->execute();
