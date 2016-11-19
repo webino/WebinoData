@@ -178,7 +178,7 @@ class DataSelect
      */
     public function hash()
     {
-        return md5((string) $this . serialize($this->subParams) . $this->hash);
+        return md5((string) $this . serialize($this->subParams) . serialize($this->flags) . $this->hash);
     }
 
     /**
@@ -928,7 +928,7 @@ class DataSelect
                 return $this->sqlSelect->having;
             default:
                 // TODO exception
-                throw new \InvalidArgumentException('Not a valid magic property for this object');
+                throw new \InvalidArgumentException('Not a valid magic property `' . $name . '`` for this object');
         }
     }
 

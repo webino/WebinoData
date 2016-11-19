@@ -90,7 +90,7 @@ class DataService extends AbstractDataService
 
         $event->setSelect($select);
         $event->setRows($items);
-        $events->trigger(DataEvent::EVENT_FETCH_CACHE, $event);
+        $events->trigger(Event\DataEvent::EVENT_FETCH_CACHE, $event);
 
         if (!$items->count()) {
             $items = parent::fetchWith($select, $parameters);
