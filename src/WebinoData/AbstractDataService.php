@@ -1040,9 +1040,10 @@ abstract class AbstractDataService implements
             } catch (\Exception $exc) {
                 throw new Exception\RuntimeException(
                         sprintf(
-                            'Statement could not be executed for the service table `%s`',
-                            $this->getTableName()
-                        ) . '; ' . ($exc->getPrevious() ? $exc->getPrevious()->getMessage() : $exc->getMessage()),
+                            'Statement could not be executed for the service table `%s`; %s',
+                            $this->getTableName(),
+                            $exc->getPrevious() ? $exc->getPrevious()->getMessage() : $exc->getMessage()
+                        ),
                         $exc->getCode(),
                         $exc
                 );
