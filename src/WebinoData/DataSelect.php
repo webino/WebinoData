@@ -940,8 +940,11 @@ class DataSelect
         try {
             return $this->getSqlString();
         } catch (\Exception $exc) {
-            return $exc;
+            // TODO use logger
+            error_log($exc);
         }
+
+        return '';
     }
 
     /**
