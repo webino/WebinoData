@@ -30,11 +30,11 @@ class DateTimeStamp
         $data = $event->getValidData();
 
         // resolve inputs
-        $service = $event->getService();
+        $service = $event->getStore();
         $config  = $service->getConfig();
         unset($config['input_filter']['type']);
 
-        $dateTimeFormatter = new DateTimeFormatter;
+        $dateTimeFormatter = new DateTimeFormatter(['format' => 'Y-m-d H:i:s']);
         $dateTime = $dateTimeFormatter->filter('now');
         $inputs   = array_column(array_filter($config['input_filter']), 'name', 'name');
 
