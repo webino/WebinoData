@@ -3,7 +3,7 @@
  * Webino (http://webino.sk)
  *
  * @link        https://github.com/webino/WebinoData for the canonical source repository
- * @copyright   Copyright (c) 2012-2014 Webino, s. r. o. (http://webino.sk)
+ * @copyright   Copyright (c) 2012-2017 Webino, s. r. o. (http://webino.sk)
  * @author      Peter Bačinský <peter@bacinsky.sk>
  * @license     BSD-3-Clause
  */
@@ -35,7 +35,7 @@ abstract class AbstractInput implements InputInterface
 
     /**
      * @param string $name
-     * @return self
+     * @return $this
      */
     protected function setName($name)
     {
@@ -45,12 +45,34 @@ abstract class AbstractInput implements InputInterface
 
     /**
      * @param array $filters
-     * @return AbstractInput
+     * @return $this
      */
     public function setFilters(array $filters)
     {
-        foreach ($filters as $key => $filter) {
-            $this->spec['filters'][is_string($key) ? $key : (string) $filter] = ['name' => (string) $filter];
+        $this->setSubOptions('filters', $filters);
+        return $this;
+    }
+
+    /**
+     * @param array $validators
+     * @return $this
+     */
+    public function setValidators(array $validators)
+    {
+        $this->setSubOptions('validators', $validators);
+        return $this;
+    }
+
+    /**
+     * @param string $section
+     * @param array $options
+     * @return $this
+     */
+    protected function setSubOptions($section, array $options)
+    {
+        foreach ($options as $key => $option) {
+            $index = is_string($key) ? $key : (string) $option;
+            $this->spec[$section][$index] = is_array($option) ? $option : ['name' => (string) $option];
         }
         return $this;
     }
