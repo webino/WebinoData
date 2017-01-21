@@ -2,6 +2,7 @@
 
 namespace WebinoData\DataPlugin;
 
+use LogicException;
 use WebinoData\Event\DataEvent;
 use Zend\EventManager\EventManager;
 
@@ -35,6 +36,10 @@ class AutoValue
         );
 
         foreach (array_column($autoInputs, 'auto_value', 'name') as $target => $source) {
+            if (empty($data[$source])) {
+                // TODO exception
+                throw new LogicException('Missing auto value data;' . var_export($data[$source], true));
+            }
             if (is_array($data[$source])) {
 
                 foreach ($data[$source] as $index => $value ) {
