@@ -23,4 +23,9 @@ return [
             ],
         ],
     ],
+    'filters' => [
+        'invokables' => [
+            'DateTimeFormatter' => Filter\DateTimeFormatter::class,
+        ]
+    ],
 ];

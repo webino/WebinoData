@@ -4,8 +4,8 @@ namespace WebinoData\DataPlugin;
 
 use ArrayAccess;
 use WebinoData\Event\DataEvent;
+use WebinoData\Filter\DateTimeFormatter;
 use Zend\EventManager\EventManager;
-use Zend\Filter\DateTimeFormatter;
 
 /**
  * Class DateTimeStamp
@@ -34,7 +34,7 @@ class DateTimeStamp
         $config  = $service->getConfig();
         unset($config['input_filter']['type']);
 
-        $dateTimeFormatter = new DateTimeFormatter(['format' => 'Y-m-d H:i:s']);
+        $dateTimeFormatter = new DateTimeFormatter;
         $dateTime = $dateTimeFormatter->filter('now');
         $inputs   = array_column(array_filter($config['input_filter']), 'name', 'name');
 
