@@ -5,6 +5,7 @@ namespace WebinoData\DataPlugin;
 use WebinoData\DataSelect;
 use WebinoData\DataService;
 use WebinoData\DataSelect\ArrayColumn;
+use WebinoData\Exception;
 use WebinoData\Event\DataEvent;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Expression as SqlExpression;
@@ -270,6 +271,7 @@ final class Relations
      * Fetch One/Many to Many
      *
      * @param DataEvent $event
+     * @throws Exception\RelationException|\Exception
      */
     public function fetchMany(DataEvent $event)
     {
@@ -316,9 +318,11 @@ final class Relations
             $keySuffix  = '_id';
 
             // decide relation
-            $subKey = $this->resolveSubKey($tableName, $options);
-            if ($subService->hasMany($subKey)) {
-                // bidirectional
+            $subKey   = $this->resolveSubKey($tableName, $options);
+            $biDirect = $subService->hasMany($subKey);
+
+            if ($biDirect) {
+                // bi-directional
                 // TODO, for BC only (remove deprecated)
                 $keySuffix  = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
                 $subOptions = $subService->manyOptions($subKey);
@@ -332,7 +336,17 @@ final class Relations
             $limit = $subSelect->getLimit();
             $subSelect->reset('limit');
 
-            $subItems = $subService->fetchWith($subSelect, $select->subParams($key));
+            try {
+                $subItems = $subService->fetchWith($subSelect, $select->subParams($key));
+            } catch (\Exception $exc) {
+                if ($biDirect) {
+                    throw $exc;
+                }
+
+                throw new Exception\RelationException(
+                    sprintf('`%s` has not `%s`', $subService->getTableName(), $subKey)
+                );
+            }
 
             foreach ($rows as &$row) {
                 is_array($row[$key]) or $row[$key] = [];
