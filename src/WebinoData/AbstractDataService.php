@@ -84,6 +84,15 @@ abstract class AbstractDataService implements
      */
     protected $initialized = false;
 
+    /**
+     * @var array
+     */
+    private $validValues = [];
+
+    /**
+     * @var array
+     */
+    private $inputMessages = [];
 
     //todo
     protected $query;
@@ -102,14 +111,6 @@ abstract class AbstractDataService implements
     {
         $this->tableGateway = $tableGateway;
         $this->config       = $config;
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfig()
-    {
-        return $this->config;
     }
 
     /**
@@ -190,6 +191,46 @@ abstract class AbstractDataService implements
             return null;
         }
         return $this->plugins[$name];
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Returns valid input names
+     *
+     * @return array
+     */
+    public function getInputs()
+    {
+        if (empty($this->config['input_filter'])) {
+            return [];
+        }
+
+        $spec = $this->config['input_filter'];
+        unset($spec['type']);
+        return array_column($spec, 'name', 'name');
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidValues()
+    {
+        return $this->validValues;
+    }
+
+    /**
+     * @return array|\string[]
+     */
+    public function getInputMessages()
+    {
+        return $this->inputMessages;
     }
 
     /**
@@ -940,6 +981,8 @@ abstract class AbstractDataService implements
      */
     public function exchangeArray(array $array)
     {
+        $this->resetInputState();
+
         if (empty($array)) {
             // TODO exception
             throw new \InvalidArgumentException('Expected data but empty');
@@ -976,7 +1019,8 @@ abstract class AbstractDataService implements
         $event->setData($data);
         $inputFilter = $this->getInputFilter();
 
-        $this->filterInputFilter($array, $inputFilter, $event->isUpdate());
+        $event->isUpdate()
+            and $this->filterInputFilter($array, $inputFilter);
 
         $events = $this->getEventManager();
 
@@ -998,8 +1042,7 @@ abstract class AbstractDataService implements
 
                     // post invalid validation
                     if (!$inputFilter->validate($data->getArrayCopy())) {
-                        // reset input filter
-                        $this->inputFilter = null;
+                        $this->resetInputFilter();
 
                         throw new Exception\RuntimeException(
                             sprintf(
@@ -1038,6 +1081,7 @@ abstract class AbstractDataService implements
                               : $this->tableGateway->insert($validDataArray);
 
             } catch (\Exception $exc) {
+                // TODO exception
                 throw new Exception\RuntimeException(
                         sprintf(
                             'Statement could not be executed for the service table `%s`; %s',
@@ -1050,12 +1094,11 @@ abstract class AbstractDataService implements
             }
         }
 
+        $this->resetInputFilter();
+
         // make sure we have an id
         isset($data['id']) && is_numeric($data['id'])
             or $data['id'] = $this->tableGateway->getLastInsertValue();
-
-        // reset input filter
-        $this->inputFilter = null;
 
         // trigger event
         $event->setAffectedRows($affectedRows);
@@ -1221,21 +1264,50 @@ abstract class AbstractDataService implements
      *
      * @param array $data
      * @param InputFilter|InputFilterInterface $inputFilter
-     * @param bool $isUpdate
      * @return $this
      */
-    public function filterInputFilter(array $data, InputFilter $inputFilter, $isUpdate)
+    public function filterInputFilter(array $data, InputFilterInterface $inputFilter)
     {
-        if (!$isUpdate) {
-            return $this;
-        }
-
         foreach ($inputFilter->getInputs() as $input) {
             $inputName = $input->getName();
 
             array_key_exists($inputName, $data)
                 or $inputFilter->remove($inputName);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param InputFilterInterface $inputFilter
+     * @return $this
+     */
+    public function mergeInputFilter(InputFilterInterface $inputFilter)
+    {
+        $this->filterInputFilter($this->getInputs(), $inputFilter);
+        $this->getInputFilter()->merge($inputFilter);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    private function resetInputState()
+    {
+        $this->validValues   = [];
+        $this->inputMessages = [];
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    private function resetInputFilter()
+    {
+        $this->validValues   = $this->inputFilter->getValues();
+        $this->inputMessages = $this->inputFilter->getMessages();
+        $this->inputFilter   = null;
 
         return $this;
     }
