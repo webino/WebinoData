@@ -3,7 +3,7 @@
  * Webino (http://webino.sk)
  *
  * @link        https://github.com/webino/WebinoData for the canonical source repository
- * @copyright   Copyright (c) 2012-2016 Webino, s. r. o. (http://webino.sk)
+ * @copyright   Copyright (c) 2012-2017 Webino, s. r. o. (http://webino.sk)
  * @author      Peter Bačinský <peter@bacinsky.sk>
  * @license     BSD-3-Clause
  */
@@ -22,8 +22,8 @@ class Text extends Common
         'required' => false,
         'validators' => [
             'length' => [
-                'name'    => 'StringLength',
-                'options' => ['min' => 0, 'max' => 0],
+                'name' => 'StringLength',
+                'options' => ['min' => null, 'max' => null],
             ],
         ],
         'filters' => [
