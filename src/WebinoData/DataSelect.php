@@ -493,13 +493,13 @@ class DataSelect
     public function subSelect($name, self $select = null)
     {
         if (null === $select) {
-            if (empty($this->subSelects[$name])) {
-                return null;
-            }
-            return $this->subSelects[$name];
+            return !empty($this->subSelects[$name]) ? $this->subSelects[$name] : null;
         }
 
-        $this->subSelects[$name] = $select;
+        $subSelect = clone $select;
+        $subSelect->setHash($this->hash());
+        $this->subSelects[$name] = $subSelect;
+
         return $this;
     }
 
@@ -516,6 +516,7 @@ class DataSelect
 
         isset($this->subParams[$name]) or $this->subParams[$name] = [];
         $this->subParams[$name] = array_replace($this->subParams[$name], $params);
+
         return $this;
     }
 
