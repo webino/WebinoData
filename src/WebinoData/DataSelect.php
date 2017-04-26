@@ -245,7 +245,7 @@ class DataSelect
         // manipulate columns
         foreach ($columns as $key => &$idColumn) {
 
-            // fix an array column to be stringable
+            // fix an array column to be string-able
             if (is_array($idColumn)) {
                 $idColumn = new ArrayColumn($idColumn);
                 continue;
@@ -253,7 +253,7 @@ class DataSelect
 
             // store subSelects
             if ($idColumn instanceof self) {
-                $this->subselect($key, $idColumn);
+                $this->subSelect($key, $idColumn);
                 continue;
             }
 
@@ -496,7 +496,7 @@ class DataSelect
             return !empty($this->subSelects[$name]) ? $this->subSelects[$name] : null;
         }
 
-        $subSelect = clone $select;
+        $subSelect = $select;
         $subSelect->setHash($this->hash());
         $this->subSelects[$name] = $subSelect;
 
