@@ -157,7 +157,7 @@ final class Relations
         }
 
         foreach ($attached as $key => $options) {
-            $idKey  = $subKey = $this->resolveSubKey($key, $options) . '_id';
+            $idKey  = $this->resolveSubKey($key, $options) . '_id';
             $subIds = [];
 
             foreach ($rows as &$row) {
