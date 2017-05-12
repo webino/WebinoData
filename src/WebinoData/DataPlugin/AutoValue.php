@@ -47,7 +47,7 @@ class AutoValue
 
                     (!empty($data[$target][$index]) || empty($value))
                     && empty($autoInputs[$target]['auto_value_force'])
-                        or $data[$target] = $data[$source];
+                        or $data[$target][$index] = $value;
                 }
 
                 continue;
