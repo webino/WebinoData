@@ -362,12 +362,45 @@ class DataSelect
      */
     public function order($order)
     {
-        if (is_string($order) && strpos($order, '(')) {
-            $order = new Expression($order);
+        $platform = $this->service->getPlatform();
+        $cols     = $this->getColumns();
+        $trick    = 'CAST(%s as UNSIGNED)';
+
+        $_order = [];
+        foreach ((array) $order as $value) {
+
+            // handle function expression
+            if (strpos($value, '(')) {
+                $_order[] = $value;
+                continue;
+            }
+
+            // handle column without order type
+            if (false === strpos($value, ' ')) {
+                $_order[] = sprintf($trick, $platform->quoteIdentifierChain(explode('.', $value)));
+                continue;
+            }
+
+            list($col, $type) = explode(' ', $value);
+
+            // handle expression column
+            if (!empty($cols[$col]) && $cols[$col] instanceof Expression) {
+                /** @var Expression $expr */
+                $expr = $cols[$col];
+                if (strpos($expr->getExpression(), '(')) {
+                    $_order[] = $platform->quoteIdentifierChain(explode('.', $col));
+                    continue;
+                }
+            }
+
+            // natural sorting workaround
+            $_order[] = sprintf($trick, $platform->quoteIdentifierChain(explode('.', $col))) . ' ' . $type;
         }
 
+        $order = join(', ', $_order);
         $this->replaceVars($order);
-        $this->sqlSelect->order($order);
+        $this->sqlSelect->order(new Expression($order));
+
         return $this;
     }
 
