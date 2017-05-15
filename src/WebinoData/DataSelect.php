@@ -357,7 +357,7 @@ class DataSelect
     }
 
     /**
-     * @param string $order
+     * @param string|array $order
      * @return $this
      */
     public function order($order)
@@ -367,7 +367,9 @@ class DataSelect
         $trick    = 'CAST(%s as UNSIGNED)';
 
         $_order = [];
-        foreach ((array) $order as $value) {
+        $parts  = is_array($order) ? $order : explode(',', $order);
+        foreach ($parts as $value) {
+            $value = trim($value);
 
             // handle function expression
             if (strpos($value, '(')) {
