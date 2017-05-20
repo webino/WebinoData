@@ -58,6 +58,27 @@ class DataService extends AbstractDataService
     }
 
     /**
+     * @return array
+     */
+    public function getCacheTagsForAll()
+    {
+        $cacheTags = [];
+        foreach ($this->one() as $one) {
+            /** @var self $store */
+            $store = $one['service'];
+            $cacheTags = array_merge($cacheTags, $store->getCacheTags());
+        }
+
+        foreach ($this->many() as $many) {
+            /** @var self $store */
+            $store = $many['service'];
+            $cacheTags = array_merge($cacheTags, $store->getCacheTags());
+        }
+
+        return array_unique($cacheTags);
+    }
+
+    /**
      * @param array $tags
      * @return $this
      */
