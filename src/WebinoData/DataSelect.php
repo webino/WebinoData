@@ -379,7 +379,9 @@ class DataSelect
 
             // handle column without order type
             if (false === strpos($value, ' ')) {
-                $_order[] = sprintf($trick, $platform->quoteIdentifierChain(explode('.', $value)));
+                $key = $platform->quoteIdentifierChain(explode('.', $value));
+                $_order[] = sprintf($trick, $key);
+                $_order[] = $key;
                 continue;
             }
 
@@ -396,7 +398,9 @@ class DataSelect
             }
 
             // natural sorting workaround
-            $_order[] = sprintf($trick, $platform->quoteIdentifierChain(explode('.', $col))) . ' ' . $type;
+            $key = $platform->quoteIdentifierChain(explode('.', $col));
+            $_order[] = sprintf($trick, $key) . ' ' . $type;
+            $_order[] = $key . ' ' . $type;
         }
 
         $order = join(', ', $_order);
