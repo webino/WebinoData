@@ -5,12 +5,12 @@ namespace WebinoData\DataPlugin;
 use WebinoData\Event\DataEvent;
 use Zend\EventManager\EventManager;
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\Sql\Expression as SqlExpression;
+use Zend\Db\Sql\Expression;
 
 /**
  * Class Order
  */
-class Order
+class Order implements OrderInterface
 {
     /**
      * @var AdapterInterface
@@ -31,8 +31,7 @@ class Order
     public function attach(EventManager $eventManager)
     {
         $eventManager->attach('data.exchange.pre', [$this, 'preExchange']);
-        // TODO delete
-        //$eventManager->attach('data.delete', array($this, 'delete'));
+        //$eventManager->attach('data.delete', [$this, 'delete']); // TODO delete
     }
 
     /**
@@ -48,7 +47,7 @@ class Order
             return;
         }
 
-        $service = $event->getService();
+        $service = $event->getStore();
 
         if (empty($data['order'])) {
             // as last item
@@ -62,7 +61,7 @@ class Order
 
         // update others
         $update = $service->getSql()->update()
-            ->set(['order' => new SqlExpression('`order`+1')]);
+            ->set(['order' => new Expression('`order`+1')]);
 
         $update->where->greaterThanOrEqualTo('order', $data['order']);
         $this->adapter->query($update->getSqlString($service->getPlatform()), 'execute');
