@@ -112,9 +112,11 @@ final class Relations
 
             /** @var DataService $subService */
             $subService = $store->one($key);
+            $idKey      = $this->resolveSubKey($key, $options) . '_id';
+
+            empty($data[$idKey]) or $value['id'] = $data[$idKey];
             $subService->exchangeArray($value);
 
-            $idKey = $this->resolveSubKey($key, $options) . '_id';
             $data[$idKey] = !empty($value['id']) ? $value['id'] : $subService->getLastInsertValue();
             $validData[$idKey] = $data[$idKey];
         }
