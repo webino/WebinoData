@@ -763,12 +763,24 @@ abstract class AbstractDataService implements
     }
 
     /**
+     * @TODO remove, deprecated
+     * @deprecated use configSelects()
      * @param string $name
      * @return DataSelect
      */
     public function configSelectset($name)
     {
+        return $this->configSelects($name);
+    }
+
+    /**
+     * @param string $name
+     * @return \WebinoData\DataSelect
+     */
+    public function configSelects($name)
+    {
         $select = $this->select();
+        // TODO use selects key instead of selectset
         if (empty($this->config['selectset'][$name])) {
             return $select;
         }
