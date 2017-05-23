@@ -9,6 +9,7 @@ use WebinoData\Event\DataEvent;
 use WebinoData\Exception;
 use WebinoData\InputFilter\InputFilter;
 use WebinoData\InputFilter\InputFilterFactoryAwareInterface;
+use WebinoData\Store\StoreAwareInterface;
 use Zend\Db\Adapter\Platform\PlatformInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
@@ -173,23 +174,40 @@ abstract class AbstractDataService implements
 
             empty($pluginOptions)
                 or $plugin->setOptions($pluginOptions);
+
+            ($plugin instanceof StoreAwareInterface)
+                and $plugin->setStore($this);
         }
 
         return $this;
     }
 
     /**
+     * @TODO remove, deprecated
+     * @deprecated use getPlugin()
      * @param string|null $name
      * @return object
      */
     public function plugin($name = null)
     {
+        return $this->getPlugin($name);
+    }
+
+    /**
+     * @param string|null $name
+     * @return object
+     */
+    public function getPlugin($name = null)
+    {
+        $this->init();
+
         if (null === $name) {
             return $this->plugins;
         }
         if (empty($this->plugins[$name])) {
             return null;
         }
+
         return $this->plugins[$name];
     }
 

@@ -7,6 +7,8 @@ use WebinoData\DataService;
 use WebinoData\DataSelect\ArrayColumn;
 use WebinoData\Exception;
 use WebinoData\Event\DataEvent;
+use WebinoData\Store\StoreAwareInterface;
+use WebinoData\Store\StoreAwareTrait;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\EventManager\EventManager;
@@ -14,8 +16,10 @@ use Zend\EventManager\EventManager;
 /**
  * Class Relations
  */
-final class Relations
+final class Relations implements StoreAwareInterface
 {
+    use StoreAwareTrait;
+
     /**
      * @var AdapterInterface
      */
@@ -30,16 +34,36 @@ final class Relations
     }
 
     /**
-     * @param EventManager $eventManager
+     * @param EventManager $events
      */
-    public function attach(EventManager $eventManager)
+    public function attach(EventManager $events)
     {
-        $eventManager->attach('data.exchange.pre', [$this, 'exchangeOne'], 500);
-        $eventManager->attach('data.exchange.invalid', [$this, 'exchangeOne'], 500);
-        $eventManager->attach('data.exchange.post', [$this, 'exchangeMany'], 500);
-        $eventManager->attach('data.fetch.pre', [$this, 'fetch'], 500);
-        $eventManager->attach('data.fetch.post', [$this, 'fetchOne'], 500);
-        $eventManager->attach('data.fetch.post', [$this, 'fetchMany'], 500);
+        $events->attach('data.exchange.pre', [$this, 'exchangeOne'], 500);
+        $events->attach('data.exchange.invalid', [$this, 'exchangeOne'], 500);
+        $events->attach('data.exchange.post', [$this, 'exchangeMany'], 500);
+        $events->attach('data.fetch.pre', [$this, 'fetch'], 500);
+        $events->attach('data.fetch.post', [$this, 'fetchOne'], 500);
+        $events->attach('data.fetch.post', [$this, 'fetchMany'], 500);
+    }
+
+    /**
+     * @param string $subStoreName
+     * @return bool
+     */
+    public function isEnabledFor($subStoreName)
+    {
+        $store   = $this->getStore();
+        $options = [];
+
+        if ($store->hasOne($subStoreName)) {
+            $options = $store->oneOptions($subStoreName);
+        }
+
+        if ($store->hasMany($subStoreName)) {
+            $options = $store->manyOptions($subStoreName);
+        }
+
+        return !$this->relationsDisabled($options);
     }
 
     /**
