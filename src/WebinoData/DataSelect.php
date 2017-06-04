@@ -4,6 +4,7 @@ namespace WebinoData;
 
 use ArrayObject;
 use WebinoData\DataSelect\ArrayColumn;
+use WebinoData\Select\Search;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Expression;
@@ -21,12 +22,17 @@ class DataSelect
     /**
      * @var AbstractDataService
      */
-    protected $service;
+    protected $store;
 
     /**
      * @var Select
      */
     protected $sqlSelect;
+
+    /**
+     * @var DataEvent
+     */
+    protected $event;
 
     /**
      * @var array
@@ -41,31 +47,34 @@ class DataSelect
     /**
      * @var array
      */
-    protected $search = [];
-
-    /**
-     * @var array
-     */
     protected $flags = [];
 
     /**
-     * @var DataEvent
+     * @var Search
      */
-    private $event;
+    protected $searchHelper;
 
     /**
      * @var string|null
      */
-    private $hash;
+    protected $hash;
 
     /**
-     * @param AbstractDataService $service
+     * @param AbstractDataService $store
      * @param Select $select
      */
-    public function __construct(AbstractDataService $service, Select $select)
+    public function __construct(AbstractDataService $store, Select $select)
     {
-        $this->service   = $service;
+        $this->store = $store;
         $this->sqlSelect = $select;
+    }
+
+    /**
+     * @return AbstractDataService
+     */
+    public function getStore()
+    {
+        return $this->store;
     }
 
     /**
@@ -74,6 +83,39 @@ class DataSelect
     public function getSqlSelect()
     {
         return $this->sqlSelect;
+    }
+
+    /**
+     * @return DataEvent
+     */
+    public function getEvent()
+    {
+        if (null === $this->event) {
+            $this->event = clone $this->store->getEvent();
+            $this->event->setSelect($this)->setStore($this->store);
+        }
+        return $this->event;
+    }
+
+    /**
+     * @return Search
+     */
+    public function getSearchHelper()
+    {
+        if (null === $this->searchHelper) {
+            $this->searchHelper = new Search($this);
+        }
+        return $this->searchHelper;
+    }
+
+    /**
+     * @param Search $searchHelper
+     * @return $this
+     */
+    public function setSearchHelper($searchHelper)
+    {
+        $this->searchHelper = $searchHelper;
+        return $this;
     }
 
     /**
@@ -137,7 +179,7 @@ class DataSelect
      */
     public function getSearch()
     {
-        return $this->search;
+        return $this->getSearchHelper()->getSearch();
     }
 
     /**
@@ -164,7 +206,25 @@ class DataSelect
     }
 
     /**
-     * @param null|string $hash
+     * @return string
+     */
+    public function getHash()
+    {
+        return md5((string) $this . serialize($this->subParams) . serialize($this->flags) . $this->hash);
+    }
+
+    /**
+     * @TODO remove
+     * @deprecated, use getHash() instead
+     * @return string
+     */
+    public function hash()
+    {
+        return $this->getHash();
+    }
+
+    /**
+     * @param string|null $hash
      * @return $this
      */
     public function setHash($hash)
@@ -174,21 +234,13 @@ class DataSelect
     }
 
     /**
-     * @return string
-     */
-    public function hash()
-    {
-        return md5((string) $this . serialize($this->subParams) . serialize($this->flags) . $this->hash);
-    }
-
-    /**
      * @param array $columns
      * @return $this
      */
     public function columns(array $columns)
     {
-        $serviceConfig = $this->service->getConfig();
-        $tableName     = $this->service->getTableName();
+        $serviceConfig = $this->store->getConfig();
+        $tableName     = $this->store->getTableName();
 
         $inputFilter = $serviceConfig['input_filter'];
         unset($inputFilter['type']);
@@ -264,7 +316,7 @@ class DataSelect
         $event = $this->getEvent();
         $event->setParam('columns', $columns);
 
-        $this->service->getEventManager()
+        $this->store->getEventManager()
             ->trigger('data.select.columns', $event);
 
         $this->sqlSelect->columns($event->getParam('columns'), false);
@@ -339,7 +391,7 @@ class DataSelect
         $event = $this->getEvent();
         $event->setParam('on', $on);
 
-        $this->service->getEventManager()
+        $this->store->getEventManager()
             ->trigger('data.select.join', $event);
 
         $this->sqlSelect->join($name, $this->autoExpression($event->getParam('on')), $columns, $type);
@@ -362,7 +414,7 @@ class DataSelect
      */
     public function order($order)
     {
-        $platform = $this->service->getPlatform();
+        $platform = $this->store->getPlatform();
         $cols     = $this->getColumns();
         $trick    = 'CAST(%s as UNSIGNED)';
 
@@ -447,10 +499,10 @@ class DataSelect
     {
         // TODO remove, {$tableName} deprecated, use {$this}
         if (false !== strpos($str, '{$tableName}')) {
-            $str = str_replace('{$tableName}', $this->service->getTableName(), $str);
+            $str = str_replace('{$tableName}', $this->store->getTableName(), $str);
         }
         if (false !== strpos($str, '{$this}')) {
-            $str = str_replace('{$this}', $this->service->getTableName(), $str);
+            $str = str_replace('{$this}', $this->store->getTableName(), $str);
         }
         return $this;
     }
@@ -482,15 +534,15 @@ class DataSelect
         is_object($predicate)
             or $predicate = new ArrayObject((array) $predicate);
 
-        $event = $this->service->getEvent();
+        $event = $this->store->getEvent();
 
         $event
             ->setSelect($this)
-            ->setStore($this->service)
+            ->setStore($this->store)
             ->setParam('predicate', $predicate)
             ->setParam('combination', $combination);
 
-        $this->service->getEventManager()
+        $this->store->getEventManager()
             ->trigger('data.select.where', $event);
 
         // todo refactor parsePredicate()
@@ -564,149 +616,11 @@ class DataSelect
      * @param array $columns
      * @param string $combination
      * @return $this
-     * @todo decouple logic
      */
     public function search($term, array $columns = [], $combination = PredicateSet::OP_AND)
     {
-        if (empty($term) && !is_numeric($term)) {
-            return $this;
-        }
-
-        if (is_array($term)) {
-            foreach ($term as $subKey => $subTerms) {
-                foreach ((array) $subTerms as $subTerm) {
-
-                    empty($subKey) || (empty($subTerm) && !is_numeric($subTerm))
-                        or $this->search($subTerm, [$subKey], $combination);
-                }
-            }
-            return $this;
-        }
-
-        $_term    = $this->sanitizeSearchTerm($term);
-        $platform = $this->service->getPlatform();
-        $where    = new ArrayObject;
-        $having   = new ArrayObject;
-        $joinCols = $this->resolveJoinColumns();
-
-        foreach ($this->resolveSearchTermParts($term, $_term) as $word) {
-            if (empty($word) && !is_numeric($word)) {
-                continue;
-            }
-
-            foreach ($columns as $column) {
-                $columnParts = explode('.', $column);
-                $identifier  = (2 === count($columnParts))
-                                ? $platform->quoteIdentifier($columnParts[0])
-                                  . '.' . $platform->quoteIdentifier($columnParts[1])
-                                : $platform->quoteIdentifier($column);
-
-                if (preg_match('~_id$~', $column)) {
-                    // id column
-                    $where[] = $identifier . ' = ' . $platform->quoteValue($word);
-                    continue;
-                }
-
-                $word     = $this->sanitizeSearchTerm($word, '%');
-                $target   = isset($joinCols[$column]) ? $having : $where;
-                $target[] = $identifier . ' LIKE ' . $platform->quoteValue('%' . $word . '%');
-            }
-        }
-
-        if (!count($where) && !count($having)) {
-            return $this;
-        }
-
-        foreach ($columns as $column) {
-            isset($this->search[$column])  or $this->search[$column] = [];
-            in_array($_term, $this->search) or $this->search[$column][] = $_term;
-        }
-
-        $predicate = function (ArrayObject $columns) {
-            return '(' . join(' ' . PredicateSet::OP_OR . ' ', $columns->getArrayCopy()) . ')';
-        };
-
-        count($where)  and $this->where($predicate($where), $combination);
-        count($having) and $this->having($predicate($having), $combination);
-
+        $this->getSearchHelper()->search($term, $columns, $combination);
         return $this;
-    }
-
-    /**
-     * @return DataEvent
-     */
-    private function getEvent()
-    {
-        if (null === $this->event) {
-            $this->event = clone $this->service->getEvent();
-            $this->event->setSelect($this)->setService($this->service);
-        }
-        return $this->event;
-    }
-
-    /**
-     * Returns array of columns to use having instead of where
-     *
-     * @return array
-     */
-    private function resolveJoinColumns()
-    {
-        $result = [];
-        foreach ($this->getJoins() as $join) {
-            if (Select::JOIN_INNER === $join['type']) {
-                continue;
-            }
-
-            foreach (array_keys($join['columns']) as $column) {
-                $result[$column] = true;
-            }
-        }
-        return $result;
-    }
-
-    // todo decouple
-    private function resolveSearchTermParts($term, $_term)
-    {
-        if ('"' === $term[0]
-            && '"' === $term[mb_strlen($term, 'utf-8') - 1]
-        ) {
-            // exact term
-            return [trim($_term, '"')];
-        }
-
-        return explode(' ', $_term);
-    }
-
-    // todo decouple
-    private function sanitizeSearchTerm($term, $replacement = ' ')
-    {
-        $_term = trim($term);
-        if (is_numeric($_term)) {
-            return $_term;
-        }
-
-        $this->fixDateSearch($_term); // TODO pluggable
-        return preg_replace('~[^a-zA-Z0-9_-]+~', $replacement, $_term);
-    }
-
-    /**
-     * @param $term
-     * @TODO decouple
-     */
-    private function fixDateSearch(&$term)
-    {
-        if (!preg_match('~^[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,4})?$~', $term)) {
-            return;
-        }
-        // fix year
-        substr_count($term, '.') >= 3 or $term.= '.';
-        list($day, $month, $year) = explode('.', $term);
-        $term = sprintf(
-            '%s-%s-%s',
-            $year,
-            str_repeat('0', 2 - strlen($month)) . $month,
-            str_repeat('0', 2 - strlen($day)) . $day
-        );
     }
 
     /**
@@ -736,7 +650,7 @@ class DataSelect
      */
     public function getSqlString()
     {
-        return $this->service->getSql()->buildSqlString($this->sqlSelect);
+        return $this->store->getSql()->buildSqlString($this->sqlSelect);
     }
 
     /**
