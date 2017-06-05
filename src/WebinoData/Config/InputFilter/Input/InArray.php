@@ -41,10 +41,7 @@ class InArray extends AbstractInput
      */
     public function setHaystack(array $haystack)
     {
-        $this->spec['validators'] = [
-            'inArray' => ['haystack' => $haystack],
-        ];
-
+        $this->spec['validators']['inArray']['options']['haystack'] = $haystack;
         return $this;
     }
 }
