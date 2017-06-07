@@ -78,7 +78,6 @@ class AbstractWebinoDataSelect extends DbSelect
         }
 
         $select = clone $this->select;
-        $select->reset(Select::COLUMNS);
         $select->reset(Select::LIMIT);
         $select->reset(Select::OFFSET);
         $select->reset(Select::ORDER);
@@ -86,7 +85,9 @@ class AbstractWebinoDataSelect extends DbSelect
         $group = $select->getRawState('group');
         $expr  = !empty($group) && is_string($group) ? 'COUNT(DISTINCT ' . current($group) . ')' : 'COUNT(*)';
 
-        $select->columns(['c' => new Expression($expr)]);
+        $columns = $select->getRawState(Select::COLUMNS);
+        $columns['c'] = new Expression($expr);
+        $select->columns($columns);
 
         $sql = $this->sql->buildSqlString($select);
         $statement = $this->service->getAdapter()->createStatement($sql);
