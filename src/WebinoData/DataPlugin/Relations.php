@@ -38,10 +38,10 @@ final class Relations implements StoreAwareInterface
      */
     public function attach(EventManager $events)
     {
+        $events->attach('data.select.columns', [$this, 'selectColumns'], 500);
         $events->attach('data.exchange.pre', [$this, 'exchangeOne'], 500);
         $events->attach('data.exchange.invalid', [$this, 'exchangeOne'], 500);
         $events->attach('data.exchange.post', [$this, 'exchangeMany'], 500);
-        $events->attach('data.fetch.pre', [$this, 'fetch'], 500);
         $events->attach('data.fetch.post', [$this, 'fetchOne'], 500);
         $events->attach('data.fetch.post', [$this, 'fetchMany'], 500);
     }
@@ -67,15 +67,15 @@ final class Relations implements StoreAwareInterface
     }
 
     /**
-     * Prepare fetch
+     * Select columns
      *
      * @param DataEvent $event
      */
-    public function fetch(DataEvent $event)
+    public function selectColumns(DataEvent $event)
     {
         $store   = $event->getStore();
         $select  = $event->getSelect();
-        $columns = $select->getColumns();
+        $columns = $event->getParam('columns');
         $inputs  = $store->getInputFilter();
 
         foreach ($columns as $key => $column) {
@@ -91,7 +91,7 @@ final class Relations implements StoreAwareInterface
                     $select->subSelect($key, $subSelect);
                 }
 
-                $select->addColumn($key, $inputs->has($key) ? $key : new SqlExpression("'0'"));
+                $columns[$key] = $inputs->has($key) ? $key : new SqlExpression("'0'");
                 continue;
             }
 
@@ -109,8 +109,11 @@ final class Relations implements StoreAwareInterface
                 $select->subSelect($key, $subSelect);
             }
 
-            $select->addColumn($key, new SqlExpression("'0'"));
+            $columns[$key] = new SqlExpression("'0'");
         }
+
+        // TODO remove, use array object
+        $event->setParam('columns', $columns);
     }
 
     /**

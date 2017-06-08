@@ -588,7 +588,7 @@ class DataSelect
         }
 
         $subSelect = $select;
-        $subSelect->setHash($this->hash());
+        $subSelect->setHash($this->getHash());
         $this->subSelects[$name] = $subSelect;
 
         return $this;
@@ -669,11 +669,8 @@ class DataSelect
     public function configure(array $config)
     {
         if (isset($config['columns'])) {
-            // todo prefixColumnsWithTable deprecated
             $columns = current($config['columns']);
-            $prefixColumnsWithTable = (2 === count($config['columns'])) ? next($config['columns']) : false;
-
-            $this->columns($columns, $prefixColumnsWithTable);
+            $this->columns($columns);
         }
 
         $this->configureWhere($config, $this->where, 'where');

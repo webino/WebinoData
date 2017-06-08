@@ -329,15 +329,13 @@ abstract class AbstractDataService implements
      */
     public function setEventManager(EventManagerInterface $eventManager)
     {
-        $eventManager->setIdentifiers(
-            [
-                __CLASS__,
-                'WebinoData',
-                'WebinoData[' . $this->getTableName() . ']',
-                // todo deprecated
-                $this->getTableName()
-            ]
-        );
+        $eventManager->setIdentifiers([
+            __CLASS__,
+            'WebinoData',
+            'WebinoData[' . $this->getTableName() . ']',
+            // todo deprecated
+            $this->getTableName()
+        ]);
 
         $this->eventManager = $eventManager;
         return $this;
