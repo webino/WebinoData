@@ -3,8 +3,9 @@
 namespace WebinoData;
 
 use ArrayObject;
-use WebinoData\DataSelect\ArrayColumn;
+use WebinoData\Select\Columns;
 use WebinoData\Select\Search;
+use WebinoData\Select\ExpressionTrait;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Expression;
@@ -17,7 +18,7 @@ use Zend\Db\Sql\Sql;
  */
 class DataSelect
 {
-    const EXPRESSION_MARK = 'EXPRESSION:';
+    use ExpressionTrait;
 
     /**
      * @var AbstractDataService
@@ -48,6 +49,11 @@ class DataSelect
      * @var array
      */
     protected $flags = [];
+
+    /**
+     * @var Columns
+     */
+    protected $columnsHelper;
 
     /**
      * @var Search
@@ -115,6 +121,27 @@ class DataSelect
     public function setSearchHelper($searchHelper)
     {
         $this->searchHelper = $searchHelper;
+        return $this;
+    }
+
+    /**
+     * @return Columns
+     */
+    public function getColumnsHelper()
+    {
+        if (null === $this->columnsHelper) {
+            $this->columnsHelper = new Columns($this);
+        }
+        return $this->columnsHelper;
+    }
+
+    /**
+     * @param Columns $columnsHelper
+     * @return $this
+     */
+    public function setColumnsHelper(Columns $columnsHelper)
+    {
+        $this->columnsHelper = $columnsHelper;
         return $this;
     }
 
@@ -239,87 +266,7 @@ class DataSelect
      */
     public function columns(array $columns)
     {
-        $serviceConfig = $this->store->getConfig();
-        $tableName     = $this->store->getTableName();
-
-        $inputFilter = $serviceConfig['input_filter'];
-        unset($inputFilter['type']);
-
-        // collect input column names
-        $inputColumns = [];
-        foreach ($inputFilter as $input) {
-            if ($input) {
-                $inputColumns[$input['name']] = new Expression(
-                    '`' . $tableName . '`.`' . $input['name'] . '`'
-                );
-            }
-        }
-
-        // replace star with input columns
-        $starIndex = false;
-        foreach ($columns as $index => $value) {
-            if ('*' === $value) {
-                $starIndex = $index;
-                unset($index);
-                unset($value);
-                break;
-            }
-        }
-        if (false !== $starIndex) {
-            unset($columns[$starIndex]);
-            $columns = array_merge($inputColumns, $columns);
-        }
-
-        // prefix id with table name
-        $idIndex = false;
-        foreach ($columns as $index => $value) {
-            if ('id' === $value) {
-                $idIndex = $index;
-                unset($index);
-                unset($value);
-                break;
-            }
-        }
-        if (false !== $idIndex) {
-
-            $columns[$idIndex] = new Expression('`' . $tableName . '`.`id`');
-
-            if (is_numeric($idIndex)) {
-                // we need to change the index to a string
-                // when we want to use an expression
-                $keys            = array_keys($columns);
-                $keyIndex        = array_search($idIndex, $keys);
-                $keys[$keyIndex] = 'id';
-                $columns         = array_combine($keys, array_values($columns));
-            }
-        }
-
-        // manipulate columns
-        foreach ($columns as $key => &$idColumn) {
-
-            // fix an array column to be string-able
-            if (is_array($idColumn)) {
-                $idColumn = new ArrayColumn($idColumn);
-                continue;
-            }
-
-            // store subSelects
-            if ($idColumn instanceof self) {
-                $this->subSelect($key, $idColumn);
-                continue;
-            }
-
-            // use auto expression?
-            is_string($idColumn) and $idColumn = $this->autoExpression($idColumn);
-        }
-
-        $event = $this->getEvent();
-        $event->setParam('columns', $columns);
-
-        $this->store->getEventManager()
-            ->trigger('data.select.columns', $event);
-
-        $this->sqlSelect->columns($event->getParam('columns'), false);
+        $this->getColumnsHelper()->setColumns($columns);
         return $this;
     }
 
@@ -329,11 +276,7 @@ class DataSelect
      */
     public function addColumns(array $columns)
     {
-        $selectColumns = $this->getColumns();
-        foreach ($columns as $key => $value) {
-            $selectColumns[$key] = $value;
-        }
-        $this->columns($selectColumns);
+        $this->getColumnsHelper()->addColumns($columns);
         return $this;
     }
 
@@ -344,8 +287,7 @@ class DataSelect
      */
     public function addColumn($name, $value)
     {
-        $columns = array_replace($this->getColumns(), [$name => $value]);
-        $this->columns($columns);
+        $this->getColumnsHelper()->addColumn($name, $value);
         return $this;
     }
 
@@ -355,11 +297,7 @@ class DataSelect
      */
     public function removeColumn($name)
     {
-        $columns = $this->getColumns();
-        if (isset($columns[$name])) {
-            unset($columns[$name]);
-        }
-        $this->columns($columns);
+        $this->getColumnsHelper()->removeColumn($name);
         return $this;
     }
 
@@ -384,7 +322,7 @@ class DataSelect
     {
         if (is_array($columns)) {
             array_walk($columns, function (&$value) {
-                $value = $this->autoExpression($value);
+                $value = $this->handleExpression($value);
             });
         }
 
@@ -394,7 +332,7 @@ class DataSelect
         $this->store->getEventManager()
             ->trigger('data.select.join', $event);
 
-        $this->sqlSelect->join($name, $this->autoExpression($event->getParam('on')), $columns, $type);
+        $this->sqlSelect->join($name, $this->handleExpression($event->getParam('on')), $columns, $type);
         return $this;
     }
 
@@ -528,6 +466,7 @@ class DataSelect
      * @param mixed $predicate
      * @param string $combination
      * @return $this
+     * @TODO decouple to helper
      */
     public function where($predicate, $combination = PredicateSet::OP_AND)
     {
@@ -629,7 +568,7 @@ class DataSelect
      */
     public function group($group)
     {
-        $this->sqlSelect->group($this->autoExpression($group));
+        $this->sqlSelect->group($this->handleExpression($group));
         return $this;
     }
 
@@ -665,6 +604,7 @@ class DataSelect
     /**
      * @param array $config
      * @return $this
+     * @TODO decouple to helper
      */
     public function configure(array $config)
     {
@@ -695,6 +635,7 @@ class DataSelect
      * @param Predicate $where
      * @param string $key
      * @return $this
+     * @TODO decouple to helper
      * @todo remain predicates
      */
     private function configureWhere(array $config, Predicate $where, $key)
@@ -807,11 +748,12 @@ class DataSelect
     /**
      * @param array|ArrayObject $predicate
      * @return array
+     * @TODO decouple to helper
      */
     private function resolveOperatorArgs($predicate)
     {
-        $left      = $this->autoExpression(key($predicate));
-        $right     = $this->autoExpression(current($predicate));
+        $left      = $this->handleExpression(key($predicate));
+        $right     = $this->handleExpression(current($predicate));
         $op        = strtolower(!empty($predicate['op']) ? $predicate['op'] : PredicateSet::OP_AND);
         $leftType  = !empty($predicate['leftType']) ? $predicate['leftType'] : Expression::TYPE_IDENTIFIER;
         $rightType = !empty($predicate['rightType']) ? $predicate['rightType'] : Expression::TYPE_VALUE;
@@ -820,24 +762,12 @@ class DataSelect
     }
 
     /**
-     * @param string|Expression $value
-     * @return Expression
-     */
-    private function autoExpression($value)
-    {
-        // detect expression
-        if (is_string($value) && 0 === strpos($value, self::EXPRESSION_MARK)) {
-            return new Expression(substr($value, strlen(self::EXPRESSION_MARK)));
-        }
-        return $value;
-    }
-
-    /**
      * @param string $type
      * @param array $config
      * @param Predicate $where
      * @param string $key
      * @return $this
+     * @TODO decouple to helper
      */
     private function processPredicate($type, array $config, Predicate $where, $key = 'where')
     {
@@ -855,6 +785,7 @@ class DataSelect
      * @param Predicate $where
      * @param string $key
      * @return $this
+     * @TODO decouple to helper
      */
     private function whereNest(array $config, Predicate $where, $key)
     {

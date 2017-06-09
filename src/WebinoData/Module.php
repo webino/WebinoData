@@ -5,6 +5,9 @@ namespace WebinoData;
 use ArrayObject;
 use Zend\Mvc\MvcEvent;
 
+/**
+ * Class Module
+ */
 class Module
 {
     /**
@@ -14,7 +17,7 @@ class Module
     {
         $services = $event->getApplication()->getServiceManager();
         $services->get('SharedEventManager')
-            ->attachAggregate($services->get('WebinoData\Listener\CacheInvalidatorListener'));
+            ->attachAggregate($services->get(Listener\CacheInvalidatorListener::class));
     }
 
     /**
@@ -25,6 +28,7 @@ class Module
      * @param DataService $service
      * @param string $filePath
      * @param DataSelect $select
+     * @param null $callback
      * @return Module
      * @throws \InvalidArgumentException Expects filePath
      * @throws \RuntimeException Expects writable filePath
@@ -32,16 +36,19 @@ class Module
     public function exportCsv(DataService $service, $filePath, DataSelect $select = null, $callback = null)
     {
         if (empty($filePath)) {
+            // TODO better exception
             throw new \InvalidArgumentException('Expected `$filePath`');
         }
 
         if (!empty($callback) && !is_callable($callback)) {
+            // TODO better exception
             throw new \InvalidArgumentException('Expected callable `$callback`');
         }
 
         $file = fopen($filePath, 'w');
 
         if (empty($file)) {
+            // TODO better exception
             throw new \RuntimeException(sprintf('Can\'t open `%s` for writing', $filePath));
         }
 
@@ -53,8 +60,8 @@ class Module
                 $dataObject = new ArrayObject($data);
                 unset($data);
 
-                empty($callback) or
-                    $callback($dataObject);
+                empty($callback)
+                    or $callback($dataObject);
 
                 $dataObjectArray = $dataObject->getArrayCopy();
 
@@ -80,7 +87,6 @@ class Module
         );
 
         fclose($file);
-
         return $this;
     }
 
@@ -97,18 +103,11 @@ class Module
      */
     public function getServiceConfig()
     {
-        return array(
-            'services' => array(
+        return [
+            'services' => [
                 // todo create a service class
                 'WebinoData' => $this,
-            ),
-            'initializers' => array(
-                'WebinoDataCacheAware' => function($service, $services) {
-                    if ($service instanceof DataCacheAwareInterface) {
-                        $service->setCache($services->get('WebinoDataCache'));
-                    }
-                }
-            ),
-        );
+            ],
+        ];
     }
 }

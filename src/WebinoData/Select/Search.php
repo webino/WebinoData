@@ -5,7 +5,7 @@ namespace WebinoData\Select;
 use ArrayObject;
 use WebinoData\DataSelect;
 use WebinoI18nSanitizeLib\Sanitize;
-use Zend\Db\Sql\Predicate\Expression;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Select;
 
@@ -163,11 +163,14 @@ class Search
         return $result;
     }
 
+    /**
+     * @return array
+     */
     private function resolveExpressionColumns()
     {
         $cols = [];
         foreach ($this->select->getColumns() as $name => $column) {
-            if ($column instanceof \Zend\Db\Sql\Expression) {
+            if ($column instanceof Expression) {
                 $expression = $column->getExpression();
 
                 false === strpos($expression, 'SELECT')
