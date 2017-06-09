@@ -167,7 +167,7 @@ class Columns
             }
 
             // store sub-selects
-            if ($column instanceof self) {
+            if ($column instanceof $this->select) {
                 $this->select->subSelect($key, $column);
                 continue;
             }
