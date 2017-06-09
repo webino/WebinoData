@@ -12,13 +12,8 @@ use Zend\Db\Sql\Select;
 /**
  * Class Search
  */
-class Search
+class Search extends AbstractHelper
 {
-    /**
-     * @var DataSelect
-     */
-    protected $select;
-
     /**
      * @var array
      */
@@ -28,15 +23,6 @@ class Search
      * @var Sanitize
      */
     protected $sanitize;
-
-    /**
-     * @param DataSelect $select
-     */
-    public function __construct(DataSelect $select)
-    {
-        $this->select = $select;
-    }
-
 
     /**
      * @return Sanitize

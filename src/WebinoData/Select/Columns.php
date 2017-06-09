@@ -9,22 +9,9 @@ use Zend\Db\Sql\Expression;
 /**
  * Class Columns
  */
-class Columns
+class Columns extends AbstractHelper
 {
     use ExpressionTrait;
-
-    /**
-     * @var DataSelect
-     */
-    protected $select;
-
-    /**
-     * @param DataSelect $select
-     */
-    public function __construct(DataSelect $select)
-    {
-        $this->select = $select;
-    }
 
     /**
      * @param array $columns

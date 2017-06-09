@@ -835,5 +835,15 @@ class DataSelect
     public function __clone()
     {
         $this->sqlSelect = clone $this->sqlSelect;
+
+        if ($this->columnsHelper) {
+            $this->columnsHelper = clone $this->columnsHelper;
+            $this->columnsHelper->setSelect($this);
+        }
+
+        if ($this->searchHelper) {
+            $this->searchHelper = clone $this->searchHelper;
+            $this->searchHelper->setSelect($this);
+        }
     }
 }
