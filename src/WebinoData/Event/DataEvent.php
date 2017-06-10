@@ -279,4 +279,16 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
         $this->arguments = $arguments;
         return $this;
     }
+
+    /**
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->select and $this->select = clone $this->select;
+        $this->data and $this->data = clone $this->data;
+        $this->validData and $this->validData = clone $this->validData;
+        $this->rows and $this->rows = clone $this->rows;
+        $this->row and $this->row = clone $this->row;
+    }
 }

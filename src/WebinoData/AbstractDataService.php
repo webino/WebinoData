@@ -1341,7 +1341,7 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * Clone data store
+     * @return void
      */
     public function __clone()
     {
