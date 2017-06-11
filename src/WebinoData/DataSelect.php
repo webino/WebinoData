@@ -5,7 +5,10 @@ namespace WebinoData;
 use ArrayObject;
 use WebinoData\Select\Columns;
 use WebinoData\Select\Search;
+use WebinoData\Select\ColumnsTrait;
 use WebinoData\Select\ExpressionTrait;
+use WebinoData\Select\RawStateTrait;
+use WebinoData\Select\ResetTrait;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Expression;
@@ -18,7 +21,11 @@ use Zend\Db\Sql\Sql;
  */
 class DataSelect
 {
+    use ColumnsTrait;
     use ExpressionTrait;
+    use RawStateTrait;
+    use ResetTrait;
+    use SearchTrait;
 
     /**
      * @var AbstractDataService
@@ -146,70 +153,6 @@ class DataSelect
     }
 
     /**
-     * @return array
-     */
-    public function getColumns()
-    {
-        return $this->sqlSelect->getRawState('columns');
-    }
-
-    /**
-     * @return array
-     */
-    public function getJoins()
-    {
-        return $this->sqlSelect->getRawState('joins');
-    }
-
-    /**
-     * @return array
-     */
-    public function getWhere()
-    {
-        return $this->sqlSelect->getRawState('where');
-    }
-
-    /**
-     * @return array
-     */
-    public function getHaving()
-    {
-        return $this->sqlSelect->getRawState('having');
-    }
-
-    /**
-     * @return array
-     */
-    public function getGroup()
-    {
-        return $this->sqlSelect->getRawState('group');
-    }
-
-    /**
-     * @return array
-     */
-    public function getOrder()
-    {
-        return $this->sqlSelect->getRawState('order');
-    }
-
-    /**
-     * @return array
-     */
-    public function getLimit()
-    {
-        return $this->sqlSelect->getRawState('limit');
-    }
-
-    /**
-     * @return array
-     */
-    public function getSearch()
-    {
-        return $this->getSearchHelper()->getSearch();
-    }
-
-    /**
      * @param string $name
      * @param bool|true $value
      * @return $this
@@ -257,47 +200,6 @@ class DataSelect
     public function setHash($hash)
     {
         $this->hash .= is_array($hash) ? md5(serialize($hash)) : $hash;
-        return $this;
-    }
-
-    /**
-     * @param array $columns
-     * @return $this
-     */
-    public function columns(array $columns)
-    {
-        $this->getColumnsHelper()->setColumns($columns);
-        return $this;
-    }
-
-    /**
-     * @param array $columns
-     * @return $this
-     */
-    public function addColumns(array $columns)
-    {
-        $this->getColumnsHelper()->addColumns($columns);
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @param string|array $value
-     * @return $this
-     */
-    public function addColumn($name, $value)
-    {
-        $this->getColumnsHelper()->addColumn($name, $value);
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return $this
-     */
-    public function removeColumn($name)
-    {
-        $this->getColumnsHelper()->removeColumn($name);
         return $this;
     }
 
@@ -551,18 +453,6 @@ class DataSelect
     }
 
     /**
-     * @param mixed $term
-     * @param array $columns
-     * @param string $combination
-     * @return $this
-     */
-    public function search($term, array $columns = [], $combination = PredicateSet::OP_AND)
-    {
-        $this->getSearchHelper()->search($term, $columns, $combination);
-        return $this;
-    }
-
-    /**
      * @param string $group
      * @return $this
      */
@@ -596,92 +486,11 @@ class DataSelect
      * @param string $part
      * @return $this
      * @TODO remove, deprecated
-     * @deprecated, use methods like resetWhere() etc.
+     * @deprecated, use methods like resetWhere() etc. from ResetTrait
      */
     public function reset($part)
     {
         $this->sqlSelect->reset($part);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetColumns()
-    {
-        $this->sqlSelect->reset(Select::COLUMNS);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetJoins()
-    {
-        $this->sqlSelect->reset(Select::JOINS);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetWhere()
-    {
-        $this->sqlSelect->reset(Select::WHERE);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetGroup()
-    {
-        $this->sqlSelect->reset(Select::GROUP);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetHaving()
-    {
-        $this->sqlSelect->reset(Select::HAVING);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetLimit()
-    {
-        $this->sqlSelect->reset(Select::LIMIT);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetOffset()
-    {
-        $this->sqlSelect->reset(Select::OFFSET);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetOrder()
-    {
-        $this->sqlSelect->reset(Select::ORDER);
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetCombine()
-    {
-        $this->sqlSelect->reset(Select::COMBINE);
         return $this;
     }
 
