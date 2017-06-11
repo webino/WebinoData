@@ -9,6 +9,7 @@ use WebinoData\Select\ColumnsTrait;
 use WebinoData\Select\ExpressionTrait;
 use WebinoData\Select\RawStateTrait;
 use WebinoData\Select\ResetTrait;
+use WebinoData\Select\SearchTrait;
 use Zend\Db\Sql\Predicate\Predicate;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Expression;
