@@ -62,7 +62,7 @@ class AbstractWebinoDataSelect extends DbSelect
         $select = clone $this->dataSelect;
         $select->offset($offset);
         $select->limit($itemCountPerPage + $this->overflow);
-        $this->dataSelect->setHash($select->hash());
+        $this->dataSelect->setHash($select->getHash());
         return $this->service->fetchWith($select);
     }
 
@@ -82,7 +82,7 @@ class AbstractWebinoDataSelect extends DbSelect
         $select->reset(Select::OFFSET);
         $select->reset(Select::ORDER);
 
-        $group = $select->getRawState('group');
+        $group = $select->getRawState(Select::GROUP);
         $expr  = !empty($group) && is_string($group) ? 'COUNT(DISTINCT ' . current($group) . ')' : 'COUNT(*)';
 
         $columns = $select->getRawState(Select::COLUMNS);
