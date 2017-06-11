@@ -594,11 +594,95 @@ class DataSelect
 
     /**
      * @param string $part
-     * @return Select
+     * @return $this
+     * @TODO remove, deprecated
+     * @deprecated, use methods like resetWhere() etc.
      */
     public function reset($part)
     {
-        return $this->sqlSelect->reset($part);
+        $this->sqlSelect->reset($part);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetColumns()
+    {
+        $this->sqlSelect->reset(Select::COLUMNS);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetJoins()
+    {
+        $this->sqlSelect->reset(Select::JOINS);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetWhere()
+    {
+        $this->sqlSelect->reset(Select::WHERE);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetGroup()
+    {
+        $this->sqlSelect->reset(Select::GROUP);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetHaving()
+    {
+        $this->sqlSelect->reset(Select::HAVING);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetLimit()
+    {
+        $this->sqlSelect->reset(Select::LIMIT);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetOffset()
+    {
+        $this->sqlSelect->reset(Select::OFFSET);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetOrder()
+    {
+        $this->sqlSelect->reset(Select::ORDER);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetCombine()
+    {
+        $this->sqlSelect->reset(Select::COMBINE);
+        return $this;
     }
 
     /**
