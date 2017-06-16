@@ -104,7 +104,7 @@ class DataService extends AbstractDataService
         $this->init();
 
         $cache   = $this->getCache();
-        $cacheId = $select->hash();
+        $cacheId = $select->getHash();
         $items   = new ArrayObject((array) $cache->getItem($cacheId));
         $events  = $this->getEventManager();
         $event   = clone $this->getEvent();

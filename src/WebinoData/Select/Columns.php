@@ -5,6 +5,7 @@ namespace WebinoData\Select;
 use WebinoData\DataSelect;
 use WebinoData\DataSelect\ArrayColumn;
 use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Select;
 
 /**
  * Class Columns
@@ -19,6 +20,16 @@ class Columns extends AbstractHelper
      */
     public function setColumns(array $columns)
     {
+        $sqlSelect  = $this->select->getSqlSelect();
+        $sqlColumns = $sqlSelect->getRawState($sqlSelect::COLUMNS);
+
+        // remove star from SQL select columns
+        $starIndex = array_search($sqlSelect::SQL_STAR, $sqlColumns);
+        if (false !== $starIndex) {
+            unset($sqlColumns[$starIndex]);
+        }
+
+        $columns = array_merge($sqlColumns, $columns);
         $columns = $this->columnsHandleStar($columns);
         $columns = $this->columnsHandleId($columns);
         $columns = $this->columnsManipulate($columns);
@@ -29,7 +40,7 @@ class Columns extends AbstractHelper
         $this->select->getStore()->getEventManager()
             ->trigger('data.select.columns', $event);
 
-        $this->select->getSqlSelect()->columns($event->getParam('columns'), false);
+        $sqlSelect->columns($event->getParam('columns'), false);
         return $this;
     }
 
@@ -95,7 +106,7 @@ class Columns extends AbstractHelper
 
         $merge = false;
         foreach ($columns as $index => $value) {
-            if ('*' === $value) {
+            if (Select::SQL_STAR === $value) {
                 $merge or $merge = true;
                 unset($columns[$index]);
             }
