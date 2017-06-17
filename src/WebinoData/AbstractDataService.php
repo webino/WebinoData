@@ -302,7 +302,7 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * @return $this
+     * @return DataEvent
      */
     protected function createEvent()
     {
@@ -767,13 +767,12 @@ abstract class AbstractDataService implements
         $this->init();
 
         $select = new DataSelect($this, $this->getSql()->select());
-        empty($columns) or $select->columns($columns, false);
-
         $events = $this->getEventManager();
         $event  = $this->createEvent();
 
         $event->setSelect($select);
         $events->trigger(DataEvent::EVENT_SELECT, $event);
+        empty($columns) or $select->columns($columns);
 
         return $select;
     }
