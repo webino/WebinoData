@@ -19,6 +19,9 @@ use Zend\Db\Sql\Sql;
 /**
  * Class DataSelect
  * @todo refactor/redesign
+ *
+ * @property \Zend\Db\Sql\Where $where
+ * @property \Zend\Db\Sql\Having $having
  */
 class DataSelect
 {
@@ -236,6 +239,42 @@ class DataSelect
             ->trigger('data.select.join', $event);
 
         $this->sqlSelect->join($name, $this->handleExpression($event->getParam('on')), $columns, $type);
+        return $this;
+    }
+
+    /**
+     * @param string|array $name
+     * @param string $on
+     * @param string|array $columns
+     * @return $this
+     */
+    public function joinLeft($name, $on, $columns = Select::SQL_STAR)
+    {
+        $this->join($name, $on, $columns, Select::JOIN_LEFT);
+        return $this;
+    }
+
+    /**
+     * @param string|array $name
+     * @param string $on
+     * @param string|array $columns
+     * @return $this
+     */
+    public function joinRight($name, $on, $columns = Select::SQL_STAR)
+    {
+        $this->join($name, $on, $columns, Select::JOIN_RIGHT);
+        return $this;
+    }
+
+    /**
+     * @param string|array $name
+     * @param string $on
+     * @param string|array $columns
+     * @return $this
+     */
+    public function joinInner($name, $on, $columns = Select::SQL_STAR)
+    {
+        $this->join($name, $on, $columns, Select::JOIN_INNER);
         return $this;
     }
 
