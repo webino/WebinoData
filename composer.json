@@ -36,5 +36,11 @@
     },
     "autoload": {
         "psr-0": {"WebinoData": "src/"}
+    },
+    "extra": {
+        "webino-devkit": {
+            "context": ["module", "github", "zend"],
+            "ZendSkeletonApplication": "release-2.5.0"
+        }
     }
 }
