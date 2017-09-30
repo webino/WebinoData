@@ -20,6 +20,7 @@ interface DataEventInterface
      * @todo redesign events
      */
     const EVENT_SELECT = 'data.select';
+    const EVENT_SELECT_COLUMNS = 'data.select.columns';
     const EVENT_DELETE = 'data.delete';
     const EVENT_DELETE_POST = 'data.delete.post';
     const EVENT_EXCHANGE_INVALID = 'data.exchange.invalid';
