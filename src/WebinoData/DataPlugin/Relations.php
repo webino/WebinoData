@@ -376,7 +376,7 @@ final class Relations implements StoreAwareInterface
             $subSelect->where([$mainKey => $mainIds]);
 
             $limit = $subSelect->getLimit();
-            $subSelect->reset('limit');
+            $subSelect->resetLimit();
 
             try {
                 $subItems = $subService->fetchWith($subSelect, $select->subParams($key));
@@ -429,11 +429,6 @@ final class Relations implements StoreAwareInterface
         array $options,
         array $subOptions
     ) {
-        $platform = $store->getPlatform();
-
-        $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
-        $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
-
         $tableName      = $store->getTableName();
         $subTableName   = $subService->getTableName();
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
@@ -443,16 +438,19 @@ final class Relations implements StoreAwareInterface
         // TODO, for BC only (remove deprecated)
         $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
 
+        // create sql
+        $platform = $store->getPlatform();
+        $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
+
         $sql = sprintf(
-            'INSERT IGNORE INTO %s (%s, %s) VALUES (%s, %s)',
+            'INSERT IGNORE INTO %s (%s, %s) VALUES (?, ?)',
             $qi($assocTableName),
             $qi($key . $keySuffix),
-            $qi($subKey . $keySuffix),
-            $qv($mainId),
-            $qv($subId)
+            $qi($subKey . $keySuffix)
         );
 
-        $this->adapter->query($sql)->execute();
+        // execute sql
+        $this->adapter->query($sql)->execute([$mainId, $subId]);
     }
 
     /**
@@ -473,11 +471,6 @@ final class Relations implements StoreAwareInterface
         array $idsExclude = [],
         $manyToMany
     ) {
-        $platform = $store->getPlatform();
-
-        $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
-        $qv = function($name) use ($platform) { return $platform->quoteValue($name); };
-
         $tableName      = $store->getTableName();
         $subTableName   = $subService->getTableName();
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
@@ -486,17 +479,27 @@ final class Relations implements StoreAwareInterface
         $subKey = $this->resolveSubKey($subTableName, $subOptions);
         // TODO, for BC only (remove deprecated)
         $keySuffix = $manyToMany ? (isset($options['keySuffix']) ? $options['keySuffix'] : 'id') : '_id';
-        $sql = sprintf('DELETE FROM %s WHERE %s=%s', $qi($assocTableName), $qi($key . $keySuffix), $qv($mainId));
+
+        // create sql
+        $platform = $store->getPlatform();
+        $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
+        $sql = sprintf('DELETE FROM %s WHERE %s=?', $qi($assocTableName), $qi($key . $keySuffix));
+        $params = [$mainId];
 
         // exclude ids to update
-        empty($idsExclude)
-            or $sql.= sprintf(
+        if (!empty($idsExclude)) {
+
+            $sql.= sprintf(
                 ' AND %s NOT IN (%s)',
                 $manyToMany ? $qi($subKey . $keySuffix) : 'id',
-                join(',', $idsExclude)
+                rtrim(str_repeat('?,', count($idsExclude)), ',')
             );
 
-        $this->adapter->query($sql)->execute();
+            $params = array_merge($params, $idsExclude);
+        }
+
+        // execute sql
+        $this->adapter->query($sql)->execute($params);
     }
 
     /**
