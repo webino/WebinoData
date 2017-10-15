@@ -38,12 +38,12 @@ final class Relations implements StoreAwareInterface
      */
     public function attach(EventManager $events)
     {
-        $events->attach('data.select.columns', [$this, 'selectColumns'], 500);
-        $events->attach('data.exchange.pre', [$this, 'exchangeOne'], 500);
-        $events->attach('data.exchange.invalid', [$this, 'exchangeOne'], 500);
-        $events->attach('data.exchange.post', [$this, 'exchangeMany'], 500);
-        $events->attach('data.fetch.post', [$this, 'fetchOne'], 500);
-        $events->attach('data.fetch.post', [$this, 'fetchMany'], 500);
+        $events->attach(DataEvent::EVENT_SELECT_COLUMNS, [$this, 'selectColumns'], 500);
+        $events->attach(DataEvent::EVENT_EXCHANGE_PRE, [$this, 'exchangeOne'], 500);
+        $events->attach(DataEvent::EVENT_EXCHANGE_INVALID, [$this, 'exchangeOne'], 500);
+        $events->attach(DataEvent::EVENT_EXCHANGE_POST, [$this, 'exchangeMany'], 500);
+        $events->attach(DataEvent::EVENT_FETCH_POST, [$this, 'fetchOne'], 500);
+        $events->attach(DataEvent::EVENT_FETCH_POST, [$this, 'fetchMany'], 500);
     }
 
     /**
