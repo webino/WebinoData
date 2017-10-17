@@ -10,9 +10,30 @@ use Zend\Db\Sql\Predicate\PredicateSet;
 trait SearchTrait
 {
     /**
+     * @var Search
+     */
+    protected $searchHelper;
+
+    /**
      * @return Search
      */
-    abstract public function getSearchHelper();
+    public function getSearchHelper()
+    {
+        if (null === $this->searchHelper) {
+            $this->searchHelper = new Search($this);
+        }
+        return $this->searchHelper;
+    }
+
+    /**
+     * @param Search $searchHelper
+     * @return $this
+     */
+    public function setSearchHelper(Search $searchHelper)
+    {
+        $this->searchHelper = $searchHelper;
+        return $this;
+    }
 
     /**
      * @return array
@@ -23,7 +44,10 @@ trait SearchTrait
     }
 
     /**
-     * @param mixed $term
+     * @see SearchTrait::searchAnd()
+     * @see SearchTrait::searchOr()
+     *
+     * @param string|array $term
      * @param array $columns
      * @param string $combination
      * @return $this
@@ -32,5 +56,25 @@ trait SearchTrait
     {
         $this->getSearchHelper()->search($term, $columns, $combination);
         return $this;
+    }
+
+    /**
+     * @param string|array $term
+     * @param array $columns
+     * @return $this
+     */
+    public function searchAnd($term, array $columns = [])
+    {
+        return $this->search($term, $columns, PredicateSet::OP_AND);
+    }
+
+    /**
+     * @param string|array $term
+     * @param array $columns
+     * @return $this
+     */
+    public function searchOr($term, array $columns = [])
+    {
+        return $this->search($term, $columns, PredicateSet::OP_OR);
     }
 }

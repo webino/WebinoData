@@ -15,11 +15,21 @@ trait ResetTrait
     abstract public function getSqlSelect();
 
     /**
+     * @param string $part
+     * @return $this
+     */
+    public function reset($part)
+    {
+        $this->getSqlSelect()->reset($part);
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function resetColumns()
     {
-        $this->getSqlSelect()->reset(Select::COLUMNS);
+        $this->reset(Select::COLUMNS);
         return $this;
     }
 
@@ -28,7 +38,7 @@ trait ResetTrait
      */
     public function resetJoins()
     {
-        $this->getSqlSelect()->reset(Select::JOINS);
+        $this->reset(Select::JOINS);
         return $this;
     }
 
@@ -37,7 +47,7 @@ trait ResetTrait
      */
     public function resetWhere()
     {
-        $this->getSqlSelect()->reset(Select::WHERE);
+        $this->reset(Select::WHERE);
         return $this;
     }
 
@@ -46,7 +56,7 @@ trait ResetTrait
      */
     public function resetGroup()
     {
-        $this->getSqlSelect()->reset(Select::GROUP);
+        $this->reset(Select::GROUP);
         return $this;
     }
 
@@ -55,7 +65,7 @@ trait ResetTrait
      */
     public function resetHaving()
     {
-        $this->getSqlSelect()->reset(Select::HAVING);
+        $this->reset(Select::HAVING);
         return $this;
     }
 
@@ -64,7 +74,7 @@ trait ResetTrait
      */
     public function resetLimit()
     {
-        $this->getSqlSelect()->reset(Select::LIMIT);
+        $this->reset(Select::LIMIT);
         return $this;
     }
 
@@ -73,7 +83,7 @@ trait ResetTrait
      */
     public function resetOffset()
     {
-        $this->getSqlSelect()->reset(Select::OFFSET);
+        $this->reset(Select::OFFSET);
         return $this;
     }
 
@@ -82,7 +92,7 @@ trait ResetTrait
      */
     public function resetOrder()
     {
-        $this->getSqlSelect()->reset(Select::ORDER);
+        $this->reset(Select::ORDER);
         return $this;
     }
 
@@ -91,7 +101,7 @@ trait ResetTrait
      */
     public function resetCombine()
     {
-        $this->getSqlSelect()->reset(Select::COMBINE);
+        $this->reset(Select::COMBINE);
         return $this;
     }
 }

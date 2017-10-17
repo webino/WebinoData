@@ -8,9 +8,30 @@ namespace WebinoData\Select;
 trait ColumnsTrait
 {
     /**
+     * @var Columns
+     */
+    protected $columnsHelper;
+
+    /**
      * @return Columns
      */
-    abstract public function getColumnsHelper();
+    public function getColumnsHelper()
+    {
+        if (null === $this->columnsHelper) {
+            $this->columnsHelper = new Columns($this);
+        }
+        return $this->columnsHelper;
+    }
+
+    /**
+     * @param Columns $columnsHelper
+     * @return $this
+     */
+    public function setColumnsHelper(Columns $columnsHelper)
+    {
+        $this->columnsHelper = $columnsHelper;
+        return $this;
+    }
 
     /**
      * @param array $columns

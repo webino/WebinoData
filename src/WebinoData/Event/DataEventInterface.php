@@ -3,7 +3,7 @@
  * Webino (http://webino.sk)
  *
  * @link        https://github.com/webino/WebinoData for the canonical source repository
- * @copyright   Copyright (c) 2013-2016 Webino, s. r. o. (http://webino.sk)
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
  * @author      Peter Bačinský <peter@bacinsky.sk>
  * @license     New BSD License
  */
@@ -15,12 +15,10 @@ namespace WebinoData\Event;
  */
 interface DataEventInterface
 {
-    /**#@+
-     * Ajax events
-     * @todo redesign events
-     */
     const EVENT_SELECT = 'data.select';
     const EVENT_SELECT_COLUMNS = 'data.select.columns';
+    const EVENT_SELECT_WHERE = 'data.select.where';
+    const EVENT_SELECT_JOIN = 'data.select.join';
     const EVENT_DELETE = 'data.delete';
     const EVENT_DELETE_POST = 'data.delete.post';
     const EVENT_EXCHANGE_INVALID = 'data.exchange.invalid';
@@ -38,7 +36,6 @@ interface DataEventInterface
     const EVENT_INCREMENT_POST = 'data.increment.post';
     const EVENT_DECREMENT = 'data.decrement';
     const EVENT_DECREMENT_POST = 'data.decrement.post';
-    /**#@-*/
 
     // TODO add interface methods
 }

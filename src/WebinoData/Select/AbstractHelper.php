@@ -15,7 +15,7 @@ abstract class AbstractHelper
     protected $select;
 
     /**
-     * @param DataSelect $select
+     * @param DataSelect|object $select
      */
     public function __construct(DataSelect $select)
     {
