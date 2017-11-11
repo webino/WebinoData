@@ -10,6 +10,7 @@ use Zend\Db\Sql\Select;
 trait GroupTrait
 {
     use ExpressionTrait;
+    use PredicateTrait;
 
     /**
      * @return Select
@@ -22,6 +23,7 @@ trait GroupTrait
      */
     public function group($group)
     {
+        $this->replaceVars($group);
         $this->getSqlSelect()->group($this->handleExpression($group));
         return $this;
     }
