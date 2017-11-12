@@ -3,9 +3,9 @@
  * Webino (http://webino.sk)
  *
  * @link        https://github.com/webino/WebinoData for the canonical source repository
- * @copyright   Copyright (c) 2013-2016 Webino, s. r. o. (http://webino.sk)
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
  * @author      Peter Bačinský <peter@bacinsky.sk>
- * @license     New BSD License
+ * @license     BSD-3-Clause
  */
 
 namespace WebinoData\Event;
@@ -70,6 +70,26 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
      * @var array
      */
     protected $arguments = [];
+
+    /**
+     * @var mixed
+     */
+    protected $wherePredicate;
+
+    /**
+     * @var string
+     */
+    protected $whereCombination;
+
+    /**
+     * @var string
+     */
+    protected $joinOn;
+
+    /**
+     * @var string|array
+     */
+    protected $joinColumns = [];
 
     /**
      * @return DataService
@@ -281,6 +301,84 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     }
 
     /**
+     * @return mixed
+     */
+    public function getWherePredicate()
+    {
+        $this->wherePredicate = $this->getParam('predicate', $this->wherePredicate); // TODO remove, legacy
+        return $this->wherePredicate;
+    }
+
+    /**
+     * @param mixed $predicate
+     * @return DataEvent
+     */
+    public function setWherePredicate($predicate)
+    {
+        $this->setParam('predicate', $predicate); // TODO remove, legacy
+        $this->wherePredicate = $predicate;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWhereCombination()
+    {
+        $this->whereCombination = $this->getParam('combination', $this->whereCombination); // TODO remove, legacy
+        return $this->whereCombination;
+    }
+
+    /**
+     * @param string $combination
+     * @return DataEvent
+     */
+    public function setWhereCombination($combination)
+    {
+        $this->setParam('combination', $combination); // TODO remove, legacy
+        $this->whereCombination = (string) $combination;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getJoinOn()
+    {
+        $this->joinOn = $this->getParam('on', $this->joinOn); // TODO remove, legacy
+        return $this->joinOn;
+    }
+
+    /**
+     * @param string $on
+     * @return $this
+     */
+    public function setJoinOn($on)
+    {
+        $this->setParam('on', $on); // TODO remove, legacy
+        $this->joinOn = $on;
+        return $this;
+    }
+
+    /**
+     * @return string|array
+     */
+    public function getJoinColumns()
+    {
+        return $this->joinColumns;
+    }
+
+    /**
+     * @param string|array $columns
+     * @return DataEvent
+     */
+    public function setJoinColumns($columns)
+    {
+        $this->joinColumns = $columns;
+        return $this;
+    }
+
+    /**
      * @return void
      */
     public function __clone()
@@ -290,5 +388,8 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
         $this->validData and $this->validData = clone $this->validData;
         $this->rows and $this->rows = clone $this->rows;
         $this->row and $this->row = clone $this->row;
+
+        $this->wherePredicate && is_object($this->wherePredicate)
+            and $this->wherePredicate = clone $this->wherePredicate;
     }
 }

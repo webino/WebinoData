@@ -67,8 +67,7 @@ class Order extends AbstractHelper
             $_order[] = $key . ' ' . $type;
         }
 
-        $order = join(', ', $_order);
-        $this->replaceVars($order);
+        $order = $this->handleVars(join(', ', $_order));
         $this->select->getSqlSelect()->order(new Expression($order));
 
         return $this;

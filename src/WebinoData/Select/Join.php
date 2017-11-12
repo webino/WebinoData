@@ -11,6 +11,7 @@ use Zend\Db\Sql\Select;
 class Join extends AbstractHelper
 {
     use ExpressionTrait;
+    use PredicateTrait;
 
     /**
      * @return \WebinoData\AbstractDataService
@@ -29,20 +30,19 @@ class Join extends AbstractHelper
      */
     public function join($name, $on, $columns = Select::SQL_STAR, $type = Select::JOIN_INNER)
     {
-        if (is_array($columns)) {
-            array_walk($columns, function (&$value) {
-                $value = $this->handleExpression($value);
-            });
-        }
-
         $event = $this->select->getEvent();
-        $event->setParam('on', $on);
 
-        $this->getStore()->getEventManager()
-            ->trigger(DataEvent::EVENT_SELECT_JOIN, $event);
+        $event->setJoinOn($on);
+        $event->setJoinColumns($columns);
 
-        $this->select->getSqlSelect()
-            ->join($name, $this->handleExpression($event->getParam('on')), $columns, $type);
+        $this->getStore()->getEventManager()->trigger(DataEvent::EVENT_SELECT_JOIN, $event);
+
+        $this->select->getSqlSelect()->join(
+            $name,
+            $this->handleExpression($this->handleVars($event->getJoinOn())),
+            $this->handleExpression($event->getJoinColumns()),
+            $type
+        );
 
         return $this;
     }

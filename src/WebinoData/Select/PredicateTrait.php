@@ -17,15 +17,13 @@ trait PredicateTrait
     /**
      * @param \ArrayObject|array $predicate
      * @return array
-     * @todo decouple (redesign)
      */
-    protected function parsePredicate($predicate)
+    protected function handlePredicate($predicate)
     {
         $newPredicate = [];
 
         foreach ($predicate as $key => $value) {
-            $args = [$key, $value];
-            $this->replaceVars($args);
+            $args = $this->handleVars([$key, $value]);
             $newPredicate[$args[0]] = $args[1];
         }
 
@@ -33,10 +31,20 @@ trait PredicateTrait
     }
 
     /**
+     * @param mixed $subject
+     * @return mixed
+     */
+    protected function handleVars($subject)
+    {
+        $this->replaceVars($subject);
+        return $subject;
+    }
+
+    /**
      * @param array|string $subject
      * @return $this
      */
-    protected function replaceVars(&$subject)
+    private function replaceVars(&$subject)
     {
         if (is_string($subject)) {
             $this->replaceVarsInternal($subject);

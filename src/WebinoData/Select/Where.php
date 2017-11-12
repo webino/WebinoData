@@ -40,11 +40,15 @@ class Where extends AbstractHelper
         $event
             ->setSelect($this->select)
             ->setStore($store)
-            ->setParam('predicate', $predicate)
-            ->setParam('combination', $combination);
+            ->setWherePredicate($predicate)
+            ->setWhereCombination($combination);
 
         $store->getEventManager()->trigger(DataEvent::EVENT_SELECT_WHERE, $event);
-        $this->select->getSqlSelect()->where($this->parsePredicate($predicate), $combination);
+
+        $this->select->getSqlSelect()->where(
+            $this->handlePredicate($event->getWherePredicate()),
+            $event->getWhereCombination()
+        );
 
         return $this;
     }

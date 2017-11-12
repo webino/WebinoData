@@ -23,8 +23,7 @@ trait GroupTrait
      */
     public function group($group)
     {
-        $this->replaceVars($group);
-        $this->getSqlSelect()->group($this->handleExpression($group));
+        $this->getSqlSelect()->group($this->handleExpression($this->handleVars($group)));
         return $this;
     }
 }
