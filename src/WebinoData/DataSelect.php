@@ -117,7 +117,7 @@ class DataSelect
     }
 
     /**
-     * @param string|null $hash
+     * @param string|array|null $hash
      * @return $this
      */
     public function setHash($hash)

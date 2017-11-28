@@ -71,17 +71,17 @@ class CacheInvalidator extends AbstractConfigurable
     }
 
     /**
-     * @param EventManager $eventManager
+     * @param EventManager $events
      */
-    public function attach(EventManager $eventManager)
+    public function attach(EventManager $events)
     {
-        $eventManager->attach('data.exchange.post', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.toggle.post', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.increment.post', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.decrement.post', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.delete.post', [$this, 'clearCache'], 100);
-        $eventManager->attach('data.fetch.cache', [$this, 'clearCacheByDateTime'], 100);
-        $eventManager->attach('data.exchange.post', [$this, 'saveNextDateTime'], 100);
+        $events->attach(DataEvent::EVENT_EXCHANGE_POST, [$this, 'clearCache'], 100);
+        $events->attach(DataEvent::EVENT_TOGGLE_POST, [$this, 'clearCache'], 100);
+        $events->attach(DataEvent::EVENT_INCREMENT_POST, [$this, 'clearCache'], 100);
+        $events->attach(DataEvent::EVENT_DECREMENT_POST, [$this, 'clearCache'], 100);
+        $events->attach(DataEvent::EVENT_DELETE_POST, [$this, 'clearCache'], 100);
+        $events->attach(DataEvent::EVENT_FETCH_CACHE, [$this, 'clearCacheByDateTime'], 100);
+        $events->attach(DataEvent::EVENT_EXCHANGE_POST, [$this, 'saveNextDateTime'], 100);
     }
 
     /**
@@ -103,18 +103,16 @@ class CacheInvalidator extends AbstractConfigurable
 
         $store = $event->getStore();
         foreach ($store->one() as $subItem) {
-            /** @var self $plugin */
-            $plugin = $subItem['service']->plugin(self::class);
-            $plugin and $tags = array_merge($tags, $plugin->getClearByTags());
+            $this->mergeClearByTags($subItem, $tags);
         }
 
         foreach ($store->many() as $subItem) {
-            /** @var self $plugin */
-            $plugin = $subItem['service']->plugin(self::class);
-            $plugin and $tags = array_merge($tags, $plugin->getClearByTags());
+            $this->mergeClearByTags($subItem, $tags);
         }
 
+        // TODO use DataCacheEvent::setClearByTags()
         $event->setParam('clearByTags', array_unique($tags));
+        // TODO use DataCacheEvent::CACHE_CLEAR
         $event->getStore()->getEventManager()->trigger('data.cache.clear', $event);
         return $this;
     }
@@ -131,13 +129,13 @@ class CacheInvalidator extends AbstractConfigurable
 
         foreach ($dateTimeClear as $dateTimeKey) {
 
-            $service = $event->getStore();
-            $select  = $service->select([$dateTimeKey])->limit(1);
+            $store  = $event->getStore();
+            $select = $store->select([$dateTimeKey])->limit(1);
 
             $select->where(['`' . $dateTimeKey . '` > NOW()']);
 
             $cacheKey = $this->createTimeDeltaCacheKey($event, $dateTimeKey);
-            $result   = current($service->fetchWith($select));
+            $result   = current($store->fetchWith($select));
 
             if (empty($result)) {
                 // nothing to show in the future
@@ -183,5 +181,23 @@ class CacheInvalidator extends AbstractConfigurable
     private function createTimeDeltaCacheKey(DataEvent $event, $dateTimeKey)
     {
         return md5($event->getStore()->getTableName() . __CLASS__ . $dateTimeKey);
+    }
+
+    /**
+     * @param array $subItem
+     * @param array $tags
+     */
+    private function mergeClearByTags($subItem, &$tags)
+    {
+        if (empty($subItem['service'])) {
+            return;
+        }
+
+        /** @var \WebinoData\DataService $store */
+        $store = $subItem['service'];
+
+        /** @var self $plugin */
+        $plugin = $store->getPlugin(self::class);
+        $plugin and $tags = array_merge($tags, $plugin->getClearByTags());
     }
 }

@@ -511,7 +511,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string|null $name
-     * @return $this|$this[]
+     * @return $this|array
      */
     public function one($name = null)
     {
@@ -633,7 +633,7 @@ abstract class AbstractDataService implements
 
     /**
      * @param string|null $name
-     * @return $this
+     * @return $this|array
      */
     public function many($name = null)
     {
