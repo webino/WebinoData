@@ -1,0 +1,91 @@
+<?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
+
+namespace WebinoData\Plugin;
+
+use ArrayAccess;
+use WebinoData\Event\DataEvent;
+use WebinoData\Filter\DateTimeFormatter;
+use Zend\EventManager\EventManager;
+
+/**
+ * Class DateTimeStamp
+ */
+class DateTimeStamp
+{
+    /**
+     * @param EventManager $events
+     */
+    public function attach(EventManager $events)
+    {
+        $events->attach(DataEvent::EVENT_EXCHANGE_PRE, [$this, 'preExchange']);
+        $events->attach(DataEvent::EVENT_IMPORT, [$this, 'import']);
+        $events->attach(DataEvent::EVENT_EXPORT, [$this, 'export']);
+    }
+
+    /**
+     * @param DataEvent $event
+     * @return void
+     */
+    public function preExchange(DataEvent $event)
+    {
+        $data = $event->getValidData();
+
+        // resolve inputs
+        $service = $event->getStore();
+        $config  = $service->getConfig();
+        unset($config['input_filter']['type']);
+
+        $dateTimeFormatter = new DateTimeFormatter;
+        $dateTime = $dateTimeFormatter->filter('now');
+        $inputs   = array_column(array_filter($config['input_filter']), 'name', 'name');
+
+        empty($inputs['updated'])
+            or $data['updated'] = $dateTime;
+
+        if ($event->isUpdate()) {
+            return;
+        }
+
+        (empty($inputs['added']) || !empty($data['added']))
+            or $data['added'] = $dateTime;
+    }
+
+    /**
+     * @param DataEvent $event
+     */
+    public function import(DataEvent $event)
+    {
+        $this->unsetTimeStamps($event->getData());
+    }
+
+    /**
+     * @param DataEvent $event
+     */
+    public function export(DataEvent $event)
+    {
+        $this->unsetTimeStamps($event->getRow());
+    }
+
+    /**
+     * @param ArrayAccess $data
+     */
+    public function unsetTimeStamps(ArrayAccess $data)
+    {
+        // don't want to synchronize this
+        if (isset($data['added'])) {
+            unset($data['added']);
+        }
+
+        if (isset($data['updated'])) {
+            unset($data['updated']);
+        }
+    }
+}

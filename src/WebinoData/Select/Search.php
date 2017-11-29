@@ -1,49 +1,32 @@
 <?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
 
 namespace WebinoData\Select;
 
 use ArrayObject;
-use WebinoData\DataSelect;
-use WebinoI18nSanitizeLib\Sanitize;
+use WebinoI18nSanitizeLib\SanitizeAwareTrait;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Predicate\PredicateSet;
-use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Select as SqlSelect;
 
 /**
  * Class Search
  */
 class Search extends AbstractHelper
 {
+    use SanitizeAwareTrait;
+
     /**
      * @var array
      */
     protected $search = [];
-
-    /**
-     * @var Sanitize
-     */
-    protected $sanitize;
-
-    /**
-     * @return Sanitize
-     */
-    public function getSanitize()
-    {
-        if (null === $this->sanitize) {
-            $this->sanitize = new Sanitize;
-        }
-        return $this->sanitize;
-    }
-
-    /**
-     * @param Sanitize $sanitize
-     * @return $this
-     */
-    public function setSanitize(Sanitize $sanitize)
-    {
-        $this->sanitize = $sanitize;
-        return $this;
-    }
 
     /**
      * @return array
@@ -138,7 +121,7 @@ class Search extends AbstractHelper
     {
         $result = [];
         foreach ($this->select->getJoins() as $join) {
-            if (Select::JOIN_INNER === $join['type']) {
+            if (SqlSelect::JOIN_INNER === $join['type']) {
                 continue;
             }
 

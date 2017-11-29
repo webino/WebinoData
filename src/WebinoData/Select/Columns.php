@@ -1,9 +1,15 @@
 <?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
 
 namespace WebinoData\Select;
 
-use WebinoData\DataSelect;
-use WebinoData\DataSelect\ArrayColumn;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 
@@ -15,6 +21,8 @@ class Columns extends AbstractHelper
     use ExpressionTrait;
 
     /**
+     * Set select columns
+     *
      * @param array $columns
      * @return $this
      */
@@ -166,7 +174,7 @@ class Columns extends AbstractHelper
 
             // store sub-selects
             if ($column instanceof $this->select) {
-                $this->select->subSelect($key, $column);
+                $this->select->setSubSelect($key, $column);
                 continue;
             }
 

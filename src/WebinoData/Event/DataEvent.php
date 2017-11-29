@@ -11,23 +11,22 @@
 namespace WebinoData\Event;
 
 use ArrayObject;
-use WebinoData\AbstractDataService;
-use WebinoData\DataSelect;
-use WebinoData\DataService;
+use WebinoData\Select;
+use WebinoData\Store\StoreInterface;
+use Zend\EventManager\Event;
 
 /**
  * Class DataEvent
- * @TODO extends \Zend\EventManager\Event
  */
-class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
+class DataEvent extends Event implements DataEventInterface
 {
     /**
-     * @var AbstractDataService
+     * @var StoreInterface
      */
     protected $store;
 
     /**
-     * @var DataSelect
+     * @var Select
      */
     protected $select;
 
@@ -92,7 +91,7 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     protected $joinColumns = [];
 
     /**
-     * @return DataService
+     * @return StoreInterface
      */
     public function getStore()
     {
@@ -100,37 +99,39 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     }
 
     /**
-     * @return DataService
+     * @return StoreInterface
+     * @todo remove, deprecated
      * @deprecated use getStore()
      */
     public function getService()
     {
-        return $this->store;
+        return $this->getStore();
     }
 
     /**
-     * @param AbstractDataService $store
+     * @param StoreInterface $store
      * @return $this
      */
-    public function setStore(AbstractDataService $store)
+    public function setStore(StoreInterface $store)
     {
         $this->store = $store;
         return $this;
     }
 
     /**
-     * @param AbstractDataService $store
+     * @param StoreInterface $store
      * @return $this
+     * @todo remove, deprecated
      * @deprecated use setStore()
      */
-    public function setService(AbstractDataService $store)
+    public function setService(StoreInterface $store)
     {
-        $this->store = $store;
+        $this->setStore($store);
         return $this;
     }
 
     /**
-     * @return DataSelect
+     * @return Select
      */
     public function getSelect()
     {
@@ -138,10 +139,10 @@ class DataEvent extends \WebinoData\DataEvent implements DataEventInterface
     }
 
     /**
-     * @param DataSelect $select
+     * @param Select $select
      * @return $this
      */
-    public function setSelect(DataSelect $select)
+    public function setSelect(Select $select)
     {
         $this->select = $select;
         return $this;

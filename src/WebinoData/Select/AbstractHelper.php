@@ -1,8 +1,16 @@
 <?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
 
 namespace WebinoData\Select;
 
-use WebinoData\DataSelect;
+use WebinoData\Select;
 
 /**
  * Class AbstractHelper
@@ -10,23 +18,23 @@ use WebinoData\DataSelect;
 abstract class AbstractHelper
 {
     /**
-     * @var DataSelect
+     * @var Select
      */
     protected $select;
 
     /**
-     * @param DataSelect|object $select
+     * @param Select|object $select
      */
-    public function __construct(DataSelect $select)
+    public function __construct(Select $select)
     {
         $this->setSelect($select);
     }
 
     /**
-     * @param DataSelect $select
+     * @param Select $select
      * @return $this
      */
-    public function setSelect(DataSelect $select)
+    public function setSelect(Select $select)
     {
         $this->select = $select;
         return $this;

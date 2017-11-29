@@ -1,9 +1,16 @@
 <?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
 
 namespace WebinoData\Select;
 
 use ArrayObject;
-use WebinoData\Event\DataEvent;
 use Zend\Db\Sql\Predicate\PredicateSet;
 
 /**
@@ -14,7 +21,7 @@ class Where extends AbstractHelper
     use PredicateTrait;
 
     /**
-     * @return \WebinoData\AbstractDataService
+     * @return \WebinoData\Store\StoreInterface
      */
     public function getStore()
     {
@@ -43,7 +50,7 @@ class Where extends AbstractHelper
             ->setWherePredicate($predicate)
             ->setWhereCombination($combination);
 
-        $store->getEventManager()->trigger(DataEvent::EVENT_SELECT_WHERE, $event);
+        $store->getEventManager()->trigger($event::EVENT_SELECT_WHERE, $event);
 
         $this->select->getSqlSelect()->where(
             $this->handlePredicate($event->getWherePredicate()),

@@ -1,9 +1,17 @@
 <?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
 
 namespace WebinoData\Select;
 
-use WebinoData\DataSelect;
-use Zend\Db\Sql\Select;
+use WebinoData\Select;
+use Zend\Db\Sql\Select as SqlSelect;
 
 /**
  * Class CombineTrait
@@ -11,7 +19,7 @@ use Zend\Db\Sql\Select;
 trait CombineTrait
 {
     /**
-     * @return Select
+     * @return SqlSelect
      */
     abstract public function getSqlSelect();
 
@@ -20,12 +28,12 @@ trait CombineTrait
      *
      * @see CombineTrait::union() Union select
      *
-     * @param DataSelect $select
+     * @param Select $select
      * @param string $type
      * @param string $modifier
      * @return $this
      */
-    public function combine(DataSelect $select, $type = Select::COMBINE_UNION, $modifier = '')
+    public function combine(Select $select, $type = SqlSelect::COMBINE_UNION, $modifier = '')
     {
         $this->getSqlSelect()->combine($select->getSqlSelect(), $type, $modifier);
         return $this;
@@ -34,12 +42,12 @@ trait CombineTrait
     /**
      * Union select
      *
-     * @param DataSelect $select
+     * @param Select $select
      * @return $this
      */
-    public function union(DataSelect $select)
+    public function union(Select $select)
     {
-        $this->combine($select, Select::COMBINE_UNION, '');
+        $this->combine($select, SqlSelect::COMBINE_UNION, '');
         return $this;
     }
 }

@@ -1,4 +1,12 @@
 <?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
 
 namespace WebinoData;
 
@@ -25,15 +33,15 @@ class Module
      *
      * @todo decouple to a service class
      *
-     * @param DataService $service
+     * @param Store $store
      * @param string $filePath
-     * @param DataSelect $select
+     * @param Select $select
      * @param null $callback
      * @return Module
      * @throws \InvalidArgumentException Expects filePath
      * @throws \RuntimeException Expects writable filePath
      */
-    public function exportCsv(DataService $service, $filePath, DataSelect $select = null, $callback = null)
+    public function exportCsv(Store $store, $filePath, Select $select = null, $callback = null)
     {
         if (empty($filePath)) {
             // TODO better exception
@@ -54,7 +62,7 @@ class Module
 
         $header = new ArrayObject;
 
-        $service->export(
+        $store->export(
             function (array $data) use ($file, $header, $callback) {
 
                 $dataObject = new ArrayObject($data);

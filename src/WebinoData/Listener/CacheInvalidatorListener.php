@@ -1,4 +1,12 @@
 <?php
+/**
+ * Webino (http://webino.sk)
+ *
+ * @link        https://github.com/webino/WebinoData for the canonical source repository
+ * @copyright   Copyright (c) 2013-2017 Webino, s. r. o. (http://webino.sk)
+ * @author      Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
 
 namespace WebinoData\Listener;
 
@@ -10,6 +18,7 @@ use Zend\EventManager\SharedListenerAggregateInterface;
 
 /**
  * Class CacheInvalidatorListener
+ * @todo deprecate shared listener
  */
 class CacheInvalidatorListener implements SharedListenerAggregateInterface
 {
@@ -40,7 +49,7 @@ class CacheInvalidatorListener implements SharedListenerAggregateInterface
     {
         $this->listeners[] = $events->attach(
             'WebinoData',
-            'data.cache.clear',
+            'data.cache.clear', // TODO event constant
             [$this, 'clearCache'],
             0
         );
@@ -64,12 +73,15 @@ class CacheInvalidatorListener implements SharedListenerAggregateInterface
     public function clearCache(DataEvent $event)
     {
         $tags = $event->getParam('clearByTags');
+        if (empty($tags)) {
+            return;
+        }
 
         /** @var Filesystem $cache */
         foreach ($this->caches as $cache) {
             try {
                 $cache->clearByTags($tags, true);
-            } catch (\Exception $exc) {
+            } catch (\Throwable $exc) {
                 // TODO logger
                 error_log($exc);
             }
