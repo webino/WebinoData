@@ -39,6 +39,21 @@ trait RawStateTrait
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasJoin($name)
+    {
+        foreach ($this->getJoins() as $join) {
+            if (!empty($join['name']) && $join['name'] == $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return array
      */
     public function getWhere()
