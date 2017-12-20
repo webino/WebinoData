@@ -16,7 +16,6 @@ namespace WebinoData\Config\InputFilter\Input;
 class Common extends AbstractInput
 {
     use DefaultableTrait;
-    use RequirableTrait;
 
     /**
      * {@inheritDoc}

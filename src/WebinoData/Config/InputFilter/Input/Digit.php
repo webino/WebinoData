@@ -15,7 +15,6 @@ namespace WebinoData\Config\InputFilter\Input;
  */
 class Digit extends AbstractInput
 {
-    use RequirableTrait;
     use DefaultableTrait;
 
     /**

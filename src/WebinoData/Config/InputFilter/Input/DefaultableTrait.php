@@ -15,6 +15,8 @@ namespace WebinoData\Config\InputFilter\Input;
  */
 trait DefaultableTrait
 {
+    use RequirableTrait;
+
     /**
      * @param int|string|bool|null $value
      * @return $this
@@ -22,6 +24,7 @@ trait DefaultableTrait
     public function setDefault($value)
     {
         $this->spec['fallback_value'] = $value;
+        $this->setRequired();
         return $this;
     }
 }
