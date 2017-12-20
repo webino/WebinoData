@@ -1,18 +1,17 @@
-# Webino modular Data service over Zend Db
+# Modular data services <br> for Zend Framework 2
 
-**Very early alpha version**
+**Work in progress...**
 
-Provides lightweight data service.
+Provides lightweight data store.
+
+- [API](http://webino.github.io/WebinoData/api/)
 
 ## Features
 
-  - Configurable sql select
-  - Advanced search
-  - Input filter
-  - Bind to form [NEED REFACTOR]
-  - Auto column:
-    - `datetime_add` [INCOMPLETE]
-    - `datetime_update`
+  - Configurable SQL select
+  - Common search support
+  - Input filtering
+  - [TODO]
 
 ## Setup
 
@@ -147,54 +146,14 @@ Following steps are necessary to get this module working, considering a zf2-skel
 
         $exampleDataService->own($relatedRow, $id);
 
-## Develop
+## Development
 
-**Requirements**
+We will appreciate any contributions on development of this module.
 
-  - Linux (recommended)
-  - NetBeans (optional)
-  - Phing
-  - PHPUnit
-  - Selenium
-  - Web browser
-
-**Setup**
-
-  1. Be sure you have configured `~/.my.cnf` for the `mysqladmin` command
-
-  2. Clone this repository
-
-  3. Configure the db in the `test/resources/config.local.php.dist` and delete the `.dist` extension.
-
-  4. Run `phing update`
-
-     Now your development environment is set.
-
-  5. Open project in (NetBeans) IDE
-
-  6. To check module integration with the skeleton application open following directory via web browser:
-
-  `._test/ZendSkeletonApplication/public/`
-
-     e.g. [http://localhost/WebinoData/._test/ZendSkeletonApplication/public/](http://localhost/WebinoData/._test/ZendSkeletonApplication/public/)
-
-  7. Integration test resources are in directory: `test/resources`
-
-     *NOTE: Module example config is also used for integration testing.*
-
-**Testing**
-
-  - Run `phpunit` in the test directory
-  - Run `phing test` in the module directory to run the tests and code insights
-
-    *NOTE: To run the code insights there are some tool requirements.*
-
-## Todo
-
-  - Shared relations.
-  - Manual insert/update.
-  - Relation handle id array *(return related rows for multiple ids)*.
+Learn [How to develop Webino modules](https://github.com/webino/Webino/wiki/How-to-develop-Webino-module)
 
 ## Addendum
 
-Please, if you are interested in this Zend Framework module report any issues and don't hesitate to contribute.
+  Please, if you are interested in this Zend Framework module report any issues and don't hesitate to contribute.
+
+[Report a bug](https://github.com/webino/WebinoData/issues) | [Fork me](https://github.com/webino/WebinoData)

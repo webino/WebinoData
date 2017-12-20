@@ -8,4 +8,11 @@
  * @license     BSD-3-Clause
  */
 
-include __DIR__ . '/src/WebinoData/Module.php';
+namespace WebinoData;
+
+/**
+ * Tests config
+ */
+return [
+
+];

@@ -8,4 +8,10 @@
  * @license     BSD-3-Clause
  */
 
-include __DIR__ . '/src/WebinoData/Module.php';
+use Tester\Assert;
+
+require __DIR__ . '/../bootstrap.php';
+
+
+// TODO tests
+Assert::true(true);

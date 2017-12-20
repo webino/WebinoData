@@ -8,4 +8,9 @@
  * @license     BSD-3-Clause
  */
 
-include __DIR__ . '/src/WebinoData/Module.php';
+namespace WebinoI18nSanitizeLib\Test;
+
+use WebinoDev\Tester\Bootstrap;
+
+require __DIR__ . '/../resources/init_autoloader.php';
+call_user_func(new Bootstrap(__DIR__));

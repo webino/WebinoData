@@ -1,6 +1,6 @@
 {
     "name":        "webino/webino-data",
-    "description": "Modular Data service over Zend Db",
+    "description": "Modular data service for Zend Framework 2",
     "type":        "library",
     "license":     "BSD-3-Clause",
     "keywords":    ["data", "service", "webino", "zf2"],
@@ -32,11 +32,21 @@
         "webino/webino-i18n-sanitize-lib": "dev-develop"
     },
     "suggest": {
-        "zendframework/zend-mvc": "To use as a Zend Framework module"
+        "zendframework/zend-mvc": "To use as a Zend Framework 2 module"
     },
-    "autoload": {
-        "psr-0": {"WebinoData": "src/"}
+    "require-dev": {
+        "webino/webino-dev": "dev-develop",
+        "webino/webino-debug": "dev-develop",
+        "zendframework/zend-mvc": "2.6.*",
+        "zendframework/zend-modulemanager": "2.*",
+        "zendframework/zend-version": "2.*",
+        "zendframework/zend-console": "2.*",
+        "zendframework/zend-log": "2.*",
+        "zendframework/zend-math": "2.*",
+        "zendframework/zend-form": "2.6.*",
+        "zendframework/zend-i18n-resources": "2.*"
     },
+    "autoload": {"psr-0": {"WebinoData": "src/"}},
     "extra": {
         "webino-devkit": {
             "context": ["module", "github", "zend"],
