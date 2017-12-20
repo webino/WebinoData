@@ -17,7 +17,6 @@ use WebinoData\Filter\ToFloat;
  */
 class Decimal extends AbstractInput
 {
-    use RequirableTrait;
     use DefaultableTrait;
 
     /**

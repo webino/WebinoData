@@ -15,7 +15,6 @@ namespace WebinoData\Config\InputFilter\Input;
  */
 class InArray extends AbstractInput
 {
-    use RequirableTrait;
     use DefaultableTrait;
 
     /**
