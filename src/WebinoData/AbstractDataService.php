@@ -1,10 +1,16 @@
 <?php
+/**
+ * Webino (https://github.com/webino/)
+ *
+ * @link        https://github.com/webino/WebinoData/ for the canonical source repository
+ * @copyright   Copyright (c) 2012-2018 Peter Bačinský <peter@bacinsky.sk>
+ * @license     BSD-3-Clause
+ */
 
 namespace WebinoData;
 
 use ArrayObject;
 use OutOfBoundsException;
-use WebinoData\DataSelect;
 use WebinoData\Event\DataEvent;
 use WebinoData\Exception;
 use WebinoData\InputFilter\InputFilter;
@@ -1107,16 +1113,12 @@ abstract class AbstractDataService implements
                               ? $this->tableGateway->update($validDataArray, $updateWhere)
                               : $this->tableGateway->insert($validDataArray);
 
-            } catch (\Exception $exc) {
-                // TODO exception
-                throw new Exception\RuntimeException(
-                        sprintf(
-                            'Statement could not be executed for the service table `%s`; %s',
-                            $this->getTableName(),
-                            $exc->getPrevious() ? $exc->getPrevious()->getMessage() : $exc->getMessage()
-                        ),
-                        $exc->getCode(),
-                        $exc
+            } catch (\Throwable $exc) {
+                throw new Exception\InvalidQueryException(
+                    strtr(
+                        '%m for table `%t`',
+                        ['%t' => $this->getTableName(), '%m' => $exc->getMessage()]
+                    )
                 );
             }
         }

@@ -10,10 +10,9 @@
 namespace WebinoData\Exception;
 
 /**
- * @category    Webino
- * @package     WebinoData_Exception
+ * Class InvalidQueryException
  */
-interface ExceptionInterface extends \Throwable
+class InvalidQueryException extends \InvalidArgumentException implements ExceptionInterface
 {
 
 }
