@@ -22,7 +22,7 @@
     "require": {
         "php": ">=5.5",
         "zendframework/zend-db": "2.*",
-        "zendframework/zend-cache": "2.7.2",
+        "zendframework/zend-cache": "2.*",
         "zendframework/zend-stdlib": "2.*",
         "zendframework/zend-filter": "2.*",
         "zendframework/zend-paginator": "2.*",
