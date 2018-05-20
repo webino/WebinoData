@@ -1012,7 +1012,7 @@ abstract class AbstractDataService implements
      * @param array $array
      * @return int Affected rows
      */
-    public function exchangeArray(array $array)
+    public function exchange(array $array)
     {
         $this->resetInputState();
 
@@ -1134,6 +1134,16 @@ abstract class AbstractDataService implements
         $isEmpty or $events->trigger(DataEvent::EVENT_EXCHANGE_POST, $event);
 
         return $event->getAffectedRows();
+    }
+
+    /**
+     * @param array $array
+     * @return int Affected rows
+     * @deprecated use exchange() instead
+     */
+    public function exchangeArray(array $array)
+    {
+        return $this->exchange($array);
     }
 
     /**
