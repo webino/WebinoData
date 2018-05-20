@@ -217,10 +217,23 @@ trait InputTrait
     /**
      * Stores data
      *
+     * @deprecated use exchange() instead
+     * @TODO remove
      * @param array $array
      * @return int Affected rows
      */
     public function exchangeArray(array $array)
+    {
+        return $this->exchange($array);
+    }
+
+    /**
+     * Stores data
+     *
+     * @param array $array
+     * @return int Affected rows
+     */
+    public function exchange(array $array)
     {
         $this->resetInputState();
 

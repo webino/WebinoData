@@ -13,7 +13,7 @@ namespace WebinoData\Exception;
 /**
  * Interface ExceptionInterface
  */
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 
 }
