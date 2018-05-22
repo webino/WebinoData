@@ -32,7 +32,8 @@
         "webino/webino-i18n-sanitize-lib": "dev-develop"
     },
     "suggest": {
-        "zendframework/zend-mvc": "To use as a Zend Framework module"
+        "zendframework/zend-mvc": "To use as a Zend Framework module",
+        "webino/webino-debug": "Debugger support"
     },
     "autoload": {
         "psr-0": {"WebinoData": "src/"}
