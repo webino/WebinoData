@@ -10,6 +10,8 @@
 
 namespace WebinoData;
 
+use WebinoData\Debugger\Bar\DbPanel;
+
 // TODO remove, BC support
 class_alias(Select::class, 'WebinoData\DataSelect');
 class_alias(Store\AbstractStore::class, 'WebinoData\AbstractDataService');
@@ -50,5 +52,17 @@ return [
         'invokables' => [
             'DateTimeFormatter' => Filter\DateTimeFormatter::class,
         ]
+    ],
+
+    'service_manager' => [
+        'invokables' => [
+            DbPanel::class => DbPanel::class,
+        ],
+    ],
+
+    'webino_debug' => [
+        'bar_panels' => [
+            'WebinoData:db' => DbPanel::class,
+        ],
     ],
 ];

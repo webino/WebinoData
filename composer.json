@@ -32,7 +32,8 @@
         "webino/webino-i18n-sanitize-lib": "dev-develop"
     },
     "suggest": {
-        "zendframework/zend-mvc": "To use as a Zend Framework 2 module"
+        "zendframework/zend-mvc": "To use as a Zend Framework 2 module",
+        "webino/webino-debug": "Debugger support"
     },
     "require-dev": {
         "webino/webino-dev": "dev-develop",
