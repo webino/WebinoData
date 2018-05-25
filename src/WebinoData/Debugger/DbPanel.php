@@ -2,6 +2,7 @@
 
 namespace WebinoData\Debugger;
 
+use BjyProfiler\Db\Profiler\Query;
 use WebinoDebug\Debugger\AbstractPanel;
 use WebinoDebug\Debugger\PanelInitInterface;
 use WebinoDebug\Debugger\PanelInterface;
@@ -42,6 +43,32 @@ class DbPanel extends AbstractPanel implements
             /** @var \BjyProfiler\Db\Profiler\Profiler $profiler */
             $this->profiler = $db->getProfiler();
         }
+    }
+
+    /**
+     * @param Query $query
+     * @return array
+     */
+    protected function createCallStack(Query $query) : array
+    {
+        $stack    = [];
+        $continue = true;
+
+        foreach (array_reverse($query->getCallStack()) as $line) {
+            if ($continue) {
+                if (empty($line['class']) || 'WebinoData' !== substr($line['class'], 0, 10)) {
+                    continue;
+                }
+            }
+
+            $stack[]  = $line;
+            $continue = false;
+        }
+
+        array_pop($stack);
+        array_pop($stack);
+
+        return $stack;
     }
 
     /**

@@ -1,3 +1,7 @@
+<?php
+use Tracy\Helpers;
+/** @var \WebinoData\Debugger\DbPanel $this */
+?>
 <style>
     .tracy-db-inner-box table { width: 100%; }
     .tracy-db-inner-box table td:first-child { border-left: none !important; }
@@ -6,40 +10,57 @@
     .tracy-db-inner-box table table td { width: 50%; border: none !important; }
     .tracy-db-inner-box table table td div { max-height: 100px; min-width: 280px; overflow: auto; }
     .tracy-db-inner-box td { width: 50%; white-space: normal !important; }
-    .tracy-db-delta-time { width: 60px !important; white-space: nowrap; }
+    .tracy-db-num { width: 1% !important; text-align: center !important; }
+    .tracy-db-delta-time { width: 1% !important; white-space: nowrap; }
     .tracy-db-sql { min-width: 400px; max-width: 600px; }
     .tracy-db-sql div { max-height: 400px; overflow: auto; }
-    .tracy-db-num { text-align: center !important; }
 </style>
 <h1><?= $this->escapeHtml($this->title) ?></h1>
-<div class="tracy-inner tracy-inner-box tracy-db-inner-box">
-    <table>
-    <?php
-    $time = 0;
-    $queryProfiles = $this->profiler->getQueryProfiles();
-    /** @var \BjyProfiler\Db\Profiler\Query $query */
-    foreach ($queryProfiles as $i => $query) {
-        $deltaTime = $query->getDeltaTime();
-        $time += $deltaTime;
-        ?>
-        <tr>
-            <td class="tracy-db-num"><strong>#<?= $this->escapeHtml($i + 1) ?></strong></td>
-            <td class="tracy-db-delta-time"><?= $this->escapeHtml(number_format($deltaTime * 1000, 1, '.', ' ')) ?>ms</td>
-            <td class="tracy-db-sql"><div><?= $this->escapeHtml($query->getSql()) ?></div></td>
-            <td style="padding: 0">
-                <table>
-                <?php foreach ($query->getParameters() as $paramName => $paramValue) { ?>
-                    <tr>
-                        <td><?= $this->escapeHtml($paramName) ?></td>
-                        <td><div><?= $this->escapeHtml($paramValue) ?></div></td>
-                    </tr>
-                <?php }?>
-                </table>
-            </td>
-        </tr>
-    <?php } ?>
-    </table>
-    <p style="padding: 0 4px">
-        <strong>Total <?= $this->escapeHtml(count($queryProfiles)) ?> in <?= $this->escapeHtml(number_format($time * 1000, 1, '.', ' ')) ?>ms</strong>
-    </p>
+<div class="tracy-inner tracy-db-inner-box">
+    <div class="tracy-inner-container tracy-inner-box">
+        <table>
+        <?php
+        $time = 0;
+        $queryProfiles = $this->profiler->getQueryProfiles();
+        /** @var \BjyProfiler\Db\Profiler\Query $query */
+        foreach ($queryProfiles as $i => $query) {
+            $deltaTime = $query->getDeltaTime();
+            $time += $deltaTime;
+            ?>
+            <tr>
+                <td class="tracy-db-num"><strong>#<?= $this->escapeHtml($i + 1) ?></strong></td>
+                <td class="tracy-db-delta-time"><?= $this->escapeHtml(number_format($deltaTime * 1000, 1, '.', ' ')) ?>ms</td>
+                <td class="tracy-db-sql">
+                    <div><?= $this->escapeHtml($query->getSql()) ?></div>
+                    <div>
+                    <a class="tracy-toggle tracy-collapsed">stack</a>
+                    <div class="tracy-collapsed">
+                        <?php
+                        foreach ($this->createCallStack($query) as $data) {
+                            if (empty($data['file']) || empty($data['line'])) {
+                                continue;
+                            }
+                            echo Helpers::editorLink($this->escapeHtml($data['file']), $this->escapeHtml($data['line'])) . '<br>';
+
+                        }
+                        ?>
+                    </div>
+                </td>
+                <td style="padding: 0">
+                    <table>
+                    <?php foreach ($query->getParameters() as $paramName => $paramValue) { ?>
+                        <tr>
+                            <td><?= $this->escapeHtml($paramName) ?></td>
+                            <td><div><?= $this->escapeHtml($paramValue) ?></div></td>
+                        </tr>
+                    <?php }?>
+                    </table>
+                </td>
+            </tr>
+        <?php } ?>
+        </table>
+        <p style="padding: 0 4px">
+            <strong>Total <?= $this->escapeHtml(count($queryProfiles)) ?> in <?= $this->escapeHtml(number_format($time * 1000, 1, '.', ' ')) ?>ms</strong>
+        </p>
+    </div>
 </div>
