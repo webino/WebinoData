@@ -10,7 +10,7 @@
 
 namespace WebinoData;
 
-use WebinoData\Debugger\Bar\DbPanel;
+use WebinoData\Debugger\DbPanel;
 
 // TODO remove, BC support
 class_alias(Select::class, 'WebinoData\DataSelect');
