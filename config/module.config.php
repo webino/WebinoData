@@ -2,7 +2,7 @@
 
 namespace WebinoData;
 
-use WebinoData\Debugger\Bar\DbPanel;
+use WebinoData\Debugger\DbPanel;
 
 return [
     // TODO remove deprecated DI config, use factories instead

@@ -1,10 +1,11 @@
 <?php
 
-namespace WebinoData\Debugger\Bar;
+namespace WebinoData\Debugger;
 
-use WebinoDebug\Debugger\Bar\AbstractPanel;
-use WebinoDebug\Debugger\Bar\PanelInitInterface;
-use WebinoDebug\Debugger\Bar\PanelInterface;
+use WebinoDebug\Debugger\AbstractPanel;
+use WebinoDebug\Debugger\PanelInitInterface;
+use WebinoDebug\Debugger\PanelInterface;
+use Zend\Db\Adapter\Profiler\ProfilerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
 
 /**
@@ -37,12 +38,15 @@ class DbPanel extends AbstractPanel implements
         /** @var \Zend\Db\Adapter\Adapter $db */
         $db = $services->get('Zend\Db\Adapter\Adapter');
 
-        if ($db instanceof \Zend\Db\Adapter\Profiler\ProfilerAwareInterface) {
+        if ($db instanceof ProfilerAwareInterface) {
             /** @var \BjyProfiler\Db\Profiler\Profiler $profiler */
             $this->profiler = $db->getProfiler();
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTab()
     {
         if (!$this->profiler || !count($this->profiler->getQueryProfiles())) {
