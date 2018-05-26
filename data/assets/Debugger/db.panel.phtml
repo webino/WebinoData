@@ -41,7 +41,6 @@ use Tracy\Helpers;
                                 continue;
                             }
                             echo Helpers::editorLink($this->escapeHtml($data['file']), $this->escapeHtml($data['line'])) . '<br>';
-
                         }
                         ?>
                     </div>
@@ -51,7 +50,7 @@ use Tracy\Helpers;
                     <?php foreach ($query->getParameters() as $paramName => $paramValue) { ?>
                         <tr>
                             <td><?= $this->escapeHtml($paramName) ?></td>
-                            <td><div><?= $this->escapeHtml($paramValue) ?></div></td>
+                            <td><div><?= $this->escapeHtml(mb_strlen($paramValue) <= 500 ? $paramValue : mb_substr($paramValue, 0, 500) . '...') ?></div></td>
                         </tr>
                     <?php }?>
                     </table>
