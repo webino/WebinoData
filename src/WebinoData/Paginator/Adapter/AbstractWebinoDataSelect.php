@@ -77,23 +77,20 @@ class AbstractWebinoDataSelect extends DbSelect
             return $this->rowCount;
         }
 
-        $select = clone $this->select;
-        $select->reset(Select::LIMIT);
-        $select->reset(Select::OFFSET);
-        $select->reset(Select::ORDER);
+        $select = clone $this->dataSelect;
+        $select->resetLimit();
+        $select->resetOffset();
+        $select->resetOrder();
 
-        $group = $select->getRawState(Select::GROUP);
-        $expr  = !empty($group) && is_string($group) ? 'COUNT(DISTINCT ' . current($group) . ')' : 'COUNT(*)';
+        $group = $select->getGroup();
+        $expr  = !empty($group) && !is_string($group) ? 'COUNT(DISTINCT ' . current($group) . ')' : 'COUNT(*)';
 
-        $columns = $select->getRawState(Select::COLUMNS);
+        $columns = $select->getColumns();
         $columns['c'] = new Expression($expr);
         $select->columns($columns);
 
-        $sql = $this->sql->buildSqlString($select);
-        $statement = $this->service->getAdapter()->createStatement($sql);
-
         try {
-            $result = $statement->execute();
+            $result = $select->execute();
         } catch (\Exception $exc) {
             // TODO better exception
             throw new \RuntimeException('Could not execute SQL ' . $sql, $exc->getCode(), $exc);

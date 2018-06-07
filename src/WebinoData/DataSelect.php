@@ -60,6 +60,11 @@ class DataSelect
     /**
      * @var array
      */
+    protected $params = [];
+
+    /**
+     * @var array
+     */
     protected $subParams = [];
 
     /**
@@ -175,6 +180,41 @@ class DataSelect
     }
 
     /**
+     * Get select parameters
+     *
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
+     * Set select parameters
+     *
+     * @param array $params
+     * @return $this
+     */
+    public function setParams(array $params)
+    {
+        $this->params = $params;
+        return $this;
+    }
+
+    /**
+     * Set select parameter
+     *
+     * @param string $name Select parameter name
+     * @param mixed $value Select parameter value
+     * @return $this
+     */
+    public function setParam($name, $value)
+    {
+        $this->params[$name] = (string) $value;
+        return $this;
+    }
+
+    /**
      * Get sub-select params
      *
      * @param string $name
@@ -200,14 +240,14 @@ class DataSelect
     }
 
     /**
-     * @param Sql $sql
-     * @param array $parameters
+     * @param array $params Select parameters
      * @return \Zend\Db\Adapter\Driver\ResultInterface
      */
-    public function execute(Sql $sql, $parameters = [])
+    public function execute($params = [])
     {
         try {
-            return $sql->prepareStatementForSqlObject($this->sqlSelect)->execute($parameters);
+            $sql = $this->store->getSql();
+            return $sql->prepareStatementForSqlObject($this->sqlSelect)->execute(array_merge($this->params, $params));
 
         } catch (\Exception $exc) {
             throw new Exception\RuntimeException(
@@ -220,7 +260,6 @@ class DataSelect
             );
         }
     }
-
 
     /**
      * Variable overloading

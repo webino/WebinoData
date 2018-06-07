@@ -864,7 +864,7 @@ abstract class AbstractDataService implements
         $events->trigger(DataEvent::EVENT_FETCH_PRE, $event);
 
         $rows = new ArrayObject;
-        foreach ($select->execute($this->getSql(), $parameters) as $row) {
+        foreach ($select->execute($parameters) as $row) {
 
             if (empty($row['id'])) {
                 $rows[] = $row;
