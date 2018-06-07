@@ -45,7 +45,7 @@ trait OutputTrait
         $events->trigger($event::EVENT_FETCH_PRE, $event);
 
         $rows = new ArrayObject;
-        foreach ($select->execute($this->getSql(), $params) as $row) {
+        foreach ($select->execute($params) as $row) {
 
             if (empty($row['id'])) {
                 $rows[] = $row;
