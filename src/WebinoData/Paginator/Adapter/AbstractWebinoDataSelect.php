@@ -5,7 +5,6 @@ namespace WebinoData\Paginator\Adapter;
 use WebinoData\DataSelect;
 use WebinoData\DataService;
 use Zend\Db\Sql\Expression;
-use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 
 /**
@@ -82,16 +81,13 @@ class AbstractWebinoDataSelect extends DbSelect
         $select->resetOffset();
         $select->resetOrder();
 
-        $group = $select->getGroup();
-        $expr  = !empty($group) && !is_string($group) ? 'COUNT(DISTINCT ' . current($group) . ')' : 'COUNT(*)';
-
         $columns = $select->getColumns();
-        $columns['c'] = new Expression($expr);
+        $columns['c'] = $this->resolveCountGroupExpression($select);
         $select->columns($columns);
 
         try {
             $result = $select->execute();
-        } catch (\Exception $exc) {
+        } catch (\Throwable $exc) {
             // TODO better exception
             throw new \RuntimeException('Could not execute SQL ' . $sql, $exc->getCode(), $exc);
         }
@@ -101,5 +97,23 @@ class AbstractWebinoDataSelect extends DbSelect
         $this->rowCount = 1 < $resultCount ? $resultCount : $row['c'];
 
         return $this->rowCount;
+    }
+
+    /**
+     * @param DataSelect $select
+     * @return Expression
+     */
+    private function resolveCountGroupExpression(DataSelect $select) : Expression
+    {
+        $group = $select->getGroup();
+
+        if (!empty($group)) {
+            if (!is_string($group)) {
+                $group = current($group);
+                $group instanceof Expression and $group = $group->getExpression();
+            }
+        }
+
+        return new Expression(is_string($group) ? 'COUNT(DISTINCT ' . $group . ')' : 'COUNT(*)');
     }
 }
