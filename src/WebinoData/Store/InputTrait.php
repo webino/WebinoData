@@ -300,7 +300,8 @@ trait InputTrait
 
                         throw new Exception\RuntimeException(
                             sprintf(
-                                'Expected valid data: %s %s',
+                                'Expected valid data for table %s: %s %s',
+                                $this->getTableName(),
                                 print_r($inputFilter->getMessages(), true),
                                 print_r($data, true)
                             )
