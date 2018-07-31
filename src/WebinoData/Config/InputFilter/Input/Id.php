@@ -15,6 +15,8 @@ namespace WebinoData\Config\InputFilter\Input;
  */
 class Id extends AbstractInput
 {
+    use DefaultableTrait;
+
     /**
      * {@inheritDoc}
      */
