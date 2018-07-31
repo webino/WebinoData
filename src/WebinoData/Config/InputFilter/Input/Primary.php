@@ -21,5 +21,6 @@ class Primary extends Id
     public function __construct()
     {
         parent::__construct('id');
+        $this->setDefault(0);
     }
 }
