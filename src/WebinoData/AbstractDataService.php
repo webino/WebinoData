@@ -813,10 +813,21 @@ abstract class AbstractDataService implements
      */
     public function configSelect()
     {
-        $firstArg    = func_get_arg(0);
-        $selectNames = is_array($firstArg) ? $firstArg : func_get_args();
-        $select      = $this->select();
+        $firstArg = func_get_arg(0);
+        if (is_array($firstArg)) {
+            $selectNames = $firstArg;
 
+        } elseif (method_exists($firstArg, 'toArray')) {
+            $selectNames = $firstArg->toArray();
+
+        } elseif (method_exists($firstArg, 'getArrayCopy')) {
+            $selectNames = $firstArg->getArrayCopy();
+
+        } else {
+            $selectNames = func_get_args();
+        }
+
+        $select = $this->select();
         $selectConfig = [];
         foreach ($selectNames as $selectName) {
 
@@ -839,7 +850,7 @@ abstract class AbstractDataService implements
     }
 
     /**
-     * @param $selectName
+     * @param string $selectName
      * @param array $parameters
      * @return array|ArrayObject
      */
