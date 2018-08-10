@@ -44,7 +44,7 @@ trait SelectTrait
     /**
      * Configures multiple selects
      *
-     * @param array|object ...$selectNames
+     * @param string ...$selectNames
      * @return Select
      */
     public function configSelect(...$selectNames)
