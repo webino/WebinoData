@@ -1,7 +1,7 @@
 <?php
 
 return array (
-  'WebinoData\\Store' =>
+  'WebinoData\\DataService' =>
   array (
     'supertypes' =>
     array (
@@ -37,14 +37,14 @@ return array (
     array (
       '__construct' =>
       array (
-        'WebinoData\\Store::__construct:0' =>
+        'WebinoData\\DataService::__construct:0' =>
         array (
           0 => 'tableGateway',
           1 => 'Zend\\Db\\TableGateway\\TableGateway',
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::__construct:1' =>
+        'WebinoData\\DataService::__construct:1' =>
         array (
           0 => 'config',
           1 => NULL,
@@ -54,7 +54,7 @@ return array (
       ),
       'setCache' =>
       array (
-        'WebinoData\\Store::setCache:0' =>
+        'WebinoData\\DataService::setCache:0' =>
         array (
           0 => 'cache',
           1 => 'Zend\\Cache\\Storage\\StorageInterface',
@@ -64,7 +64,7 @@ return array (
       ),
       'setCacheTags' =>
       array (
-        'WebinoData\\Store::setCacheTags:0' =>
+        'WebinoData\\DataService::setCacheTags:0' =>
         array (
           0 => 'tags',
           1 => NULL,
@@ -74,7 +74,7 @@ return array (
       ),
       'setEvent' =>
       array (
-        'WebinoData\\Store::setEvent:0' =>
+        'WebinoData\\DataService::setEvent:0' =>
         array (
           0 => 'event',
           1 => 'WebinoData\\DataEvent',
@@ -84,7 +84,7 @@ return array (
       ),
       'setEventManager' =>
       array (
-        'WebinoData\\Store::setEventManager:0' =>
+        'WebinoData\\DataService::setEventManager:0' =>
         array (
           0 => 'eventManager',
           1 => 'Zend\\EventManager\\EventManagerInterface',
@@ -94,7 +94,7 @@ return array (
       ),
       'setServiceManager' =>
       array (
-        'WebinoData\\Store::setServiceManager:0' =>
+        'WebinoData\\DataService::setServiceManager:0' =>
         array (
           0 => 'serviceManager',
           1 => 'Zend\\ServiceManager\\ServiceManager',
@@ -104,7 +104,7 @@ return array (
       ),
       'setPlatform' =>
       array (
-        'WebinoData\\Store::setPlatform:0' =>
+        'WebinoData\\DataService::setPlatform:0' =>
         array (
           0 => 'platform',
           1 => 'Zend\\Db\\Adapter\\Platform\\PlatformInterface',
@@ -114,7 +114,7 @@ return array (
       ),
       'setInputFilterFactory' =>
       array (
-        'WebinoData\\Store::setInputFilterFactory:0' =>
+        'WebinoData\\DataService::setInputFilterFactory:0' =>
         array (
           0 => 'inputFilter',
           1 => 'Zend\\InputFilter\\Factory',
@@ -124,7 +124,7 @@ return array (
       ),
       'setInputFilter' =>
       array (
-        'WebinoData\\Store::setInputFilter:0' =>
+        'WebinoData\\DataService::setInputFilter:0' =>
         array (
           0 => 'inputFilter',
           1 => 'Zend\\InputFilter\\InputFilterInterface',
@@ -134,21 +134,21 @@ return array (
       ),
       'setHasOne' =>
       array (
-        'WebinoData\\Store::setHasOne:0' =>
+        'WebinoData\\DataService::setHasOne:0' =>
         array (
           0 => 'name',
           1 => NULL,
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::setHasOne:1' =>
+        'WebinoData\\DataService::setHasOne:1' =>
         array (
           0 => 'service',
-          1 => 'WebinoData\\Store',
+          1 => 'WebinoData\\DataService',
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::setHasOne:2' =>
+        'WebinoData\\DataService::setHasOne:2' =>
         array (
           0 => 'options',
           1 => NULL,
@@ -160,21 +160,21 @@ return array (
       ),
       'setHasOneService' =>
       array (
-        'WebinoData\\Store::setHasOneService:0' =>
+        'WebinoData\\DataService::setHasOneService:0' =>
         array (
           0 => 'name',
           1 => false,
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::setHasOneService:1' =>
+        'WebinoData\\DataService::setHasOneService:1' =>
         array (
           0 => 'serviceName',
           1 => false,
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::setHasOneService:2' =>
+        'WebinoData\\DataService::setHasOneService:2' =>
         array (
           0 => 'options',
           1 => false,
@@ -186,21 +186,21 @@ return array (
       ),
       'setHasMany' =>
       array (
-        'WebinoData\\Store::setHasMany:0' =>
+        'WebinoData\\DataService::setHasMany:0' =>
         array (
           0 => 'name',
           1 => NULL,
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::setHasMany:1' =>
+        'WebinoData\\DataService::setHasMany:1' =>
         array (
           0 => 'service',
-          1 => 'WebinoData\\Store',
+          1 => 'WebinoData\\DataService',
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::setHasMany:2' =>
+        'WebinoData\\DataService::setHasMany:2' =>
         array (
           0 => 'options',
           1 => NULL,
@@ -212,21 +212,21 @@ return array (
       ),
       'setHasManyService' =>
       array (
-        'WebinoData\\Store::setHasManyService:0' =>
+        'WebinoData\\DataService::setHasManyService:0' =>
         array (
           0 => 'name',
           1 => false,
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::setHasManyService:1' =>
+        'WebinoData\\DataService::setHasManyService:1' =>
         array (
           0 => 'serviceName',
           1 => false,
           2 => true,
           3 => NULL,
         ),
-        'WebinoData\\Store::setHasManyService:2' =>
+        'WebinoData\\DataService::setHasManyService:2' =>
         array (
           0 => 'options',
           1 => false,
@@ -238,7 +238,7 @@ return array (
       ),
       'setQuery' =>
       array (
-        'WebinoData\\Store::setQuery:0' =>
+        'WebinoData\\DataService::setQuery:0' =>
         array (
           0 => 'query',
           1 => 'WebinoData\\DataQuery',
