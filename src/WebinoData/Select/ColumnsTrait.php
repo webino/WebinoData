@@ -44,10 +44,10 @@ trait ColumnsTrait
     }
 
     /**
-     * @param array $columns
+     * @param iterable $columns
      * @return $this
      */
-    public function addColumns(array $columns)
+    public function addColumns(iterable $columns)
     {
         $this->getColumnsHelper()->addColumns($columns);
         return $this;

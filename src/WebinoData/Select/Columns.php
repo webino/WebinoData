@@ -45,10 +45,10 @@ class Columns extends AbstractHelper
     }
 
     /**
-     * @param array $columns
+     * @param iterable $columns
      * @return $this
      */
-    public function addColumns(array $columns)
+    public function addColumns(iterable $columns)
     {
         $selectColumns = $this->select->getColumns();
         foreach ($columns as $key => $value) {
