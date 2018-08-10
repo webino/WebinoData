@@ -44,30 +44,40 @@ trait SelectTrait
     /**
      * Configures multiple selects
      *
-     * @param array ...$selectNames
+     * @param array|object ...$selectNames
      * @return Select
      */
     public function configSelect(...$selectNames)
     {
-        $firstArg    = current($selectNames);
-        $selectNames = is_array($firstArg) ? $firstArg : $selectNames;
-        $select      = $this->select();
-        $config      = $this->getConfig();
+        $firstArg = func_get_arg(0);
+        if (is_array($firstArg)) {
+            $selectNames = $firstArg;
 
+        } elseif (method_exists($firstArg, 'toArray')) {
+            $selectNames = $firstArg->toArray();
+
+        } elseif (method_exists($firstArg, 'getArrayCopy')) {
+            $selectNames = $firstArg->getArrayCopy();
+
+        } else {
+            $selectNames = func_get_args();
+        }
+
+        $select = $this->select();
         $selectConfig = [];
         foreach ($selectNames as $selectName) {
 
             if (!is_string($selectName)) {
                 continue;
             }
-            if (!isset($config['select'][$selectName])) {
+            if (!isset($this->config['select'][$selectName])) {
                 // allow empty select config
                 continue;
             }
 
             $selectConfig = array_replace_recursive(
                 $selectConfig,
-                $config['select'][$selectName]
+                $this->config['select'][$selectName]
             );
         }
 
