@@ -86,6 +86,8 @@ class Search extends AbstractHelper
             $this->resolveExpressionColumns()
         );
 
+        $target = !empty($havingCols) ? $having : $where;
+
         foreach ($this->resolveSearchTermParts($term, $_term) as $word) {
             if (empty($word) && !is_numeric($word)) {
                 continue;
@@ -104,8 +106,7 @@ class Search extends AbstractHelper
                     continue;
                 }
 
-                $word     = $this->sanitizeSearchTerm($word, '%');
-                $target   = !empty($havingCols[$column]) ? $having : $where;
+                $word = $this->sanitizeSearchTerm($word, '%');
                 $target[] = $identifier . ' LIKE ' . $platform->quoteValue('%' . $word . '%');
             }
         }
