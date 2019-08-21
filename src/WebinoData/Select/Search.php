@@ -82,8 +82,8 @@ class Search extends AbstractHelper
         $having   = new ArrayObject;
 
         $havingCols = array_merge(
-            $this->resolveJoinColumns(),
-            $this->resolveExpressionColumns()
+            $this->resolveJoinColumns($columns),
+            $this->resolveExpressionColumns($columns)
         );
 
         $target = !empty($havingCols) ? $having : $where;
@@ -133,10 +133,13 @@ class Search extends AbstractHelper
     /**
      * Returns array of columns to use having instead of where
      *
+     * @param array $searchCols
      * @return array
      */
-    private function resolveJoinColumns()
+    private function resolveJoinColumns(array $searchCols = [])
     {
+        $searchCols = array_flip($searchCols);
+
         $result = [];
         foreach ($this->select->getJoins() as $join) {
             if (Select::JOIN_INNER === $join['type']) {
@@ -144,19 +147,27 @@ class Search extends AbstractHelper
             }
 
             foreach (array_keys($join['columns']) as $column) {
-                $result[$column] = true;
+                if (isset($searchCols[$column])) {
+                    $result[$column] = true;
+                }
             }
         }
         return $result;
     }
 
     /**
+     * @param array $searchCols
      * @return array
      */
-    private function resolveExpressionColumns()
+    private function resolveExpressionColumns(array $searchCols = [])
     {
+        $searchCols = array_flip($searchCols);
+
         $cols = [];
         foreach ($this->select->getColumns() as $name => $column) {
+            if (!isset($searchCols[$name])) {
+                continue;
+            }
             if ($column instanceof Expression) {
                 $expression = $column->getExpression();
 
