@@ -89,7 +89,7 @@ class AbstractWebinoDataSelect extends DbSelect
             $result = $select->execute();
         } catch (\Throwable $exc) {
             // TODO better exception
-            throw new \RuntimeException('Could not execute SQL ' . $sql, $exc->getCode(), $exc);
+            throw new \RuntimeException('Could not execute SQL ' . $select->getSqlString(), $exc->getCode(), $exc);
         }
 
         $row = $result->current();
