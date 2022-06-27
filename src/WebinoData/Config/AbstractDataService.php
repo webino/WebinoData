@@ -39,6 +39,9 @@ abstract class AbstractDataService
                     )
                     : $option->toArray();
 
+            } elseif (class_exists($key)) { // TODO use if implements data plugin interface instead
+                $this->options['parameters']['config']['plugin'][$key] = $option;
+
             } elseif (isset($this->options[$key])) {
                 $this->options[$key] = array_merge_recursive($this->options[$key], $option);
 
