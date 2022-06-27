@@ -10,6 +10,7 @@ use WebinoData\Event\DataEvent;
 use WebinoData\Store\StoreAwareInterface;
 use WebinoData\Store\StoreAwareTrait;
 use Zend\Db\Adapter\AdapterInterface;
+use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql\Expression as SqlExpression;
 use Zend\EventManager\EventManager;
 
@@ -499,7 +500,11 @@ final class Relations implements StoreAwareInterface
         }
 
         // execute sql
-        $this->adapter->query($sql)->execute($params);
+        try {
+            $this->adapter->query($sql)->execute($params);
+        } catch (InvalidQueryException $exc) {
+            throw new Exception\InvalidQueryException($sql, $exc->getCode(), $exc);
+        };
     }
 
     /**
