@@ -3,6 +3,6 @@
 namespace Webino\Config\Input;
 
 class_alias(
-    \WebinoData\Config\InputFilter\Input\Decimal::class,
-    Decimal::class
+    \WebinoData\Config\InputFilter\Input\Digit::class,
+    Digit::class
 );

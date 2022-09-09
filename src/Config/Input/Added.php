@@ -1,8 +1,8 @@
 <?php
 
-namespace Webino\Config\Asset;
+namespace Webino\Config\Input;
 
 class_alias(
-    \WebinoBase\Config\Asset\Accordion::class,
-    Accordion::class
+    \WebinoData\Config\InputFilter\Input\Added::class,
+    Added::class
 );

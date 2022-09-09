@@ -37,7 +37,8 @@
         "webino/webino-debug": "Debugger support"
     },
     "autoload": {
-        "psr-0": {"WebinoData": "src/"}
+        "psr-0": {"WebinoData": "src/"},
+        "psr-4": {"Webino\\": "src/"}
     },
     "extra": {
         "webino-devkit": {

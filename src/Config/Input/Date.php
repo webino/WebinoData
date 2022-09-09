@@ -3,6 +3,6 @@
 namespace Webino\Config\Input;
 
 class_alias(
-    \WebinoData\Config\InputFilter\Input\Common::class,
-    Common::class
+    \WebinoData\Config\InputFilter\Input\Date::class,
+    Date::class
 );

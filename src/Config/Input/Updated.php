@@ -3,6 +3,6 @@
 namespace Webino\Config\Input;
 
 class_alias(
-    \WebinoData\Config\InputFilter\Input\Toggle::class,
-    Toggle::class
+    \WebinoData\Config\InputFilter\Input\Updated::class,
+    Updated::class
 );

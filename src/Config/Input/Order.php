@@ -3,6 +3,6 @@
 namespace Webino\Config\Input;
 
 class_alias(
-    \WebinoData\Config\InputFilter\Input\InArray::class,
-    InArray::class
+    \WebinoData\Config\InputFilter\Input\Order::class,
+    Order::class
 );
