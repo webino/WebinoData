@@ -11,27 +11,24 @@
 namespace WebinoData\Config\InputFilter\Input;
 
 /**
- * Digit data type
+ * Adds ability to value range
  */
-class Digit extends AbstractInput
+trait RangedTrait
 {
-    use DefaultableTrait;
-    use RangedTrait;
-
     /**
-     * {@inheritDoc}
+     * @param int $min
+     * @param int $max
+     * @return $this
      */
-    protected $spec = [
-        'validators' => [
-            'digits' => ['name' => 'Digits'],
-        ],
-    ];
-
-    /**
-     * @param string $name
-     */
-    public function __construct($name)
+    public function setBetween($min, $max)
     {
-        $this->setName($name);
+        $this->spec['validators'] = [
+            'between' => [
+                'name'    => 'Between',
+                'options' => ['min' => $min, 'max' => $max],
+            ],
+        ];
+
+        return $this;
     }
 }
