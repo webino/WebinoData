@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Webino (http://webino.sk)
