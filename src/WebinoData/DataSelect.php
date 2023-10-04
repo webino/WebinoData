@@ -284,7 +284,7 @@ class DataSelect
         $row = $result->current();
         $resultCount = $result->count();
 
-        return 1 < $resultCount ? $resultCount : $row['c'];
+        return (int) (1 < $resultCount ? $resultCount : ( $row['c'] ?? 0));
     }
 
     /**
