@@ -77,43 +77,7 @@ class AbstractWebinoDataSelect extends DbSelect
         }
 
         $select = clone $this->dataSelect;
-        $select->resetLimit();
-        $select->resetOffset();
-        $select->resetOrder();
-
-        $columns = $select->getColumns();
-        $columns['c'] = $this->resolveCountGroupExpression($select);
-        $select->columns($columns);
-
-        try {
-            $result = $select->execute();
-        } catch (\Throwable $exc) {
-            // TODO better exception
-            throw new \RuntimeException('Could not execute SQL ' . $select->getSqlString(), $exc->getCode(), $exc);
-        }
-
-        $row = $result->current();
-        $resultCount = $result->count();
-        $this->rowCount = 1 < $resultCount ? $resultCount : $row['c'];
-
+        $this->rowCount = $select->count();
         return $this->rowCount;
-    }
-
-    /**
-     * @param DataSelect $select
-     * @return Expression
-     */
-    private function resolveCountGroupExpression(DataSelect $select) : Expression
-    {
-        $group = $select->getGroup();
-
-        if (!empty($group)) {
-            if (!is_string($group)) {
-                $group = current($group);
-                $group instanceof Expression and $group = $group->getExpression();
-            }
-        }
-
-        return new Expression(is_string($group) ? 'COUNT(DISTINCT ' . $group . ')' : 'COUNT(*)');
     }
 }

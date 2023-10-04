@@ -3,8 +3,8 @@
 namespace WebinoData;
 
 use WebinoData\Event\DataEvent;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select as SqlSelect;
-use Zend\Db\Sql\Sql;
 
 /**
  * Class DataSelect
@@ -259,6 +259,50 @@ class DataSelect
                 $exc
             );
         }
+    }
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
+        $this->resetLimit();
+        $this->resetOffset();
+        $this->resetOrder();
+
+        $columns = $this->getColumns();
+        $columns['c'] = $this->resolveCountGroupExpression($this);
+
+        $this->columns($columns);
+
+        try {
+            $result = $this->execute();
+        } catch (\Throwable $exc) {
+            // TODO better exception
+            throw new \RuntimeException('Could not execute SQL ' . $this->getSqlString(), $exc->getCode(), $exc);
+        }
+
+        $row = $result->current();
+        $resultCount = $result->count();
+
+        return 1 < $resultCount ? $resultCount : $row['c'];
+    }
+
+    /**
+     * @param DataSelect $select
+     * @return Expression
+     */
+    private function resolveCountGroupExpression(DataSelect $select) : Expression
+    {
+        $group = $select->getGroup();
+
+        if (!empty($group)) {
+            if (!is_string($group)) {
+                $group = current($group);
+                $group instanceof Expression and $group = $group->getExpression();
+            }
+        }
+
+        return new Expression(is_string($group) ? 'COUNT(DISTINCT ' . $group . ')' : 'COUNT(*)');
     }
 
     /**
