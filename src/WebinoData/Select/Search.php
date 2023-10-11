@@ -31,6 +31,7 @@ class Search extends AbstractHelper
     {
         if (null === $this->sanitize) {
             $this->sanitize = new Sanitize;
+            $this->sanitize->addNotReplacedChars('_');
         }
         return $this->sanitize;
     }
@@ -209,6 +210,7 @@ class Search extends AbstractHelper
 
 
         $this->fixDateSearch($_term);
+        $_term = preg_replace('~[[:space:]]+~', '_', $_term);
         $_term = $this->getSanitize()->filter($_term);
 
         return preg_replace('~[^a-zA-Z0-9_-]+~', $replacement, $_term);
