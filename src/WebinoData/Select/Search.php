@@ -208,7 +208,6 @@ class Search extends AbstractHelper
             return $_term;
         }
 
-
         $this->fixDateSearch($_term);
         $_term = preg_replace('~[[:space:]]+~', '_', $_term);
         $_term = $this->getSanitize()->filter($_term);
