@@ -800,10 +800,9 @@ abstract class AbstractDataService implements
      */
     public function configSelects($name)
     {
-        $select = $this->select();
         // TODO use selects key instead of selectset
         if (empty($this->config['selectset'][$name])) {
-            return $select;
+            return $this->configSelect((array) $name);
         }
         return $this->configSelect($this->config['selectset'][$name]);
     }

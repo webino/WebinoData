@@ -88,8 +88,12 @@ final class Relations implements StoreAwareInterface
                 }
 
                 if (is_string($column) || $column instanceof ArrayColumn) {
-                    $subSelect = $store->one($key)->configSelect((array) $column);
-                    $select->subSelect($key, $subSelect);
+                    if (is_string($column)) {
+                        $subSelect = $store->one($key)->configSelects($column);
+                    } else {
+                        $subSelect = $store->one($key)->configSelect((array) $column);
+                    }
+                    $select->setSubSelect($key, $subSelect);
                 }
 
                 $columns[$key] = $inputs->has($key) ? $key : new SqlExpression("'0'");
@@ -106,8 +110,12 @@ final class Relations implements StoreAwareInterface
             }
 
             if (is_string($column) || $column instanceof ArrayColumn) {
-                $subSelect = $store->many($key)->configSelect((array) $column);
-                $select->subSelect($key, $subSelect);
+                if (is_string($column)) {
+                    $subSelect = $store->many($key)->configSelects($column);
+                } else {
+                    $subSelect = $store->many($key)->configSelect((array) $column);
+                }
+                $select->setSubSelect($key, $subSelect);
             }
 
             $columns[$key] = new SqlExpression("'0'");
