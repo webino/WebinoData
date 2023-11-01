@@ -38,7 +38,7 @@ class Join extends AbstractHelper
         $this->getStore()->getEventManager()->trigger(DataEvent::EVENT_SELECT_JOIN, $event);
 
         $this->select->getSqlSelect()->join(
-            $name,
+            $this->handleExpression($this->handleVars($name)),
             $this->handleExpression($this->handleVars($event->getJoinOn())),
             $this->handleExpression($event->getJoinColumns()),
             $type
