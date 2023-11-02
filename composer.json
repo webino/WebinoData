@@ -30,7 +30,7 @@
         "zendframework/zend-eventmanager": "2.*",
         "zendframework/zend-servicemanager": "2.*",
         "webino/webino-i18n-sanitize-lib": "dev-develop",
-        "webino/zend-db": "~2.7.1"
+        "webino/zend-db": "~2.7.2"
     },
     "suggest": {
         "zendframework/zend-mvc": "To use as a Zend Framework module",
