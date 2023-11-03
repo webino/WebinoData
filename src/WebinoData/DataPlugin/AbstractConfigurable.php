@@ -15,7 +15,7 @@ abstract class AbstractConfigurable implements ConfigurableInterface
     protected $options = array();
 
     /**
-     * @param  array|Traversable $options
+     * @param  array|\Traversable $options
      * @return self
      * @throws \InvalidArgumentException
      */
@@ -38,7 +38,9 @@ abstract class AbstractConfigurable implements ConfigurableInterface
             } else {
                 throw new \InvalidArgumentException(sprintf(
                     'The option "%s" does not have a matching %s setter method or options[%s] array key',
-                    $key, $setter, $key
+                    $key,
+                    $setter,
+                    $key
                 ));
             }
         }

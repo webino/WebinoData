@@ -30,7 +30,7 @@ class AutoValue
 
         $autoInputs = array_filter(
             $config['input_filter'],
-            function($value) {
+            function ($value) {
                 return !empty($value['auto_value']);
             }
         );
@@ -43,7 +43,7 @@ class AutoValue
             }
 
             if (is_array($data[$source])) {
-                foreach ($data[$source] as $index => $value ) {
+                foreach ($data[$source] as $index => $value) {
 
                     (!empty($data[$target][$index]) || empty($value))
                     && empty($autoInputs[$target]['auto_value_force'])

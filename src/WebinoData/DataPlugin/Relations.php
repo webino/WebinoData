@@ -151,7 +151,7 @@ final class Relations implements StoreAwareInterface
             $idKey      = $this->resolveSubKey($key, $options) . '_id';
 
             empty($data[$idKey]) or $value['id'] = $data[$idKey];
-            $subService->exchangeArray($value);
+            $subService->exchange($value);
 
             $data[$idKey] = !empty($value['id']) ? $value['id'] : $subService->getLastInsertValue();
             $validData[$idKey] = $data[$idKey];
@@ -187,8 +187,8 @@ final class Relations implements StoreAwareInterface
 
             $attached[$key] = $options;
 
-            $select->subSelect($key)
-                or $select->subSelect($key, $store->one($key)->select());
+            $select->getSubSelect($key)
+                or $select->setSubSelect($key, $store->one($key)->select());
         }
 
         if (empty($attached)) {
@@ -214,7 +214,7 @@ final class Relations implements StoreAwareInterface
             }
 
             /** @var DataSelect $subSelect */
-            $subSelect  = clone $select->subSelect($key);
+            $subSelect  = clone $select->getSubSelect($key);
             /** @var DataService $subService */
             $subService = $store->one($key);
             $tableName  = $subService->getTableName();
@@ -270,9 +270,7 @@ final class Relations implements StoreAwareInterface
             $subKey = $this->resolveSubKey($tableName, $options);
             $subOptions = $subService->hasMany($subKey) ? $subService->manyOptions($subKey) : [];
 
-            $manyToMany = array_key_exists('oneToMany', $options)
-                        ? !$options['oneToMany']
-                        : true;
+            $manyToMany = !array_key_exists('oneToMany', $options) || !$options['oneToMany'];
 
             $this->assocDelete(
                 $store,
@@ -297,7 +295,7 @@ final class Relations implements StoreAwareInterface
                     $assocSubKey = $subKey . '_id';
                     $manyToMany or $value[$assocSubKey] = $mainId;
 
-                    $subService->exchangeArray($value);
+                    $subService->exchange($value);
                 }
 
                 if ($manyToMany) {
@@ -349,8 +347,8 @@ final class Relations implements StoreAwareInterface
 
             $attached[$key] = $options;
 
-            $select->subSelect($key)
-                or $select->subSelect($key, $store->many($key)->select());
+            $select->getSubSelect($key)
+                or $select->setSubSelect($key, $store->many($key)->select());
         }
 
         if (empty($attached)) {
@@ -363,7 +361,7 @@ final class Relations implements StoreAwareInterface
         foreach ($attached as $key => $options) {
 
             /** @var DataSelect $subSelect */
-            $subSelect  = clone $select->subSelect($key);
+            $subSelect  = clone $select->getSubSelect($key);
             $subService = $store->many($key);
             // TODO, for BC only (remove deprecated)
             $keySuffix  = '_id';
@@ -375,7 +373,7 @@ final class Relations implements StoreAwareInterface
             if ($biDirect) {
                 // bi-directional
                 // TODO, for BC only (remove deprecated)
-                $keySuffix  = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
+                $keySuffix  = $options['keySuffix'] ?? 'id';
                 $subOptions = $subService->manyOptions($subKey);
 
                 $this->assocJoin($subSelect, $store, $subService, $subOptions);
@@ -388,7 +386,7 @@ final class Relations implements StoreAwareInterface
             $subSelect->resetLimit();
 
             try {
-                $subItems = $subService->fetchWith($subSelect, $select->subParams($key));
+                $subItems = $subService->fetchWith($subSelect, $select->getSubParams($key));
             } catch (\Exception $exc) {
                 if ($biDirect) {
                     throw $exc;
@@ -433,8 +431,8 @@ final class Relations implements StoreAwareInterface
     private function assocInsert(
         DataService $store,
         DataService $subService,
-        $mainId,
-        $subId,
+        int $mainId,
+        int $subId,
         array $options,
         array $subOptions
     ) {
@@ -445,11 +443,13 @@ final class Relations implements StoreAwareInterface
         $key    = $this->resolveSubKey($tableName, $options);
         $subKey = $this->resolveSubKey($subTableName, $subOptions);
         // TODO, for BC only (remove deprecated)
-        $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
+        $keySuffix = $options['keySuffix'] ?? 'id';
 
         // create sql
         $platform = $store->getPlatform();
-        $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
+        $qi = function ($name) use ($platform) {
+            return $platform->quoteIdentifier($name);
+        };
 
         $sql = sprintf(
             'INSERT IGNORE INTO %s (%s, %s) VALUES (?, ?)',
@@ -469,16 +469,16 @@ final class Relations implements StoreAwareInterface
      * @param array $options
      * @param array $subOptions
      * @param array $idsExclude
-     * @param $manyToMany
+     * @param bool $manyToMany
      */
     private function assocDelete(
         DataService $store,
         DataService $subService,
-        $mainId,
+        int $mainId,
         array $options,
         array $subOptions,
         array $idsExclude = [],
-        $manyToMany
+        bool $manyToMany = false
     ) {
         $tableName      = $store->getTableName();
         $subTableName   = $subService->getTableName();
@@ -487,11 +487,15 @@ final class Relations implements StoreAwareInterface
         $key = $this->resolveSubKey($tableName, $options);
         $subKey = $this->resolveSubKey($subTableName, $subOptions);
         // TODO, for BC only (remove deprecated)
-        $keySuffix = $manyToMany ? (isset($options['keySuffix']) ? $options['keySuffix'] : 'id') : '_id';
+        $keySuffix = $manyToMany ? ($options['keySuffix'] ?? 'id') : '_id';
 
         // create sql
         $platform = $store->getPlatform();
-        $qi = function($name) use ($platform) { return $platform->quoteIdentifier($name); };
+
+        $qi = function ($name) use ($platform) {
+            return $platform->quoteIdentifier($name);
+        };
+
         $sql = sprintf('DELETE FROM %s WHERE %s=?', $qi($assocTableName), $qi($key . $keySuffix));
         $params = [$mainId];
 
@@ -521,7 +525,7 @@ final class Relations implements StoreAwareInterface
      * @param DataService $subService
      * @param array $options
      */
-    private function assocJoin($select, DataService $store, DataService $subService, array $options)
+    private function assocJoin(DataSelect $select, DataService $store, DataService $subService, array $options)
     {
         // todo DRY
         $tableName      = $store->getTableName();
@@ -530,7 +534,7 @@ final class Relations implements StoreAwareInterface
         $assocTableName = $this->resolveAssocTableName($tableName, $subTableName, $options);
 
         // TODO, for BC only (remove deprecated)
-        $keySuffix = isset($options['keySuffix']) ? $options['keySuffix'] : 'id';
+        $keySuffix = $options['keySuffix'] ?? 'id';
         $select->join($assocTableName, $subTableName . '.id=' . $assocTableName . '.' . $assocSubKey . $keySuffix);
     }
 

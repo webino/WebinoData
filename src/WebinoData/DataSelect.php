@@ -68,6 +68,11 @@ class DataSelect
     protected $subParams = [];
 
     /**
+     * @var bool
+     */
+    protected $cached = true;
+
+    /**
      * @param AbstractDataService $store
      * @param SqlSelect $select
      */
@@ -245,8 +250,10 @@ class DataSelect
      */
     public function execute($params = [])
     {
+        $sql = $this->store->getSql();
+
         try {
-            $sql = $this->store->getSql();
+
             return $sql->prepareStatementForSqlObject($this->sqlSelect)->execute(array_merge($this->params, $params));
 
         } catch (\Exception $exc) {
@@ -328,7 +335,7 @@ class DataSelect
     }
 
     /**
-     * @return \Exception|string
+     * @return string
      */
     public function __toString()
     {
@@ -404,12 +411,34 @@ class DataSelect
     public function subParams($name, array $params = [])
     {
         if (empty($params)) {
-            return isset($this->subParams[$name]) ? $this->subParams[$name] : [];
+            return $this->subParams[$name] ?? [];
         }
 
         isset($this->subParams[$name]) or $this->subParams[$name] = [];
         $this->subParams[$name] = array_replace($this->subParams[$name], $params);
 
+        return $this;
+    }
+
+    /**
+     * Returns when when cache select
+     *
+     * @return bool
+     */
+    public function isCached(): bool
+    {
+        return $this->cached;
+    }
+
+    /**
+     * Set true to use select cache
+     *
+     * @param bool $cached
+     * @return self
+     */
+    public function setCached(bool $cached = true)
+    {
+        $this->cached = $cached;
         return $this;
     }
 }

@@ -97,7 +97,7 @@ class DataService extends AbstractDataService
     {
         $select->setHash($parameters);
 
-        if (!$this->hasCache()) {
+        if (!$select->isCached() || !$this->hasCache()) {
             return parent::fetchWith($select, $parameters);
         }
 
